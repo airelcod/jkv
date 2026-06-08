@@ -3441,7 +3441,7 @@ async function eliminarProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
     
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
@@ -3478,7 +3478,7 @@ async function eliminarProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
     
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
@@ -4010,7 +4010,7 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
     console.log('Enviando datos:', data);
 
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -4033,7 +4033,7 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
 async function eliminarRecepcion(id) {
     if (!confirm('¿Eliminar esta recepción?')) return;
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id })
@@ -4083,7 +4083,7 @@ document.getElementById('formProveedor')?.addEventListener('submit', async (e) =
     if (id) data.id = id;
 
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -4270,7 +4270,7 @@ document.getElementById('formPagoProveedor')?.addEventListener('submit', async (
     };
     
     try {
-        const response = await fetch('api/db/proveedores_pagos.js', {
+        const response = await fetch('/api/db/proveedores_pagos.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -4456,7 +4456,7 @@ document.getElementById('formAdelantoProveedor')?.addEventListener('submit', asy
     }
     
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -4554,7 +4554,7 @@ async function eliminarAdelantoProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este adelanto?')) return;
     
     try {
-        const response = await fetch('api/db/materia_prima.js', {
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar_adelanto', id: id })
@@ -4729,7 +4729,7 @@ async function eliminarRegistroProduccion(elemento) {
     
     try {
         // Enviar solicitud para eliminar
-        const response = await fetch('api/db/produccion_sucursal.js', {
+        const response = await fetch('/api/db/produccion_sucursal.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -6149,7 +6149,7 @@ if (formSucursal) {
         };
         
         try {
-            const response = await fetch('api/db/produccion_sucursal.js?action=guardar', {
+            const response = await fetch('/api/db/produccion_sucursal.js?action=guardar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -6222,7 +6222,7 @@ function getFechaActual() {
 }
     </script>
 <script>
-    const obtenerproduccion = 'api/db/produccion_sucursal.js';
+    const obtenerproduccion = '/api/db/produccion_sucursal.js';
     const guardarproduccion = '/api/db/guardar_produccion.js';
     
     let menuActual = null;
@@ -7107,7 +7107,7 @@ function eliminarTrabajadorConfirmar(id, nombre) {
 // Eliminar trabajador
 async function eliminarTrabajador(id) {
     try {
-        const response = await fetch('api/db/trabajadores.js', {
+        const response = await fetch('/api/db/trabajadores.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id: id })
@@ -8187,7 +8187,7 @@ document.getElementById('formTrabajador')?.addEventListener('submit', async (e) 
     if (id) data.id = id;
     
     try {
-        const response = await fetch('api/db/trabajadores.js', {
+        const response = await fetch('/api/db/trabajadores.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -8652,7 +8652,7 @@ async function eliminarVenta(id) {
     if (!confirm('¿Estás seguro de eliminar esta venta? Esta acción no se puede deshacer.')) return;
     
     try {
-        const response = await fetch('api/db/ventas.js', {
+        const response = await fetch('/api/db/ventas.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id: id })
@@ -9066,7 +9066,7 @@ document.getElementById('formEgreso')?.addEventListener('submit', async (e) => {
     };
 
     try {
-        const response = await fetch('api/db/egresos.js', {
+        const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -9090,7 +9090,7 @@ async function eliminarEgreso(id) {
     if (!confirm('¿Estás seguro de eliminar este egreso?')) return;
 
     try {
-        const response = await fetch('api/db/egresos.js', {
+        const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id: id })
@@ -9138,7 +9138,7 @@ async function eliminarCategoriaEgreso(id, nombre) {
     if (!confirm(`¿Estás seguro de eliminar la categoría "${nombre}"?`)) return;
     
     try {
-        const response = await fetch('api/db/egresos.js', {
+        const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar_categoria', id: id })
@@ -9177,7 +9177,7 @@ document.getElementById('formCategoriaEgreso')?.addEventListener('submit', async
     if (id) data.id = id;
     
     try {
-        const response = await fetch('api/db/egresos.js', {
+        const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -9533,7 +9533,7 @@ async function verProduccionProducto(productoNombre) {
                             return;
                         }
                         
-                        fetch(\`api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
+                        fetch(\`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
                             .then(res => res.json())
                             .then(data => {
                                 if (data.success) {
@@ -10299,7 +10299,7 @@ function abrirModalCliente(id = null) {
 
 async function cargarClienteParaEditar(id) {
     try {
-        const response = await fetch(`api/db/clientes.js?action=obtener_uno&id=${id}`);
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${id}`);
         const data = await response.json();
         if (data.success) {
             const c = data.cliente;
@@ -10347,7 +10347,7 @@ document.getElementById('formCliente')?.addEventListener('submit', async (e) => 
     if (id) data.id = id;
     
     try {
-        const response = await fetch('api/db/clientes.js', {
+        const response = await fetch('/api/db/clientes.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -10379,7 +10379,7 @@ function eliminarClienteConfirmar(id, nombre) {
 
 async function eliminarCliente(id) {
     try {
-        const response = await fetch('api/db/clientes.js', {
+        const response = await fetch('/api/db/clientes.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id: id })
@@ -10419,7 +10419,7 @@ async function cargarDatosClienteEnFormulario(clienteId) {
     }
     
     try {
-        const response = await fetch(`api/db/clientes.js?action=obtener_uno&id=${clienteId}`);
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`);
         const data = await response.json();
         if (data.success) {
             const c = data.cliente;
@@ -10512,7 +10512,7 @@ ventaForm.addEventListener('submit', async (e) => {
     console.log('Datos enviados:', JSON.stringify(data, null, 2)); // Para depuración
     
     try {
-        const response = await fetch('api/db/ventas.js', {
+        const response = await fetch('/api/db/ventas.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -11210,7 +11210,7 @@ async function guardarCuenta(event) {
     const action = tipo === 'pagar' ? 'guardar_pagar' : 'guardar_cobrar';
     
     try {
-        const response = await fetch('api/db/cuentas.js', {
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, descripcion, monto, fecha_inicio, fecha_vencimiento })
@@ -11233,7 +11233,7 @@ async function eliminarCuenta(id, tipo) {
     if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
     const action = tipo === 'pagar' ? 'eliminar_pagar' : 'eliminar_cobrar';
     try {
-        const response = await fetch('api/db/cuentas.js', {
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, id })
@@ -11302,7 +11302,7 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
     }
     
     try {
-        const response = await fetch('api/db/cuentas.js', {
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -11338,7 +11338,7 @@ document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta)
 
 async function verHistorialPagos(id, tipo) {
     try {
-        const response = await fetch(`api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`);
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`);
         const data = await response.json();
         
         if (data.success && data.pagos.length > 0) {
@@ -11453,7 +11453,7 @@ async function verHistorialPagos(id, tipo) {
                             const { pagoId, cuentaId, tipo } = pagoAEliminar;
                             
                             try {
-                                const response = await fetch('api/db/cuentas.js', {
+                                const response = await fetch('/api/db/cuentas.js', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ 
