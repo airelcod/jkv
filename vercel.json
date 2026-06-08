@@ -1,13 +1,13 @@
 {
   "functions": {
-    "api/*.php": {
-      "runtime": "vercel-php@0.7.4"
+    "api/db/*.js": {
+      "runtime": "nodejs20.x"
     }
   },
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/db/(.*)",
+      "dest": "/api/db/$1"
     }
   ]
 }
