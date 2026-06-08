@@ -4228,8 +4228,14 @@ async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
 async function recalcularPeriodoProveedor() {
     const proveedorId = document.getElementById('pagoProveedorId').value;
     if (!proveedorId) return;
-    
-    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
+
+	const token = localStorage.getItem('token');
+    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const dataProv = await responseProv.json();
     const diaCorte = dataProv.proveedor?.dia_corte || 2;
     
@@ -4237,7 +4243,13 @@ async function recalcularPeriodoProveedor() {
 }
 
 async function recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte) {
-    const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${getFechaActual()}&dia_corte=${diaCorte}`);
+	const token = localStorage.getItem('token');
+    const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${getFechaActual()}&dia_corte=${diaCorte}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const dataPeriodo = await responsePeriodo.json();
     
     if (dataPeriodo.success) {
@@ -4271,7 +4283,13 @@ document.getElementById('pagoPeriodoFin')?.addEventListener('change', () => {
 // Modificar la función actualizarResumenPagoProveedor
 async function actualizarResumenPagoProveedor(proveedorId, inicio, fin) {
     try {
-        const responseResumen = await fetch(`/api/db/materia_prima.js?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`);
+		const token = localStorage.getItem('token');
+        const responseResumen = await fetch(`/api/db/materia_prima.js?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataResumen = await responseResumen.json();
         
         if (dataResumen.success) {
@@ -4350,9 +4368,13 @@ document.getElementById('formPagoProveedor')?.addEventListener('submit', async (
     };
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/proveedores_pagos.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4379,7 +4401,13 @@ function cerrarModalPagoProveedor() {
 // Ver historial de pagos de un proveedor
 async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
     try {
-        const response = await fetch(`/api/db/proveedores_pagos.js?action=obtener_historial&proveedor_id=${proveedorId}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/proveedores_pagos.js?action=obtener_historial&proveedor_id=${proveedorId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (!data.success) {
@@ -4444,7 +4472,13 @@ function cerrarModalHistorialPagos() {
 
 async function cargarAdelantosProveedor(proveedorId) {
     try {
-        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         const container = document.getElementById('listaAdelantosProveedor');
