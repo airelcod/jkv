@@ -2454,7 +2454,7 @@
 // ========== FUNCIONES PARA EXPORTAR CUENTAS POR COBRAR PENDIENTES ==========
 async function exportarCuentasPendientesCobrar() {
     try {
-        const response = await fetch('db/cuentas.php?action=obtener_cobrar_pendientes');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar_pendientes');
         const data = await response.json();
         
         if (!data.success || !data.datos || data.datos.length === 0) {
@@ -2736,7 +2736,7 @@ let egresosDataCache = null;
 
 async function cargarEstadisticasResumen() {
     try {
-        const response = await fetch('db/estadisticas.php');
+        const response = await fetch('/api/db/estadisticas.js');
         const data = await response.json();
         
         if (!data.success) {
@@ -3050,7 +3050,7 @@ function cargarResumenManual() {
     }    
         // Ver detalle de recepción
 async function verDetalleRecepcion(id) {
-    const response = await fetch(`db/materia_prima.php?action=obtener_detalle_recepcion&id=${id}`);
+    const response = await fetch(`/api/db/materia_prima.js?action=obtener_detalle_recepcion&id=${id}`);
     const data = await response.json();
     
     if (!data.success) {
@@ -3201,7 +3201,7 @@ function editarProveedorDesdeLista(id, nombre, contacto, telefono, email, direcc
 // Cargar productos dinámicamente desde la tabla productos (mismo método que producción)
 async function cargarProductosEnSelect() {
     try {
-        const response = await fetch('db/obtener_productos_mp.php');
+        const response = await fetch('/api/db/obtener_productos_mp.js');
         const data = await response.json();
         
         console.log('Productos recibidos:', data); // Para depuración
@@ -3297,7 +3297,7 @@ document.getElementById('mpProductoEntregadoText')?.addEventListener('input', fu
 // Cargar proveedores para el sidebar
 async function cargarProveedores() {
     try {
-        const response = await fetch('db/materia_prima.php?action=obtener_proveedores');
+        const response = await fetch('/api/db/materia_prima.js?action=obtener_proveedores');
         const data = await response.json();
         if (data.success) {
             mostrarListaProveedores(data.proveedores);
@@ -3589,7 +3589,7 @@ function agregarFiltrosMateriaPrima() {
 
 async function cargarRecepciones(proveedorId = null) {
     try {
-        let url = 'db/materia_prima.php?action=obtener&modo=tabla';
+        let url = '/api/db/materia_prima.js?action=obtener&modo=tabla';
         if (proveedorId) {
             url += `&proveedor_id=${proveedorId}`;
         }
@@ -3773,7 +3773,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
     
     try {
         // 1. Obtener datos del proveedor
-        const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+        const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
         const dataProv = await responseProv.json();
         
         if (!dataProv.success) {
@@ -3782,7 +3782,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         }
         
         // 2. Obtener las recepciones de leche en ese período
-        const responseRecepciones = await fetch(`db/materia_prima.php?action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`);
+        const responseRecepciones = await fetch(`/api/db/materia_prima.js?action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`);
         const dataRecepciones = await responseRecepciones.json();
         
         if (!dataRecepciones.success || dataRecepciones.recepciones.length === 0) {
@@ -3798,7 +3798,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         let fechaPago = '';
         
         if (pagoId) {
-            const responsePago = await fetch(`db/proveedores_pagos.php?action=obtener_pago&id=${pagoId}`);
+            const responsePago = await fetch(`/api/db/proveedores_pagos.js?action=obtener_pago&id=${pagoId}`);
             const dataPago = await responsePago.json();
             if (dataPago.success && dataPago.pago) {
                 totalPagado = parseFloat(dataPago.pago.monto_pagado);
@@ -4133,7 +4133,7 @@ async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
     document.getElementById('pagoFecha').value = getFechaActual();
     
     // Obtener día de corte del proveedor
-    const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
     const dataProv = await responseProv.json();
     const diaCorte = dataProv.proveedor?.dia_corte || 2;
     
@@ -4149,7 +4149,7 @@ async function recalcularPeriodoProveedor() {
     const proveedorId = document.getElementById('pagoProveedorId').value;
     if (!proveedorId) return;
     
-    const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
     const dataProv = await responseProv.json();
     const diaCorte = dataProv.proveedor?.dia_corte || 2;
     
@@ -4157,7 +4157,7 @@ async function recalcularPeriodoProveedor() {
 }
 
 async function recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte) {
-    const responsePeriodo = await fetch(`db/calcular_periodo_por_corte.php?fecha=${getFechaActual()}&dia_corte=${diaCorte}`);
+    const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${getFechaActual()}&dia_corte=${diaCorte}`);
     const dataPeriodo = await responsePeriodo.json();
     
     if (dataPeriodo.success) {
@@ -4191,7 +4191,7 @@ document.getElementById('pagoPeriodoFin')?.addEventListener('change', () => {
 // Modificar la función actualizarResumenPagoProveedor
 async function actualizarResumenPagoProveedor(proveedorId, inicio, fin) {
     try {
-        const responseResumen = await fetch(`db/materia_prima.php?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`);
+        const responseResumen = await fetch(`/api/db/materia_prima.js?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`);
         const dataResumen = await responseResumen.json();
         
         if (dataResumen.success) {
@@ -4299,7 +4299,7 @@ function cerrarModalPagoProveedor() {
 // Ver historial de pagos de un proveedor
 async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
     try {
-        const response = await fetch(`db/proveedores_pagos.php?action=obtener_historial&proveedor_id=${proveedorId}`);
+        const response = await fetch(`/api/db/proveedores_pagos.js?action=obtener_historial&proveedor_id=${proveedorId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -4364,7 +4364,7 @@ function cerrarModalHistorialPagos() {
 
 async function cargarAdelantosProveedor(proveedorId) {
     try {
-        const response = await fetch(`db/materia_prima.php?action=obtener_adelantos&proveedor_id=${proveedorId}`);
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`);
         const data = await response.json();
         
         const container = document.getElementById('listaAdelantosProveedor');
@@ -4486,7 +4486,7 @@ document.getElementById('formAdelantoProveedor')?.addEventListener('submit', asy
 
 async function verHistorialAdelantosProveedor(proveedorId, proveedorNombre) {
     try {
-        const response = await fetch(`db/materia_prima.php?action=obtener_adelantos&proveedor_id=${proveedorId}`);
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -4689,7 +4689,7 @@ function limpiarFiltroProveedor() {
 <script>
     
 async function cargarTrabajadoresEnSelect() {
-    const response = await fetch('db/obtener_trabajadores_select.php');
+    const response = await fetch('/api/db/obtener_trabajadores_select.js');
     const data = await response.json();
     const select = document.getElementById('trabajadorSelect');
     if (data.success) {
@@ -4763,7 +4763,7 @@ async function verDetalleProduccion(elemento) {
     let sucursalId = elemento.getAttribute('data-sucursal-id');
     
     // Construir URL
-    let url = `db/obtener_detalle_produccion.php?fecha=${fecha}&producto=${producto}`;
+    let url = `/api/db/obtener_detalle_produccion.js?fecha=${fecha}&producto=${producto}`;
     if (sucursalId && sucursalId !== '0') {
         url += `&sucursal_id=${sucursalId}`;
     }
@@ -4883,7 +4883,7 @@ async function verDetalleProduccion(elemento) {
     
 async function cargarSucursalesEnSelectTrabajador() {
     try {
-        const res = await fetch('db/obtener_sucursales.php');
+        const res = await fetch('/api/db/obtener_sucursales.js');
         const data = await res.json();
         const select = document.getElementById('trabajadorSucursal');
         
@@ -4921,7 +4921,7 @@ async function cargarSucursalesEnSelectTrabajador() {
 }
     
 async function calcularPeriodoPersonalizado(trabajador_id) {
-    const response = await fetch(`db/calcular_periodo_pago.php?trabajador_id=${trabajador_id}`);
+    const response = await fetch(`/api/db/calcular_periodo_pago.js?trabajador_id=${trabajador_id}`);
     const data = await response.json();
     if (data.success) {
         document.getElementById('periodoInicio').value = data.inicio;
@@ -6041,7 +6041,7 @@ function exportarProduccionImprimir() {
 
 async function cargarProduccionSucursal() {
     try {
-        let url = `db/produccion_sucursal.php?action=obtener_tabla`;
+        let url = `/api/db/produccion_sucursal.js?action=obtener_tabla`;
         
         // Si no es "total", pasar el ID de sucursal para filtrar
         if (sucursalActual !== 'total') {
@@ -6223,7 +6223,7 @@ function getFechaActual() {
     </script>
 <script>
     const obtenerproduccion = 'db/produccion_sucursal.php';
-    const guardarproduccion = 'db/guardar_produccion.php';
+    const guardarproduccion = '/api/db/guardar_produccion.js';
     
     let menuActual = null;
     let animando = false;
@@ -6274,7 +6274,7 @@ function getFechaActual() {
     
     async function cargarPerfilUsuario() {
         try {
-            const response = await fetch('db/obtener_usuario.php');
+            const response = await fetch('/api/db/obtener_usuario.js');
             const data = await response.json();
             
             if (data.success) {
@@ -6363,7 +6363,7 @@ function getFechaActual() {
         if (password) data.password = password;
         
         try {
-            const response = await fetch('db/actualizar_usuario.php', {
+            const response = await fetch('/api/db/actualizar_usuario.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -6389,7 +6389,7 @@ function getFechaActual() {
         }
         
         try {
-            const response = await fetch('db/lista_usuarios.php');
+            const response = await fetch('/api/db/lista_usuarios.js');
             const data = await response.json();
             
             if (data.success) {
@@ -6503,7 +6503,7 @@ function getFechaActual() {
         const rol = document.getElementById('nuevoRol').value;
         
         try {
-            const response = await fetch('db/crear_usuario.php', {
+            const response = await fetch('/api/db/crear_usuario.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre, email, password, rol })
@@ -6541,7 +6541,7 @@ function getFechaActual() {
         const password = document.getElementById('editPassword').value;
         
         try {
-            const response = await fetch('db/actualizar_usuario_admin.php', {
+            const response = await fetch('/api/db/actualizar_usuario_admin.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, nombre, email, rol, password })
@@ -6565,7 +6565,7 @@ function getFechaActual() {
         if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
         
         try {
-            const response = await fetch('db/eliminar_usuario.php', {
+            const response = await fetch('/api/db/eliminar_usuario.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
@@ -6584,9 +6584,12 @@ function getFechaActual() {
         }
     }
     
-    function cerrarSesion() {
-        window.location.href = 'db/logout.php';
-    }
+    // NUEVO
+	function cerrarSesion() {
+	    localStorage.removeItem('token');
+	    localStorage.removeItem('user');
+	    window.location.href = 'index.html';
+	}
     
     let submenuActual = 'perfil';
     
@@ -6687,20 +6690,35 @@ function getFechaActual() {
     
     document.getElementById('tipoProducto').dispatchEvent(new Event('change'));
     
-    // Verificar si ya hay sesión activa
-    async function verificarSesion() {
-        try {
-            const response = await fetch('db/obtener_usuario.php');
-            const data = await response.json();
-            if (!data.success) {
-                window.location.href = 'index.html';
-            } else {
-                usuarioActual = data.user;
-            }
-        } catch (error) {
-            console.log('Error');
-        }
-    }
+    // NUEVO (usa token JWT)
+	function getAuthToken() {
+	    return localStorage.getItem('token');
+	}
+	
+	async function verificarSesion() {
+	    const token = getAuthToken();
+	    if (!token) {
+	        window.location.href = 'index.html';
+	        return;
+	    }
+	    
+	    try {
+	        const response = await fetch('/api/db/obtener_usuario.js', {
+	            headers: { 'Authorization': `Bearer ${token}` }
+	        });
+	        const data = await response.json();
+	        if (!data.success) {
+	            localStorage.removeItem('token');
+	            localStorage.removeItem('user');
+	            window.location.href = 'index.html';
+	        } else {
+	            usuarioActual = data.user;
+	        }
+	    } catch (error) {
+	        console.log('Error verificando sesión:', error);
+	        window.location.href = 'index.html';
+	    }
+	}
     
     verificarSesion();
     
@@ -6743,7 +6761,7 @@ function toggleSueldoFijo() {
 // Cargar trabajadores para el sidebar
 async function cargarTrabajadores() {
     try {
-        const response = await fetch('db/trabajadores.php?action=obtener');
+        const response = await fetch('/api/db/trabajadores.js?action=obtener');
         const data = await response.json();
         if (data.success) {
             mostrarListaTrabajadores(data.trabajadores);
@@ -6803,7 +6821,7 @@ function mostrarListaTrabajadores(trabajadores) {
 // Ver detalle de préstamos de un trabajador
 async function verDetallePrestamos(trabajadorId, nombre) {
     try {
-        const response = await fetch(`db/trabajadores.php?action=obtener_prestamos&trabajador_id=${trabajadorId}`);
+        const response = await fetch(`/api/db/trabajadores.js?action=obtener_prestamos&trabajador_id=${trabajadorId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -6991,7 +7009,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     try {
-        const responseTrabajador = await fetch(`db/trabajadores.php?action=obtener_uno&id=${trabajadorId}`);
+        const responseTrabajador = await fetch(`/api/db/trabajadores.js?action=obtener_uno&id=${trabajadorId}`);
         const dataTrabajador = await responseTrabajador.json();
         
         if (!dataTrabajador.success) {
@@ -7000,7 +7018,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
         }
         
         const trabajador = dataTrabajador.trabajador;
-        const responseDeuda = await fetch(`db/trabajadores.php?action=obtener_deuda&trabajador_id=${trabajadorId}`);
+        const responseDeuda = await fetch(`/api/db/trabajadores.js?action=obtener_deuda&trabajador_id=${trabajadorId}`);
         const dataDeuda = await responseDeuda.json();
         const deudaPendiente = dataDeuda.success ? dataDeuda.deuda : 0;
         
@@ -7008,7 +7026,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
         const fechaActual = hoy.toISOString().split('T')[0];
         const diaCorte = trabajador.dia_corte || 2;
         
-        const responsePeriodo = await fetch(`db/calcular_periodo_por_corte.php?fecha=${fechaActual}&dia_corte=${diaCorte}`);
+        const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${fechaActual}&dia_corte=${diaCorte}`);
         const dataPeriodo = await responsePeriodo.json();
         
         if (!dataPeriodo.success) {
@@ -7033,7 +7051,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
                 cantidad: parseFloat(trabajador.sueldo_fijo) || 0
             }];
         } else {
-            const responseProd = await fetch(`db/obtener_produccion_por_periodo.php?trabajador_id=${trabajadorId}&inicio=${periodoInicio}&fin=${periodoFin}`);
+            const responseProd = await fetch(`/api/db/obtener_produccion_por_periodo.js?trabajador_id=${trabajadorId}&inicio=${periodoInicio}&fin=${periodoFin}`);
             const dataProd = await responseProd.json();
             if (!dataProd.success) {
                 alert('Error al cargar la producción');
@@ -7178,7 +7196,7 @@ document.getElementById('formPrestamo')?.addEventListener('submit', async (e) =>
     const descripcion = document.getElementById('prestamoDescripcion').value;
     
     try {
-        const response = await fetch('db/trabajadores.php?action=guardar_prestamo', {
+        const response = await fetch('/api/db/trabajadores.js?action=guardar_prestamo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ trabajador_id, monto, fecha, descripcion })
@@ -7226,7 +7244,7 @@ function calcularSemanaActual() {
 // Cargar SOLO días que tienen pagos
 async function cargarDiasConPagos() {
     try {
-        const response = await fetch('db/nomina.php?action=obtener_dias_con_pagos');
+        const response = await fetch('/api/db/nomina.js?action=obtener_dias_con_pagos');
         const data = await response.json();
         
         // Ocultar o mostrar el enlace de historial completo según si hay pagos
@@ -7327,7 +7345,7 @@ function cambiarDiaPago(fecha) {
 }
 
 async function cargarPagosPorDia(fecha) {
-    const response = await fetch(`db/nomina.php?action=obtener_pagos_por_dia&fecha=${fecha}`);
+    const response = await fetch(`/api/db/nomina.js?action=obtener_pagos_por_dia&fecha=${fecha}`);
     const data = await response.json();
     if (data.success) {
         mostrarPagosDeDia(fecha, data.pagos);
@@ -7387,7 +7405,7 @@ async function actualizarPestañasPagos() {
 
 // Ver historial completo
 async function verHistorialCompleto() {
-    const response = await fetch('db/nomina.php?action=obtener_historial_completo');
+    const response = await fetch('/api/db/nomina.js?action=obtener_historial_completo');
     const data = await response.json();
     
     if (!data.success) {
@@ -7464,7 +7482,7 @@ async function abrirModalRegistrarPago() {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     try {
-        const response = await fetch('db/trabajadores.php?action=obtener');
+        const response = await fetch('/api/db/trabajadores.js?action=obtener');
         const data = await response.json();
         if (data.success) {
             const select = document.getElementById('nominaSelectTrabajador');
@@ -7498,7 +7516,7 @@ document.getElementById('nominaSelectTrabajador').addEventListener('change', asy
     const trabajadorId = this.value;
     if (!trabajadorId) return;
     
-    const response = await fetch(`db/calcular_periodo_pago.php?trabajador_id=${trabajadorId}`);
+    const response = await fetch(`/api/db/calcular_periodo_pago.js?trabajador_id=${trabajadorId}`);
     const data = await response.json();
     
     if (data.success) {
@@ -7577,7 +7595,7 @@ document.getElementById('formRegistrarPagoNomina')?.addEventListener('submit', a
     };
     
     try {
-        const response = await fetch('db/nomina.php?action=guardar_pago', {
+        const response = await fetch('/api/db/nomina.js?action=guardar_pago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dataToSend)
@@ -7763,7 +7781,7 @@ function mostrarPagosDeDia(fecha, pagos) {
 */
     
 async function verDetallePago(pagoId) {
-    const response = await fetch(`db/obtener_detalle_pago.php?id=${pagoId}`);
+    const response = await fetch(`/api/db/obtener_detalle_pago.js?id=${pagoId}`);
     const data = await response.json();
     
     if (!data.success) {
@@ -8200,7 +8218,7 @@ async function eliminarPago(id) {
     }
     
     try {
-        const response = await fetch('db/nomina.php?action=eliminar_pago', {
+        const response = await fetch('/api/db/nomina.js?action=eliminar_pago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id })
@@ -8290,7 +8308,7 @@ function cambiarTabVentas(tab) {
 
 async function cargarProductosVenta() {
     try {
-        const response = await fetch('db/obtener_productos_venta.php');
+        const response = await fetch('/api/db/obtener_productos_venta.js');
         const data = await response.json();
         if (data.success) {
             productosVentaGlobal = data.productos;
@@ -8518,7 +8536,7 @@ function agregarFiltrosVentas() {
 // Historial de ventas - asegurar que la sucursal se muestre correctamente
 async function cargarHistorialVentas() {
     try {
-        const response = await fetch('db/ventas.php?action=obtener');
+        const response = await fetch('/api/db/ventas.js?action=obtener');
         const data = await response.json();
         if (data.success) {
             mostrarHistorialVentas(data.ventas);
@@ -8579,7 +8597,7 @@ function mostrarHistorialVentas(ventas) {
 
 async function verFactura(id) {
     try {
-        const response = await fetch(`db/ventas.php?action=obtener_detalle&id=${id}`);
+        const response = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${id}`);
         const data = await response.json();
         
         if (data.success && data.detalles && data.detalles.length > 0) {
@@ -8817,7 +8835,7 @@ function cambiarCategoriaEgreso(categoriaNombre) {
 
 async function cargarCategoriasEgresos() {
     try {
-        const response = await fetch(`db/egresos.php?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`);
         const data = await response.json();
         if (data.success) {
             mostrarCategoriasEgresos(data.categorias);
@@ -8945,7 +8963,7 @@ function agregarFiltroEgresos() {
 
 async function cargarEgresos() {
     try {
-        let url = `db/egresos.php?action=obtener&tipo=${tipoEgresoActual}`;
+        let url = `/api/db/egresos.js?action=obtener&tipo=${tipoEgresoActual}`;
         if (categoriaActual && categoriaActual !== '0' && categoriaActual !== 'Todos') {
             url += `&categoria=${encodeURIComponent(categoriaActual)}`;
         }
@@ -9009,7 +9027,7 @@ function abrirFormularioEgreso() {
 
 async function cargarSelectCategorias() {
     try {
-        const response = await fetch(`db/egresos.php?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`);
         const data = await response.json();
         const select = document.getElementById('egresoCategoria');
         if (data.success && select) {
@@ -9207,7 +9225,7 @@ document.getElementById('formNuevoProducto')?.addEventListener('submit', async (
     const es_leche = document.getElementById('esLeche').checked;
     
     try {
-        const response = await fetch('db/crear_producto.php', {
+        const response = await fetch('/api/db/crear_producto.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, es_leche })
@@ -9246,7 +9264,7 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
     const ubicacion = document.getElementById('ubicacionSucursal').value;
     
     try {
-        const response = await fetch('db/crear_sucursal.php', {
+        const response = await fetch('/api/db/crear_sucursal.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, ubicacion })
@@ -9271,7 +9289,7 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
 // Cargar productos en los selects del formulario con botón de eliminar
 async function cargarProductosEnSelects() {
     try {
-        const response = await fetch('db/obtener_productos.php');
+        const response = await fetch('/api/db/obtener_productos.js');
         const data = await response.json();
         if (data.success) {
             const selectProducto = document.getElementById('tipoProductoSucursal');
@@ -9356,7 +9374,7 @@ async function verProduccionProducto(productoNombre) {
             sucursalId = sucursalActual === 'principal' ? 1 : 2;
         }
         
-        const response = await fetch(`db/produccion_sucursal.php?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`);
+        const response = await fetch(`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -9654,7 +9672,7 @@ function cerrarModalConfirmacion() {
 async function eliminarSucursal(nombre, id) {
     // Primero verificar si tiene registros
     try {
-        const checkResponse = await fetch(`db/verificar_registros.php?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`);
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`);
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar la sucursal "${formatearNombre(nombre)}"?`;
@@ -9672,7 +9690,7 @@ async function eliminarSucursal(nombre, id) {
 // Eliminar producto
 async function eliminarProducto(nombre, id) {
     try {
-        const checkResponse = await fetch(`db/verificar_registros.php?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
@@ -9694,7 +9712,7 @@ document.getElementById('btnConfirmarEliminar').onclick = async function() {
     const action = tipoElementoAEliminar === 'sucursal' ? 'eliminar_sucursal' : 'eliminar_producto';
     
     try {
-        const response = await fetch('db/eliminar_elemento.php', {
+        const response = await fetch('/api/db/eliminar_elemento.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -9725,7 +9743,7 @@ document.getElementById('btnConfirmarEliminar').onclick = async function() {
 // Exportar registros de sucursal
 async function exportarRegistrosSucursal(nombre) {
     try {
-        window.open(`db/exportar_registros.php?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, '_blank');
+        window.open(`/api/db/exportar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, '_blank');
     } catch (error) {
         console.error('Error:', error);
         alert('Error al exportar');
@@ -9733,7 +9751,7 @@ async function exportarRegistrosSucursal(nombre) {
 }
     
 async function cargarTrabajadoresPorSucursal(sucursalId) {
-    const response = await fetch(`db/obtener_trabajadores_por_sucursal.php?sucursal_id=${sucursalId}`);
+    const response = await fetch(`/api/db/obtener_trabajadores_por_sucursal.js?sucursal_id=${sucursalId}`);
     const data = await response.json();
     const select = document.getElementById('trabajadorSelect');
     if (data.success) {
@@ -9751,7 +9769,7 @@ async function cargarTrabajadoresPorSucursal(sucursalId) {
 // Agrega esta versión modificada:
 async function cargarSucursalesEnSelect() {
     try {
-        const response = await fetch('db/obtener_sucursales.php');
+        const response = await fetch('/api/db/obtener_sucursales.js');
         const data = await response.json();
         if (data.success) {
             
@@ -9811,7 +9829,7 @@ async function cargarSucursalesEnSelect() {
 // Modificar cargarProductosEnSelects para incluir botón de eliminar
 async function cargarProductosEnSelects() {
     try {
-        const response = await fetch('db/obtener_productos.php');
+        const response = await fetch('/api/db/obtener_productos.js');
         const data = await response.json();
         if (data.success) {
             const selectProducto = document.getElementById('tipoProductoSucursal');
@@ -9843,7 +9861,7 @@ function abrirGestionProductos() {
 
 async function mostrarListaProductos() {
     try {
-        const response = await fetch('db/obtener_productos.php');
+        const response = await fetch('/api/db/obtener_productos.js');
         const data = await response.json();
         
         let html = `
@@ -9902,7 +9920,7 @@ function cerrarGestionProductos() {
 async function eliminarProductoTH(nombre, id) {
     // Verificar si tiene registros
     try {
-        const checkResponse = await fetch(`db/verificar_registros.php?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
@@ -9911,7 +9929,7 @@ async function eliminarProductoTH(nombre, id) {
         }
         
         if (confirm(mensaje)) {
-            const response = await fetch('db/eliminar_producto.php', {
+            const response = await fetch('/api/db/eliminar_producto.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre: nombre, id: id })
@@ -9950,7 +9968,7 @@ let clienteEditandoId = null;
 // --- Funciones para el Panel Lateral y Select ---
 async function cargarClientes() {
     try {
-        const response = await fetch('db/clientes.php?action=obtener_todos');
+        const response = await fetch('/api/db/clientes.js?action=obtener_todos');
         const data = await response.json();
         if (data.success) {
             mostrarListaClientes(data.clientes);
@@ -10074,7 +10092,7 @@ function mostrarMenuCliente(event, clienteId) {
 async function verDetallesCliente(clienteId) {
     try {
         // Obtener datos del cliente
-        const responseCliente = await fetch(`db/clientes.php?action=obtener_uno&id=${clienteId}`);
+        const responseCliente = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`);
         const dataCliente = await responseCliente.json();
         
         if (!dataCliente.success) {
@@ -10085,11 +10103,11 @@ async function verDetallesCliente(clienteId) {
         const cliente = dataCliente.cliente;
         
         // Obtener historial de ventas del cliente
-        const responseVentas = await fetch(`db/ventas.php?action=obtener_por_cliente&cliente_id=${clienteId}`);
+        const responseVentas = await fetch(`/api/db/ventas.js?action=obtener_por_cliente&cliente_id=${clienteId}`);
         const dataVentas = await responseVentas.json();
         
         // Obtener deudas pendientes del cliente desde cuentas_cobrar
-        const responseDeudas = await fetch(`db/cuentas.php?action=obtener_deudas_cliente&cliente_id=${clienteId}`);
+        const responseDeudas = await fetch(`/api/db/cuentas.js?action=obtener_deudas_cliente&cliente_id=${clienteId}`);
         const dataDeudas = await responseDeudas.json();
         
         // Generar HTML para la ventana de detalles
@@ -10636,7 +10654,7 @@ function cambiarTabCuentas(tipo) {
 
 async function cargarCuentasPagar() {
     try {
-        const response = await fetch('db/cuentas.php?action=obtener_pagar');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_pagar');
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'pagar');
@@ -10651,7 +10669,7 @@ async function cargarCuentasPagar() {
 
 async function cargarCuentasCobrar() {
     try {
-        const response = await fetch('db/cuentas.php?action=obtener_cobrar');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar');
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'cobrar');
@@ -10670,7 +10688,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
     
     try {
         // Obtener datos de la cuenta por cobrar
-        const response = await fetch(`db/cuentas.php?action=obtener_detalle_cobrar&id=${cuentaId}`);
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_detalle_cobrar&id=${cuentaId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -10679,14 +10697,14 @@ async function verEstadoCuentaCobrar(cuentaId) {
         }
         
         // Obtener los pagos de esta cuenta
-        const responsePagos = await fetch(`db/cuentas.php?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`);
+        const responsePagos = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`);
         const dataPagos = await responsePagos.json();
         
         // Si la cuenta está asociada a una venta, obtener los productos
         let detallesProductos = [];
         if (data.cuenta.venta_id) {
             try {
-                const responseVenta = await fetch(`db/ventas.php?action=obtener_detalle&id=${data.cuenta.venta_id}`);
+                const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`);
                 const dataVenta = await responseVenta.json();
                 if (dataVenta.success && dataVenta.detalles) {
                     detallesProductos = dataVenta.detalles;
@@ -10911,11 +10929,11 @@ function agregarFiltrosCuentas(containerId) {
 async function agregarResumenesDebajo(containerId) {
     try {
         // Obtener datos de proveedores
-        const responseMP = await fetch('db/materia_prima.php?action=obtener&modo=tabla');
+        const responseMP = await fetch('/api/db/materia_prima.js?action=obtener&modo=tabla');
         const dataMP = await responseMP.json();
         
         // Obtener datos de producción
-        const responseProd = await fetch('db/produccion_sucursal.php?action=obtener_tabla');
+        const responseProd = await fetch('/api/db/produccion_sucursal.js?action=obtener_tabla');
         const htmlProd = await responseProd.text();
         
         // Generar el HTML de los resúmenes (USANDO TUS FUNCIONES EXISTENTES)
