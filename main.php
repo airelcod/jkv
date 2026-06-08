@@ -1,0 +1,11751 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agroindustria Lactea J.K.V. C.A.</title>
+    <link rel="icon" href="source/main.ico" type="image/png">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'mainFont';
+            src: url('source/font.ttf');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'mainFont', calibri;
+            transition: 0.3s;
+        }
+
+        body {
+            background: #f4d71b;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            display: flex;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Header que se reduce */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-width: 300px;
+            height: 85vh;
+            padding: 16px 0px;
+            background: #fff;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(0,0,0,.7);
+            border-right: 1px solid rgba(0,0,0,.7);
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Cuando está abierto, el header se reduce */
+        .main-container.menu-abierto .header {
+            width: 50%;
+        }
+        
+        /* Panel lateral fijo detrás */
+        .panel-lateral {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 50%;
+            height: 90vh;
+            background: #f4d71b;
+            z-index: 1;
+            opacity: 1;
+            visibility: hidden;
+            transition: all 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: hidden;
+            border-left: 1px solid rgba(0,0,0,.4);
+        }
+        
+        /* Cuando está abierto, el panel se muestra */
+        .main-container.menu-abierto .panel-lateral {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            gap: 24px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form {
+            display: flex;
+            width: max-content;
+            gap: 32px;
+            justify-content: center;
+        }
+
+        .form-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align:center;
+            text-wrap:nowrap;
+            width: 120px;
+            padding: 12px 18px;
+            background: #f4d71b;
+            border-radius: 4px;
+            font-size: 20px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0);
+            box-shadow: 0px 4px 12px rgba(0,0,0,.3);
+        }
+
+        .form-box:hover {
+            opacity: 1;
+            border: 1px solid rgba(39,130,51,1);
+            box-shadow: 0px 8px 12px rgba(0,0,0,.2);
+        }
+
+        .title-bar {
+            border: 1px solid rgba(0,0,0,.4);
+            border-radius: 2px;
+            padding: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            color: rgba(255,255,255,.8);
+            width: 360px;
+            background: #278233;
+        }
+
+        .btn {
+            font-size: 16px;
+            border: 1px solid rgba(0,0,0,.4);
+            background: #f4d71b;
+            color: rgba(0,0,0,.7);
+            padding: 4px 14px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+		.form-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            box-sizing: border-box;
+            background: #f4d71b;
+            border-radius: 4px;
+			border: 1px solid rgba(0,0,0,0);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0,0,0,.3);
+        }
+
+        .form-btn:hover {
+            opacity: 1;
+            border: 1px solid rgba(0,0,0,.4);
+            box-shadow: 0px 8px 11px rgba(0,0,0,.2);
+        }
+
+		.form-btn-limpiar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            box-sizing: border-box;
+            background: rgba(0,0,0,.4);
+            border-radius: 4px;
+			border: 1px solid rgba(0,0,0,0);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0,0,0,.3);
+        }
+
+        .form-btn-limpiar:hover {
+            opacity: 1;
+            border: 1px solid rgba(0,0,0,.4);
+            box-shadow: 0px 8px 11px rgba(0,0,0,.2);
+        }
+
+        .icon {
+            mix-blend-mode: multiply;
+            opacity: .8;
+        }
+
+        .user-h2 {
+            margin-top: 12px;
+            color: rgba(0,0,0,.6);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        
+        .user-h2:hover {
+            margin-top: 12px;
+            color: rgba(0,0,0,.5);
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .user-h2.activo {
+            color: rgba(0,0,0,.7);
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .modal-produccion {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255,255,255,0.2);
+            overflow-y: hidden;
+        }
+        
+        .modal-content-produccion {
+            background-color: #fefefe;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 3px;
+            width: 1020px;
+            max-width: 1200px;
+            max-height: 600px;
+            overflow-y:auto;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .close-produccion {
+            position: absolute;
+            right: 25px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .close-produccion:hover {
+            color: #000;
+        }
+        
+        .close-produccion-legal {
+            right: 25px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .close-produccion-legal:hover {
+            color: #000;
+        }
+
+		.close-cuenta {
+            margin-left:auto;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .close-cuenta:hover {
+            color: #000;
+        }
+        
+        /* Tabla styles */
+        .tabla-produccion {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            table-layout: auto;
+            border: 1px solid rgba(0,0,0,.4);
+        }
+        
+        .tabla-produccion th {
+            background: #278233;
+            color: rgba(255,255,255,.8);
+            border-bottom: 1px solid rgba(0,0,0,0.4);
+        }
+        
+        .tabla-produccion tr:hover {
+            background: rgba(0,0,0,.067);
+        }
+
+        .tabla-produccion th,
+        .tabla-produccion td {
+            border: none;
+            padding: 8px 6px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .celda-producto {
+            white-space: nowrap;
+        }
+
+        .producto-info {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+		.producto-leche {
+			display: inline-block;
+            padding: 3px;
+            border-radius: 3px;
+            border: none;
+            white-space: nowrap;
+            font-size: 0.85em;
+            cursor: pointer;
+		}
+
+		.producto-peso {
+			display: inline-block;
+            padding: 3px;
+            border-radius: 3px;
+            border-right: 1px solid rgba(0,0,0,0);
+            white-space: nowrap;
+            font-size: 0.85em;
+            cursor: pointer;
+		}
+
+        .producto-piezas {
+            display: inline-block;
+            padding: 3px;
+            border-radius: 3px;
+            border-left: 1px solid rgba(0,0,0,0);
+            white-space: nowrap;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+		.producto-leche:hover {
+			background: rgba(0,0,0,.07);
+		}
+
+		.producto-peso:hover {
+			background: rgba(0,0,0,.07);
+            border-right: 1px solid rgba(0,0,0,0);
+		}
+        
+        .producto-piezas:hover {
+            background: rgba(0,0,0,.07);
+            border-left: 1px solid rgba(0,0,0,0);
+        }
+        
+        .dia-actual {
+            background-color: #fff3cd;
+        }
+        
+        /* Botones */
+        .btn-agregar {
+			display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+			padding: 8px 16px;
+            font-size: 24px;
+            box-sizing: border-box;
+            background: #f4d71b;
+            border-radius: 4px;
+			border: 1px solid rgba(0,0,0,0);
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0,0,0,.3);
+        }
+        
+        .btn-agregar:hover {
+            opacity: 1;
+            border: 1px solid rgba(0,0,0,.4);
+            box-shadow: 0px 8px 11px rgba(0,0,0,.2);
+        }
+        
+        /* Formulario modal */
+        .form-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .form-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 3px;
+            width: 380px;
+			box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .form-group, .form-group-date, .formPerfil {
+            margin-bottom: 15px;
+        }
+
+		.formPerfil {
+			padding-top: 16px;
+			font-size:12px;
+		}
+        
+        .form-group-date {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .form-group label, .form-group-date label, .formPerfil label {
+            display: block;
+            margin-bottom: 5px;
+            color: rgba(0,0,0,.7);
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group select, .form-group-date input, .formPerfil input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(0,0,0,.4);
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        
+        .form-group select, .formPerfil select {
+            cursor: pointer;
+        }
+        
+        .form-group-date input[type="date"] {
+            border: none;
+            cursor: default;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .btn-submit {
+            background-color: #278233;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: max-content;
+            margin-left: auto;
+        }
+        
+        /* Agrega al final de tu CSS */
+		.spinner {
+		    display: inline-block;
+		    width: 40px;
+		    height: 40px;
+		    border: 4px solid #f3f3f3;
+		    border-top: 4px solid #278233;
+		    border-radius: 50%;
+		    animation: spin 1s linear infinite;
+		}
+		
+		@keyframes spin {
+		    0% { transform: rotate(0deg); }
+		    100% { transform: rotate(360deg); }
+		}
+		
+		.cargando {
+		    text-align: center;
+		    padding: 40px;
+		    font-size: 16px;
+		    color: #666;
+		}
+        
+        /* Estilos para el panel de usuarios */
+        .submenu-contenido {
+			overflow-y:auto;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .submenu-panel {
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .submenu-panel.oculto {
+            display: none;
+        }
+        
+        .perfil-usuario {
+            background: rgba(255,255,255,0.9);
+            border-radius: 3px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,.4);
+            text-align: center;
+        }
+        
+        .avatar-usuario {
+            width: 100px;
+            height: 100px;
+            background: #278233;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+        
+        .campo-config {
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0,0,0,.4);
+        }
+        
+        .campo-config label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #278233;
+        }
+        
+        .campo-config input, .campo-config select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(0,0,0,.4);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .btn-guardar-config {
+            background: #278233;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-eliminar {
+            color: rgba(0,0,0,.7);
+			background:rgba(0,0,0,.1);
+            border: 1px solid rgba(0,0,0,0);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+			height:32px;
+        }
+
+		.btn-eliminar:hover {
+            opacity:.8;
+            border: 1px solid rgba(0,0,0,.4);
+			background: rgba(0,0,0,.2);
+        }
+        
+        .btn-editar {
+            color: rgba(0,0,0,.7);
+			background:rgba(0,0,0,.04);
+            border: 1px solid rgba(0,0,0,0);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+			height:32px;
+        }
+
+		.btn-editar:hover {
+            color: rgba(0,0,0,.6);
+			background:rgba(0,0,0,.1);
+            border: 1px solid rgba(0,0,0,.3);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .tabla-usuarios {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .tabla-usuarios th,
+        .tabla-usuarios td {
+            border: none;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .tabla-usuarios th {
+            background: none;
+            color: #278233;
+        }
+        
+        .rol-admin {
+            color: rgba(0,0,0,.8);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+			font-style:italic;
+            display: inline-block;
+        }
+
+		.rol-admin:hover {
+            background: rgba(0,0,0,.1);
+        }
+        
+        .rol-supervisor {
+            color: rgba(0,0,0,.8);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+			font-style:italic;
+            display: inline-block;
+        }
+
+		.rol-supervisor:hover {
+            background: rgba(0,0,0,.1);
+        }
+        
+        .rol-operador {
+            color: rgba(0,0,0,.8);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+			font-style:italic;
+            display: inline-block;
+        }
+
+		.rol-operador:hover {
+            background: rgba(0,0,0,.1);
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content-produccion {
+                margin: 20px auto;
+                padding: 10px;
+            }
+            
+            .tabla-produccion {
+                font-size: 12px;
+            }
+            
+            .tabla-produccion th,
+            .tabla-produccion td {
+                padding: 5px;
+            }
+            
+            .main-container.menu-abierto .header {
+                width: 100%;
+            }
+            
+            .panel-lateral {
+                width: 100%;
+                height: 100%;
+                position: fixed;
+                z-index: 10;
+            }
+        }
+
+        .showResumen {
+            color: #278233;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 1;
+            margin: 6px 0px;
+            filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.2));
+        }
+
+        .showResumen:hover {
+            opacity: .8;
+            transform: scale(1.1);
+            filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.1));
+        }
+        
+        .cerrar-sesion {
+            margin-top: 20px;
+            background: #f44336;
+        }
+        
+        .cerrar-sesion:hover {
+            background: #d32f2f;
+        }
+        
+        .info-usuario {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+		/* Estilos para pestañas de cuentas */
+.tab-cuentas-btn {
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.tab-cuentas-btn:hover {
+    opacity: 0.8;
+}
+
+.tabla-cuentas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.tabla-cuentas th,
+.tabla-cuentas td {
+    border: none;
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.tabla-cuentas th {
+    background: #278233;
+    color: white;
+    font-weight: bold;
+}
+
+.tabla-cuentas tr:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.estado-pendiente {
+    background: #f4d71b;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+        
+.estado-vencido {
+	background: rgba(244,60,14,1);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.estado-pagado, .estado-cobrado {
+    background: rgba(36,150,0,.7);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn-estado-cuenta {
+    background: rgba(36,150,0,.7);
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.btn-estado-cuenta:hover {
+    background: #1e6b28;
+}
+
+.btn-eliminar-cuenta {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-eliminar-cuenta:hover {
+    background: #d32f2f;
+}
+
+.monto-vencido {
+    color: rgba(244,60,14,1);
+    font-weight: bold;
+}
+
+.monto-pendiente {
+    color: #a18f1b;
+    font-weight: bold;
+}
+
+.monto-pagado {
+	color: #278233;
+    font-weight: bold;
+}
+        
+        /* Contenedor de pestañas con botón */
+.tabs-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #278233;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.tabs-wrapper {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-add-sucursal {
+    background: #278233;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-add-sucursal:hover {
+    background: #1e6b28;
+}
+        
+        /* Estilo para el checkbox personalizado */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #278233;
+}
+
+.checkbox-container label {
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Botones de eliminar en pestañas */
+.tab-sucursal-btn {
+    position: relative;
+}
+
+.btn-delete-sucursal {
+    color: #555;
+    background:none;
+    border: none;
+    width: 18px;
+    height: 18px;
+    font-size: 24px;
+    font-weight:bold;
+    cursor: pointer;
+    margin-left: 3px;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-sucursal:hover {
+    transform: translateY(-2px);
+}
+
+
+/* Modal de confirmación */
+.modal-confirmacion {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-confirmacion-content {
+    background-color: white;
+    margin: 20% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+}
+
+.modal-confirmacion-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.modal-confirmacion-buttons button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-confirmar {
+    background: #f44336;
+    color: white;
+}
+
+.btn-cancelar {
+    background: #666;
+    color: white;
+}
+        
+        /* Estilo para el ícono de eliminar en el encabezado */
+        .delete-producto-th {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: none;
+            color: rgba(255,255,255,.6);
+            font-size: 24px;
+            font-weight:bold;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-producto-th:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Estilos para nómina */
+.tab-nomina-btn {
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.tab-nomina-btn:hover {
+    opacity: 0.8;
+}
+
+.menu-opcion {
+    transition: all 0.2s ease;
+}
+
+.menu-opcion:hover {
+    transform: translateX(5px);
+}
+        
+        /* Estilos para semanas colapsables */
+.semana-item {
+    transition: all 0.2s ease;
+}
+
+.semana-header:hover {
+    opacity: 0.9;
+}
+
+.semana-contenido {
+    transition: all 0.3s ease;
+}
+        
+        /* Para la tabla de egresos */
+.tabla-cuentas td {
+    vertical-align: middle;
+}
+        
+        /* Estilos para el resumen compacto */
+*::-webkit-scrollbar {
+    width: 6px;
+}
+*::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb {
+    background: #278233;
+    border-radius: 3px;
+}
+        
+        /* Estilos para materia prima */
+        #tablaMateriaPrima td {
+            vertical-align: middle;
+        }
+        
+        .matHover:hover {
+        	background:rgba(0,0,0,.08);
+        }
+
+        #tablaMateriaPrima small {
+            display: block;
+            color: #999;
+        }
+        
+        .nominaTab:hover {
+        	background:rgba(0,0,0,.08);
+        }
+        
+        .nominaCell {
+        	cursor:pointer;
+        }
+        
+        .nominaCell:hover {
+        	background:rgba(0,0,0,.08);
+        }
+        /* Estilos para detalles de materia prima */
+.mp-detalle-container {
+    font-family: 'mainFont', calibri;
+}
+.mp-detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.mp-detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 8px 0;
+}
+.mp-detalle-label {
+    font-weight: bold;
+    color: #555;
+}
+.mp-detalle-value {
+    color: #222;
+}
+.mp-observaciones {
+    background: #fff8e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid #ffc107;
+}
+.btn-editar-proveedor {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+}
+.btn-editar-proveedor:hover {
+    background: #0b7dda;
+}
+        
+        /* Estilos para menú contextual de trabajador */
+.menu-opcion-item {
+    transition: background 0.2s ease;
+}
+.menu-opcion-item:hover {
+    background: rgba(39,130,51,0.1);
+}
+
+.btn-menu-trabajador {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.btn-menu-trabajador:hover {
+    background: rgba(0,0,0,0.05);
+}
+        
+        /* Estilos para filtros y búsqueda */
+.filtros-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    background: rgba(0,0,0,0);
+    padding: 0px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0);
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filtro-grupo label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+}
+
+.filtro-grupo input, .filtro-grupo select {
+    padding: 8px 12px;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 160px;
+}
+
+.filtro-grupo input:focus, .filtro-grupo select:focus {
+    outline: none;
+    border-color: #278233;
+}
+
+.btn-filtro {
+    background: #278233;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-filtro:hover {
+    background: #1e6b28;
+}
+
+.btn-limpiar-filtros {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-limpiar-filtros:hover {
+    background: #555;
+}
+
+.busqueda-container {
+    margin-bottom: 15px;
+}
+
+.busqueda-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.busqueda-container input:focus {
+    outline: none;
+    border-color: #278233;
+}
+
+.filtro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+        
+        .payHover {
+        	display:flex;
+            flex-direction:column;
+            cursor:pointer;
+            padding:3px;
+            border-radius:4px;
+        }
+        
+        .payHover:hover {
+        	background:rgba(0,0,0,.15);
+        }
+    </style>
+</head>
+<body>
+	<div class="bar" style="width:100%;height:32px;background:#f4d71b;border-bottom:1px solid rgba(0,0,0,.7); display:flex;align-items:center;justify-content:flex-end;-webkit-app-region:drag"><span onclick="event.stopPropagation()" style="font-size:32px;cursor:pointer;box-sizing:border-box;margin-left:auto;transform:translateX(-6px);-webkit-app-region:no-drag;" onclick="cerrarVentanaElectron();">&times;</span></div>
+    <div class="main-container" id="mainContainer">
+        <div class="header">
+            <div class="window-title-bar" style="width:95%;height:95%;display:flex;flex-direction:column;align-items:flex-end;position:absolute">
+                <div class="showResumen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <svg onclick="toggleMenu('resumen')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="60" height="60">
+                        <rect x="22" y="18" width="56" height="64" rx="3" fill="none" stroke="#278233" stroke-width="3"/>
+                        <line x1="32" y1="32" x2="68" y2="32" stroke="#278233" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="44" x2="62" y2="44" stroke="#278233" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="52" x2="58" y2="52" stroke="#278233" stroke-width="3" stroke-linecap="round"/>
+                        <rect x="35" y="58" width="8" height="14" rx="1" fill="#278233"/>
+                        <rect x="46" y="50" width="8" height="22" rx="1" fill="#278233"/>
+                        <rect x="57" y="42" width="8" height="30" rx="1" fill="#278233"/>
+                        <line x1="30" y1="74" x2="72" y2="74" stroke="#278233" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <span style="margin-top:-6px;" onclick="toggleMenu('resumen')">Resumen</span>
+                </div>
+
+                <div class="showResumen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <svg onclick="toggleMenu('usuarios')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="60" height="60">
+                        <circle cx="50" cy="35" r="14" fill="none" stroke="#278233" stroke-width="3"/>
+                        <path d="M 22 82 Q 30 55 50 55 Q 70 55 78 82" fill="none" stroke="#278233" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <span style="margin-top:-6px;" onclick="toggleMenu('usuarios')">Usuarios</span>
+                </div>
+            </div>
+            <img height="160" class="logo" src="source/logo.png">
+    
+            <main>
+                <div class="title-bar">
+                    <span>Menu Principal</span>
+                </div>
+                
+                <div class="form">
+                    <div class="form-box" onclick="abrirModalCuentas()">
+                        <img class="icon" height="60" src="source/iconos/dash.png">
+                        <p>Cuentas</p>
+                    </div>
+        
+                    <div class="form-box" onclick="abrirModalNomina()">
+                        <img class="icon" height="60" src="source/iconos/nom.png">
+                        <p>Nomina</p>
+                    </div>
+                </div>
+    
+                <div class="form">
+                    <div class="form-box" onclick="abrirModalProduccion()">
+                        <img class="icon" height="60" src="source/iconos/prod.png">
+                        <p>Produccion</p>
+                    </div>
+        
+                    <div class="form-box" onclick="abrirModalEgresos()">
+                        <img class="icon" height="60" src="source/iconos/eg.png">
+                        <p>Egresos</p>
+                    </div>
+                </div>
+                
+                <div class="form">
+                	<div class="form-box" onclick="abrirModalMateriaPrima()">
+                        <img class="icon" height="60" src="source/iconos/mat.png">
+                        <p>Materia Prima</p>
+                    </div>
+                    
+                    <div class="form-box" onclick="abrirModalVentas()">
+                        <img class="icon" height="60" src="source/iconos/vent.png">
+                        <p>Ventas</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Panel de Resumen -->
+        <div id="panelResumen" class="panel-lateral">
+            <h2 style="margin-top:12px;color:rgba(0,0,0,.8);cursor:default; padding: 0 15px;">Resumen y estadisticas</h2>
+            <div class="statics-main" style="margin-top:12px;width: 90%; height: 90%;background:rgba(255,255,255,.9);border-radius:3px;border:1px solid rgba(0,0,0,.4); padding: 15px; overflow-y: auto;">
+
+                <!-- Tarjetas de resumen (más compactas y con gradientes) -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <div style="background: rgba(0,0,0,.04); border-radius: 4px; padding: 10px; text-align: center; border:1px solid rgba(0,0,0,.4);">
+                        <div style="font-size: 16px; color: rgba(0,0,0,0.5);">Por Cobrar</div>
+                        <div id="totalCobrar" style="font-size: 24px; font-weight: bold; color: rgba(0,0,0,.8);">$0.00</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,.04); border-radius: 4px; padding: 10px; text-align: center; border:1px solid rgba(0,0,0,.4);">
+                        <div style="font-size: 16px; color: rgba(0,0,0,0.5);">Por Pagar</div>
+                        <div id="totalPagar" style="font-size: 24px; font-weight: bold; color: rgba(0,0,0,.8);">$0.00</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,.04); border-radius: 4px; padding: 10px; text-align: center; border:1px solid rgba(0,0,0,.4);">
+                        <div style="font-size: 16px; color: rgba(0,0,0,0.5);;">Egresos</div>
+                        <div id="totalEgresos" style="font-size: 24px; font-weight: bold; color: rgba(0,0,0,.8);">$0.00</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,.04); border-radius: 4px; padding: 10px; text-align: center; border:1px solid rgba(0,0,0,.4);">
+                        <div style="font-size: 16px; color: rgba(0,0,0,.5);">Deuda</div>
+                        <div id="totalDeudas" style="font-size: 24px; font-weight: bold; color: rgba(0,0,0,.8);">$0.00</div>
+                    </div>
+                </div>
+
+                <!-- Gráficas lado a lado -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <!-- Gráfica de producción -->
+                    <div style="flex: 1; min-width: 220px; background: rgba(39,130,51,0.03); border-radius: 8px; padding: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3 style="font-size: 12px; color: #278233; margin: 0;">Producción Semanal</h3>
+                            <span id="expandProd" style="cursor: pointer; font-size: 16px; color: #278233; background: rgba(39,130,51,0.1); padding: 2px 6px; border-radius: 4px;">⛶</span>
+                        </div>
+                        <canvas id="graficaProduccion" style="width: 100%; height: 180px;"></canvas>
+                    </div>
+
+                    <!-- Gráfica de egresos -->
+                    <div style="flex: 1; min-width: 220px; background: rgba(33,150,243,0.03); border-radius: 8px; padding: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3 style="font-size: 12px; color: #2196F3; margin: 0;">Egresos por Categoría</h3>
+                            <span id="expandEgr" style="cursor: pointer; font-size: 16px; color: #2196F3; background: rgba(33,150,243,0.1); padding: 2px 6px; border-radius: 4px;">⛶</span>
+                        </div>
+                        <canvas id="graficaEgresosCategoria" style="width: 100%; height: 180px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Listas lado a lado -->
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <!-- Trabajadores con deuda -->
+                    <div style="flex: 1; min-width: 200px; background: rgba(255,152,0,0.05); border-radius: 8px; padding: 10px;">
+                        <h3 style="font-size: 20px; color: rgba(0,0,0,.7); margin-bottom: 8px;">Deudas Pendientes</h3>
+                        <div id="listaDeudas" style="max-height: 150px; overflow-y: auto; font-size: 18px;">
+                            <div class="cargando"><div class="spinner" style="width:20px;height:20px;"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Producción por producto -->
+                    <div style="flex: 1; min-width: 200px; background: rgba(39,130,51,0.05); border-radius: 8px; padding: 10px;">
+                        <h3 style="font-size: 20px; color: rgba(0,0,0,0.7); margin-bottom: 8px;">Producción por Producto</h3>
+                        <div id="totalesProduccion" style="font-size: 18px; max-height: 150px; overflow-y: auto;">
+                            <div class="cargando"><div class="spinner" style="width:20px;height:20px;"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para expandir gráfica de producción -->
+        <div id="modalExpandProd" class="form-modal" style="z-index: 1003;">
+            <div class="form-content" style="width:max-content;height:max-content;">
+                <span class="close-cuenta" onclick="document.getElementById('modalExpandProd').style.display='none'">&times;</span>
+                <h3 style="margin-bottom: 15px; color: #278233;">Producción Semanal</h3>
+                <canvas id="graficaProduccionExpand" style="width: 100%; height: 300px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Modal para expandir gráfica de egresos -->
+        <div id="modalExpandEgr" class="form-modal" style="z-index: 1003;">
+            <div class="form-content" style="width:max-content;height:max-content;">
+                <span class="close-cuenta" onclick="document.getElementById('modalExpandEgr').style.display='none'">&times;</span>
+                <h3 style="margin-bottom: 15px; color: #2196F3;">Egresos por Categoría</h3>
+                <canvas id="graficaEgresosCategoriaExpand" style="width: 100%; height: 300px;"></canvas>
+            </div>
+        </div>
+        
+        <!-- Panel de Usuarios -->
+        <div id="panelUsuarios" class="panel-lateral">
+            <div style="display:flex;align-items:center;justify-content:center;width:100%;">
+                <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-top:4px">
+                    <h2 class="user-h2 activo" data-submenu="perfil" onclick="cambiarSubmenu('perfil')">Perfil de usuario</h2>
+                </div>
+                <div style="height:100%;width:1%;background:rgba(0,0,0,.6);border-radius:3px;margin-top:10px"></div>
+                <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-top:4px">
+                    <h2 class="user-h2" data-submenu="lista" onclick="cambiarSubmenu('lista')">Lista de usuarios</h2>
+                </div>
+            </div>
+            
+            <div id="submenuPerfil" class="submenu-panel" style="width: 90%; margin-top: 20px;overflow-y:auto;border-radius:3px;">
+                <div class="cargando"><div class="spinner"></div></div>
+            </div>
+            
+            <div id="submenuLista" class="submenu-panel oculto perfil-usuario" style="width: 90%; margin-top: 20px;">
+                <div class="cargando"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+    <center><span style="color:rgba(0,0,0,.7);cursor:default">© 2026 PST10. Todos los derechos reservados. <span style="color:rgba(35,130,51)">pst10carora@gmail.com</span></span></center>
+    
+    <!-- Modal de Producción con Sucursales -->
+    <div id="modalProduccion" class="modal-produccion">
+        <div class="modal-content-produccion" style="width:90vw;">
+            <span class="close-produccion-legal" onclick="cerrarModalProduccion()">&times;</span>
+
+            <!-- Pestañas de sucursales con botón agregar -->
+            <div class="tabs-container">
+                <div class="tabs-wrapper" id="tabsWrapper">
+                    <!-- Las pestañas se generarán dinámicamente -->
+                </div>
+                <button class="btn-add-sucursal" onclick="abrirModalNuevaSucursal()">+ Sucursal</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-agregar" onclick="abrirModalNuevoProducto()" style="font-size: 14px; padding: 10px 12px;">+ Producto</button>
+                </div>
+                <button class="btn-agregar" onclick="abrirFormularioSucursal()" style="font-size: 24px; padding: 8px 16px;">+</button>
+            </div>
+
+            <div id="contenidoTabla">
+                <div class="cargando"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulario Modal con Sucursal -->
+    <div id="formModalSucursal" class="form-modal">
+        <div class="form-content">
+            <span class="close-cuenta" onclick="cerrarFormularioSucursal()">&times;</span>
+            <h3 style="margin-bottom: 20px; color: #278233;">Nuevo Registro</h3>
+            <form id="formProduccionSucursal">
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" id="fechaSucursal" required>
+                </div>
+                <div class="form-group" style="display:none">
+                    <label>Trabajador:</label>
+                    <select id="trabajadorSelect">
+                        <option value="">Seleccionar trabajador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Producto:</label>
+                    <select id="tipoProductoSucursal" required>
+                        <option value="leche">Leche</option>
+                        <option value="mozzarella">Queso Mozzarella</option>
+                        <option value="parmesano">Queso Parmesano</option>
+                        <option value="ricota">Queso Ricota</option>
+                        <option value="provolone">Queso Provolone</option>
+                    </select>
+                </div>
+                <div class="form-group" id="grupoPesoSucursal">
+                    <label id="weight-label-sucursal">Peso (kg):</label>
+                    <input type="number" step="0.01" id="pesoKgSucursal">
+                </div>
+                <div class="form-group" id="grupoPiezasSucursal">
+                    <label>Cantidad de Piezas:</label>
+                    <input type="number" id="piezasSucursal">
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulario Modal -->
+    <div id="formModal" class="form-modal">
+        <div class="form-content">
+            <form id="formProduccion">
+                <div class="form-group-date">
+                    <label>Fecha:</label>
+                    <input type="date" id="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Producto:</label>
+                    <select id="tipoProducto" required>
+                        <option value="leche">Leche</option>
+                        <option value="mozzarella">Queso Mozzarella</option>
+                        <option value="parmesano">Queso Parmesano</option>
+                        <option value="ricota">Queso Ricota</option>
+                        <option value="provolone">Queso Provolone</option>
+                    </select>
+                </div>
+                <div class="form-group" id="grupoPeso">
+                    <label id="weight-label">Peso:</label>
+                    <input type="number" step="0.01" id="pesoKg">
+                </div>
+                <div class="form-group" id="grupoPiezas">
+                    <label>Cantidad de Piezas:</label>
+                    <input type="number" id="piezas">
+                </div>
+                <button type="submit" class="form-btn">Guardar</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de edición de usuario (para admin) -->
+    <div id="modalEditarUsuario" class="form-modal">
+        <div class="form-content">
+            <h3 id="modalEditarTitulo" style="margin-bottom: 20px;">Editar Usuario</h3>
+            <form id="formEditarUsuario">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="editNombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol:</label>
+                    <select id="editRol">
+                        <option value="admin">Administrador</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="operador">Operador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nueva Contraseña (dejar en blanco para no cambiar):</label>
+                    <input type="password" id="editPassword">
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+
+	<!-- Modal de Cuentas -->
+	<div id="modalCuentas" class="modal-produccion">
+	    <div class="modal-content-produccion" style="width: 900px; max-width: 95%;">
+	        <span class="close-produccion" id="closeCuentas" style="margin-left:auto" onclick="cerrarModalCuentas()">&times;</span>
+	        
+	        <!-- Pestañas -->
+	        <div style="display: flex; gap: 10px; border-bottom: 2px solid #278233; margin-bottom: 20px;">
+	            <button class="tab-cuentas-btn active" onclick="cambiarTabCuentas('pagar')" style="background: #278233; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Cuentas por Pagar</button>
+	            <button class="tab-cuentas-btn" onclick="cambiarTabCuentas('cobrar')" style="background: #ddd; color: #333; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Cuentas por Cobrar</button>
+	        </div>
+	        
+	        
+	        <!-- Tabla de Cuentas por Pagar -->
+	        <div id="tabPagar" class="tab-cuentas-contenido" style="overflow-y:auto;overflow-x:hidden">
+	            <div class="cargando"><div class="spinner"></div></div>
+	        </div>
+	        
+	        <!-- Tabla de Cuentas por Cobrar -->
+	        <div id="tabCobrar" class="tab-cuentas-contenido" style="display: none;overflow-y:auto;overflow-x:hidden">
+	            <div class="cargando"><div class="spinner"></div></div>
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- Formulario para agregar cuenta -->
+	<div id="formCuentaModal" class="form-modal">
+	    <div class="form-content" style="width: 450px; max-width: 90%;">
+			<span class="close-cuenta" style="margin-left:auto" onclick="cerrarFormularioCuenta()">&times;</span>
+	        <h3 id="formCuentaTitle" style="margin-bottom: 20px; color: #278233;">Nueva Cuenta</h3>
+	        <form id="formCuenta">
+	            <input type="hidden" id="cuentaTipo" value="pagar">
+	            <div class="form-group">
+	                <label>Descripción:</label>
+	                <input type="text" id="cuentaDescripcion" required placeholder="Ej: Compra de leche, Venta de queso...">
+	            </div>
+	            <div class="form-group">
+	                <label>Monto:</label>
+	                <input type="number" step="0.01" id="cuentaMonto" required placeholder="0.00">
+	            </div>
+	            <div class="form-group">
+	                <label>Fecha de Inicio:</label>
+	                <input type="date" id="cuentaFechaInicio" required>
+	            </div>
+	            <div class="form-group">
+	                <label>Fecha de Vencimiento:</label>
+	                <input type="date" id="cuentaFechaVencimiento" required>
+	            </div>
+	            <button type="submit" class="form-btn" style="width: 100%;">Guardar</button>
+	        </form>
+	    </div>
+	</div>
+    
+    
+    <!-- Modal para Registrar Pago Parcial de Cuentas -->
+<div id="modalPagoParcial" class="form-modal">
+    <div class="form-content" style="width: 450px; max-width: 90%;">
+        <span class="close-cuenta" onclick="cerrarModalPagoParcial()">&times;</span>
+        <h3 id="modalPagoTitle" style="margin-bottom: 20px; color: #278233;">Registrar Pago</h3>
+        <form id="formPagoParcialCuenta">
+            <input type="hidden" id="cuentaPagoId">
+            <input type="hidden" id="cuentaPagoTipo">
+            
+            <div class="form-group">
+                <label>Monto Pendiente:</label>
+                <input type="text" id="cuentaPagoPendiente" readonly style="background: #f0f0f0; font-weight: bold;">
+            </div>
+            
+            <div class="form-group">
+                <label>Monto a Pagar:</label>
+                <input type="number" step="0.01" id="cuentaPagoMonto" required placeholder="0.00" oninput="validarMontoPagoCuenta()">
+                <small id="cuentaPagoErrorMsg" style="color: #f44336; display: none;">⚠ El monto no puede exceder el saldo pendiente</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Método de Pago:</label>
+                <select id="cuentaPagoMetodo">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="cheque">Cheque</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Referencia (opcional):</label>
+                <input type="text" id="cuentaPagoReferencia" placeholder="N° de cheque, comprobante...">
+            </div>
+            
+            <div class="form-group">
+                <label>Observaciones:</label>
+                <textarea id="cuentaPagoObservaciones" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+            </div>
+            
+            <button type="submit" class="form-btn" style="width: 100%;" id="btnRegistrarPagoCuenta">Registrar Pago</button>
+        </form>
+    </div>
+</div>
+
+
+    <!-- Modal para crear nuevo producto -->
+    <div id="modalNuevoProducto" class="form-modal">
+        <div class="form-content" style="width: 400px;">
+            <span class="close-cuenta" style="margin-left:auto" onclick="cerrarModalProducto()">&times;</span>
+            <h3 style="margin-bottom: 20px;">Nuevo Producto</h3>
+            <form id="formNuevoProducto">
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" id="nombreProducto" required>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="esLeche">
+                        <label for="esLeche">¿Es líquido? (se mide en litros)</label>
+                    </div>
+                    <small style="display: block; color: #666; margin-top: 5px;">Ej: leche, suero, crema</small>
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Crear Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para crear nueva sucursal -->
+    <div id="modalNuevaSucursal" class="form-modal">
+        <div class="form-content" style="width: 400px;">
+            <span class="close-cuenta" style="margin-left:auto;" onclick="cerrarModalSucursal()">&times;</span>
+            <h3 style="margin-bottom: 20px;">Nueva Sucursal</h3>
+            <form id="formNuevaSucursal">
+                <div class="form-group">
+                    <label>Nombre de la Sucursal:</label>
+                    <input type="text" id="nombreSucursal" required>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación (opcional):</label>
+                    <input type="text" id="ubicacionSucursal" placeholder="Ciudad, dirección...">
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Crear Sucursal</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar -->
+    <div id="modalConfirmacion" class="modal-confirmacion">
+        <div class="modal-confirmacion-content">
+            <h3 id="confirmacionTitulo">¿Eliminar?</h3>
+            <p id="confirmacionMensaje">¿Estás seguro de que deseas eliminar este elemento?</p>
+            <div class="modal-confirmacion-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-confirmar" id="btnConfirmarEliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Nómina Simplificado -->
+    <div id="modalNomina" class="modal-produccion">
+        <div class="modal-content-produccion" style="width: 1000px; max-width: 95%;">
+            <span class="close-produccion" id="closeNomina" onclick="cerrarModalNomina()">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #278233;">Nómina</h2>
+
+            <div style="display: flex; gap: 20px;">
+                <!-- Sidebar de trabajadores -->
+                <div style="width: 250px; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Trabajadores</h3>
+                        <button class="btn-agregar" onclick="abrirModalTrabajador()" style="font-size: 14px; padding: 5px 10px;">+</button>
+                    </div>
+                    <div id="listaTrabajadores" style="max-height: 450px; overflow-y: auto;overflow-x:hidden">
+                        <div class="cargando"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Contenido principal -->
+                <div style="flex: 1;">
+                    <!-- Botón único para registrar pago 
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                        <button class="form-btn" onclick="abrirModalRegistrarPago()" style="padding: 8px 20px;">Registrar Pago</button>
+                    </div> -->
+
+                    <!-- Historial de pagos por semana (colapsable) -->
+                    <div id="listaSemanas" style="max-height: 500px; overflow-y: auto;">
+                        <div class="cargando"><div class="spinner"></div></div>
+                    </div>
+                    <div style="width:100%;display:flex;justify-content:flex-end;margin-top:16px;">
+                    	<label style="cursor:pointer;color:#278233" onclick="verHistorialCompleto()">Ver Historial de Pagos Completo</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para registrar pago de nómina (NOMINA) -->
+    <div id="modalRegistrarPago" class="form-modal">
+        <div class="form-content" style="width: 450px;">
+            <span class="close-cuenta" onclick="cerrarModalRegistrarPago()">&times;</span>
+            <h3 style="margin-bottom: 20px;">Registrar Pago de Nómina</h3>
+            <form id="formRegistrarPagoNomina">
+                <div class="form-group">
+                    <label>Trabajador:</label>
+                    <select id="nominaSelectTrabajador" required style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;">
+                        <option value="">Seleccionar trabajador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Deuda Pendiente:</label>
+                    <input type="text" id="nominaDeuda" readonly style="background: #f0f0f0;">
+                </div>
+                <div class="form-group">
+                    <label>Monto a Pagar (Producción):</label>
+                    <input type="number" step="0.01" id="nominaMonto" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Total Neto a Pagar:</label>
+                    <input type="text" id="nominaTotalNeto" readonly style="background: #f0f0f0; font-weight: bold; color: #278233;">
+                </div>
+                <div class="form-group">
+                    <label>Método de Pago:</label>
+                    <select id="nominaMetodo">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Observaciones:</label>
+                    <textarea id="nominaObs" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Registrar Pago</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para préstamo -->
+    <div id="modalPrestamo" class="form-modal">
+        <div class="form-content" style="width: 400px;">
+            <span class="close-cuenta" onclick="cerrarModalPrestamo()">&times;</span>
+            <h3 style="margin-bottom: 20px;">Nuevo Préstamo</h3>
+            <form id="formPrestamo">
+                <input type="hidden" id="prestamoTrabajadorId">
+                <div class="form-group">
+                    <label>Trabajador:</label>
+                    <input type="text" id="prestamoTrabajadorNombre" readonly style="background: #f0f0f0;">
+                </div>
+                <div class="form-group">
+                    <label>Monto:</label>
+                    <input type="number" step="0.01" id="prestamoMonto" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" id="prestamoFecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="prestamoDescripcion" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Registrar Préstamo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para trabajador -->
+    <div id="modalTrabajador" class="form-modal">
+        <div class="form-content" style="width: 450px;">
+            <span class="close-cuenta" onclick="cerrarModalTrabajador()">&times;</span>
+            <h3 id="modalTrabajadorTitle" style="margin-bottom: 20px;">Nuevo Trabajador</h3>
+            <form id="formTrabajador">
+                <input type="hidden" id="trabajadorId">
+                <div class="form-group">
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="trabajadorNombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Cédula:</label>
+                    <input type="text" id="trabajadorCedula" required>
+                </div>
+                <div class="form-group">
+                    <label>Cargo:</label>
+                    <input type="text" id="trabajadorCargo">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono:</label>
+                    <input type="text" id="trabajadorTelefono">
+                </div>
+                <div class="form-group" style="display:none">
+                    <label>Tipo de Pago:</label>
+                    <select id="trabajadorTipoPago" onchange="toggleSueldoFijo()">
+                        <option value="produccion">Por Producción (por kg/piezas)</option>
+                        <option value="fijo">Sueldo Fijo</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grupoSueldoFijo">
+                    <label>Monto del Sueldo:</label>
+                    <input type="number" step="0.01" id="trabajadorSueldoFijo" placeholder="Ej: 150.00">
+                    <small style="display: block; color: #666;">Monto fijo semanal que recibirá el trabajador</small>
+                </div>
+                <div style="display:flex;width:100%;gap:8px">
+                    <div class="form-group" style="width:100%">
+                        <label>Sucursal:</label>
+                        <select id="trabajadorSucursal">
+                            <!-- se llena dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="width:100%">
+                        <label>Día de corte:</label>
+                        <select id="trabajadorDiaCorte">
+                            <option value="1">Domingo</option><option value="2">Lunes</option>
+                            <option value="3">Martes</option><option value="4">Miércoles</option>
+                            <option value="5">Jueves</option><option value="6">Viernes</option>
+                            <option value="7">Sábado</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Guardar</button>
+            </form>
+        </div>
+    </div>
+    
+    
+    <!-- Modal de Egresos (Gastos y Costos) -->
+    <div id="modalEgresos" class="modal-produccion">
+        <div class="modal-content-produccion" style="width: 900px; max-width: 95%;">
+            <span class="close-produccion" id="closeEgresos" style="margin-left:auto;" onclick="cerrarModalEgresos()">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #278233;">Gastos y Costos</h2>
+
+            <!-- Pestañas de tipo (Gastos/Costos) -->
+            <div style="display: flex; gap: 10px; border-bottom: 2px solid #278233; margin-bottom: 15px;">
+                <button class="tab-egresos-btn active" onclick="cambiarTabEgresos('gasto')" style="background: #278233; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Gastos</button>
+                <button class="tab-egresos-btn" onclick="cambiarTabEgresos('costo')" style="background: #ddd; color: #333; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Costos</button>
+            </div>
+
+            <!-- Contenedor de pestañas de categorías -->
+            <div class="tabs-categorias-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                <div class="tabs-categorias-wrapper" id="tabsCategoriasEgresos" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <!-- Las pestañas de categorías se generarán dinámicamente -->
+                </div>
+                <button class="btn-agregar" onclick="abrirModalNuevaCategoriaEgreso()" style="font-size: 12px; padding: 6px 12px;">+ Categoría</button>
+            </div>
+
+            <!-- Botón para agregar egreso -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="form-btn" onclick="abrirFormularioEgreso()" style="padding: 8px 20px;">+ Nuevo Egreso</button>
+            </div>
+
+            <!-- Contenedor de la tabla -->
+            <div id="tablaEgresos">
+                <div class="cargando"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar categoría de egreso -->
+    <div id="modalCategoriaEgreso" class="form-modal">
+        <div class="form-content" style="width: 400px;">
+            <span class="close-cuenta" onclick="cerrarModalCategoriaEgreso()">&times;</span>
+            <h3 id="modalCategoriaTitle" style="margin-bottom: 20px;">Nueva Categoría</h3>
+            <form id="formCategoriaEgreso">
+                <input type="hidden" id="categoriaEgresoId">
+                <input type="hidden" id="categoriaEgresoTipo">
+                <div class="form-group">
+                    <label>Nombre de la Categoría:</label>
+                    <input type="text" id="categoriaEgresoNombre" required placeholder="Ej: Materia Prima, Servicios...">
+                </div>
+                <button type="submit" class="form-btn" style="width: 100%;">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+<!-- Formulario para agregar egreso -->
+<div id="formEgresoModal" class="form-modal">
+    <div class="form-content" style="width: 450px; max-width: 90%;">
+        <span class="close-cuenta" style="margin-left:auto;" onclick="cerrarFormularioEgreso()">&times;</span>
+        <h3 id="formEgresoTitle" style="margin-bottom: 20px; color: #278233;">Nuevo Egreso</h3>
+        <form id="formEgreso">
+            <input type="hidden" id="egresoTipo" value="gasto">
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" id="egresoFecha" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción:</label>
+                <input type="text" id="egresoDescripcion" required placeholder="Ej: Compra de insumos, Pago de servicios...">
+            </div>
+            <div class="form-group">
+                <label>Monto:</label>
+                <input type="number" step="0.01" id="egresoMonto" required placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Categoría:</label>
+                <select id="egresoCategoria" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;">
+                    <option value="">Sin categoría</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Método de Pago:</label>
+                <select id="egresoMetodoPago">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="cheque">Cheque</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Referencia (opcional):</label>
+                <input type="text" id="egresoReferencia" placeholder="Factura #, comprobante...">
+            </div>
+            <div class="form-group">
+                <label>Observaciones:</label>
+                <textarea id="egresoObservaciones" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+            </div>
+            <button type="submit" class="form-btn" style="width: 100%;">Guardar</button>
+        </form>
+    </div>
+</div>
+    
+    <!-- Modal de Materia Prima -->
+<div id="modalMateriaPrima" class="modal-produccion">
+    <div class="modal-content-produccion" style="width: 1000px;">
+        <span class="close-produccion" id="closeMateriaPrima" style="margin-left:auto;" onclick="cerrarModalMateriaPrima()">&times;</span>
+        <h2 style="margin-bottom: 20px; color: rgba(0,0,0,.8);">Recepción de Material</h2>
+
+        <div style="display: flex; gap: 20px;">
+            <!-- Sidebar de proveedores -->
+            <div style="width: 250px; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Proveedores</h3>
+                    <button class="btn-agregar" onclick="abrirModalProveedor()" style="font-size: 14px; padding: 5px 10px;">+</button>
+                </div>
+                <div id="listaProveedores" style="max-height: 450px; overflow-y: auto;">
+                    <div class="cargando"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div style="flex: 1;">
+                <!-- Botón único para registrar recepción -->
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                    <button class="form-btn" onclick="abrirFormularioMateriaPrima()" style="padding: 8px 20px;">+ Registrar Recepcion</button>
+                </div>
+
+                <!-- Tabla de recepciones (colapsable por semana) -->
+                <div id="listaRecepciones" style="max-height: 500px; overflow-y: auto;">
+                    <div class="cargando"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario para registrar recepción de leche -->
+<div id="formMateriaPrimaModal" class="form-modal">
+    <div class="form-content" style="width: 480px;">
+        <span class="close-cuenta" onclick="cerrarFormularioMateriaPrima()">&times;</span>
+        <h3 style="margin-bottom: 20px;">Registrar Recepción</h3>
+        <form id="formMateriaPrima">
+            <div style="display:flex;gap:6px">
+                <div class="form-group" style="width:100%">
+                    <label>Fecha:</label>
+                    <input type="date" id="mpFecha" required>
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Hora:</label>
+                    <input type="time" id="mpHora" required>
+                </div>
+            </div>
+            
+            <div style="display:flex;gap:6px;">
+                <div class="form-group" style="width:100%">
+                    <label>Proveedor:</label>
+                    <select id="mpProveedor" required style="width: 100%; padding: 8px;">
+                        <option value="">Seleccionar proveedor</option>
+                    </select>
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Tipo de Leche:</label>
+                    <select id="mpTipoLeche" required>
+                        <option value="normal">Normal</option>
+                        <option value="especial">Especial</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display:flex;gap:6px;">
+                <div class="form-group" style="width:100%">
+                    <label>Cantidad (litros):</label>
+                    <input type="number" step="0.01" id="mpCantidad" required placeholder="0.00" oninput="calcularCostoTotal()">
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Precio Unitario ($/litro):</label>
+                    <input type="number" step="0.01" id="mpCostoPorLitro" required placeholder="0.00" oninput="calcularCostoTotal()">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Costo Total:</label>
+                <input type="text" id="mpCostoTotal" readonly style="background:#f0f0f0; font-weight: bold;">
+            </div>
+            
+            <!-- Checkbox para guardar en cuentas por pagar -->
+            <div style="margin-bottom: 15px; background: rgba(39,130,51,0.1); padding: 10px; border-radius: 4px;display:none">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="mpGuardarEnCuentas">
+                    <span>Guardar esta deuda en Cuentas por Pagar</span>
+                </label>
+            </div>
+            
+            <!-- Opcional: Pago con producto -->
+            <div style="border-top: 1px solid rgba(0,0,0,.1); padding-top: 10px; margin-top: 10px;">
+                <label style="font-size: 13px; color: #666; cursor: pointer; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="mpPagoProducto" onchange="togglePagoProducto()"> 
+                    ¿Entregar reciclable?
+                </label>
+            </div>
+            
+            <div id="divPagoProducto" style="display: none; margin-top: 10px;">
+                <div class="form-group">
+                    <label>Producto Entregado:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select id="mpProductoEntregadoSelect" style="flex: 2; padding: 8px;">
+                            <option value="">Seleccionar producto</option>
+                        </select>
+                        <input type="text" id="mpProductoEntregadoText" placeholder="Otro producto" style="flex: 1; padding: 8px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad Entregada:</label>
+                    <input type="number" step="0.01" id="mpCantidadProducto" placeholder="0.00">
+                    <small id="unidadProducto" style="display: block; color: #666;">kg</small>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Observaciones:</label>
+                <textarea id="mpObservaciones" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+            </div>
+            <button type="submit" class="form-btn" style="width: 100%;">Guardar Registro</button>
+        </form>
+    </div>
+</div>
+    
+<!-- Modal para agregar proveedor -->
+<div id="modalProveedor" class="form-modal">
+    <div class="form-content" style="width: 400px;">
+        <span class="close-cuenta" onclick="cerrarModalProveedor()">&times;</span>
+        <h3 id="modalProveedorTitle" style="margin-bottom: 20px;">Nuevo Proveedor</h3>
+        <form id="formProveedor">
+            <input type="hidden" id="provId" />
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="wdith:100%;">
+                    <label>Nombre:</label>
+                    <input type="text" id="provNombre" required>
+                </div>
+                <div class="form-group" style="width:100%;">
+                    <label>Contacto:</label>
+                    <input type="text" id="provContacto">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="width:100%"> 
+                    <label>Teléfono:</label>
+                    <input type="text" id="provTelefono">
+                </div>
+                <div class="form-group" style="width:100%"> 
+                    <label>Email:</label>
+                    <input type="email" id="provEmail">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="width:100%">
+                    <label>Dirección:</label>
+                    <textarea id="provDireccion" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Día de Corte (día de pago):</label>
+                    <select id="provDiaCorte">
+                        <option value="1">Domingo</option>
+                        <option value="2" selected>Lunes</option>
+                        <option value="3">Martes</option>
+                        <option value="4">Miércoles</option>
+                        <option value="5">Jueves</option>
+                        <option value="6">Viernes</option>
+                        <option value="7">Sábado</option>
+                    </select>
+                </div>
+            </div>
+                
+            <button type="submit" class="form-btn" style="width: 100%;">Guardar Proveedor</button>
+        </form>
+    </div>
+</div>
+    
+<!-- Modal de Ventas -->
+<div id="modalVentas" class="modal-produccion">
+    <div class="modal-content-produccion" style="width: 900px; max-width: 95%;">
+        <span class="close-produccion close-ventas" onclick="cerrarModalVentas()">&times;</span>
+        <h2 style="margin-bottom: 20px; color: #278233;">Registro de Ventas</h2>
+
+        <!-- Pestañas -->
+        <div style="display: flex; gap: 10px; border-bottom: 2px solid #278233; margin-bottom: 20px;">
+            <button class="tab-ventas-btn active" onclick="cambiarTabVentas('nueva')" style="background: #278233; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Nueva Venta</button>
+            <button class="tab-ventas-btn" onclick="cambiarTabVentas('historial')" style="background: #ddd; color: #333; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;">Historial de Ventas</button>
+        </div>
+
+        <!-- Panel Nueva Venta -->
+        <!-- Reemplaza TODO dentro de <div id="tabNuevaVenta" ...> -->
+    <div id="tabNuevaVenta" class="tab-ventas-contenido">
+        <div style="display: flex; gap: 20px;">
+            <!-- Panel lateral de Clientes (NUEVO) -->
+            <div style="width: 250px; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 15px; flex-shrink: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0;">Clientes</h3>
+                    <button class="btn-agregar" onclick="abrirModalCliente()" style="font-size: 14px; padding: 5px 10px;">+</button>
+                </div>
+                <div id="listaClientesVenta" style="max-height: 450px; overflow-y: auto;">
+                    <div class="cargando"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- Formulario de Venta (Modificado) -->
+            <form id="formVenta" style="flex: 1; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                <!-- DATOS DEL CLIENTE (Cambiado a un select + campos de solo lectura) -->
+                <div style="margin-bottom: 20px; padding: 6px; border-radius: 8px;">
+                    <h3 style="color: #278233; margin-bottom: 10px;">Datos del Cliente</h3>
+                    <div style="display:flex;width:100%;gap:8px;">
+                        <div class="form-group" style="width:100%">
+                            <label>Seleccionar Cliente *</label>
+                            <select id="ventaClienteId" required style="width: 100%; padding: 8px;">
+                                <option value="">-- Seleccione un cliente --</option>
+                            </select>
+                            <small style="color: #666;">Los datos se cargarán automáticamente</small>
+                        </div>
+                        <div class="form-group" style="width:100%">
+                            <label>Nombre / Razón Social</label>
+                            <input type="text" id="ventaClienteNombre" readonly style="background:#f0f0f0;">
+                        </div>
+                    </div>
+                    <div style="display:flex;width:100%;gap:8px;">
+                        <div class="form-group" style="width:100%">
+                            <label>RIF / Cédula</label>
+                            <input type="text" id="ventaClienteRif" readonly style="background:#f0f0f0;">
+                        </div>
+                        <div class="form-group" style="width:100%">
+                            <label>Teléfono</label>
+                            <input type="text" id="ventaClienteTelefono" readonly style="background:#f0f0f0;">
+                        </div>
+					</div>
+                    <div style="display:flex;width:100%;gap:8px;">
+                        <div class="form-group" style="width:100%">
+                            <label>Contacto</label>
+                            <input type="text" id="ventaClienteContacto" readonly style="background:#f0f0f0;">
+                        </div>
+                    
+                        <div class="form-group" style="width:100%">
+                            <label>Email</label>
+                            <input type="email" id="ventaClienteEmail" readonly style="background:#f0f0f0;">
+                        </div>
+                    </div>
+                        <div class="form-group" style="width:100%">
+                            <label>Dirección</label>
+                            <input type="text" id="ventaClienteDireccion" readonly style="background:#f0f0f0;">
+                        </div>
+                </div>
+
+                <!-- DATOS DE LA VENTA -->
+                <div style="margin-bottom: 20px; padding: 6px; border-radius: 8px;">
+                    <h3 style="color: #278233; margin-bottom: 10px;">Datos de la Venta</h3>
+                    <div style="display: flex; width: 100%; gap: 8px; align-items: stretch;">
+                        <div style="display: flex; flex-direction: column; width: 100%; gap: 8px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Fecha *</label>
+                                <input type="date" id="ventaFecha" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Método de Pago *</label>
+                                <select id="ventaMetodoPago" required>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="transferencia">Transferencia</option>
+                                    <option value="cheque">Cheque</option>
+                                    <option value="credito">Crédito</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Sucursal</label>
+                                <select id="ventaSucursalId" style="width: 100%; padding: 8px;">
+                                    <option value="">-- Todas las sucursales --</option>
+                                    <option value="1">Principal</option>
+                                    <option value="2">Cerro Verde</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="width: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
+                            <label>Observaciones</label>
+                            <textarea id="ventaObservaciones" rows="3" style="width: 100%; height: 100%; min-height: 78px; resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- Productos (Sin cambios) -->
+                <div style="margin-bottom: 20px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px;">
+                    <h3 style="color: #278233; margin-bottom: 10px;">Productos</h3>
+                    <div id="listaProductosVenta">
+                        <div class="producto-row" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                            <select class="producto-select" style="flex: 2; min-width: 150px; padding: 8px;" required>
+                                <option value="">Seleccionar producto</option>
+                            </select>
+                            <input type="number" step="0.01" class="producto-cantidad" placeholder="kg/L" style="flex: 1; min-width: 100px; padding: 8px;" required>
+                            <input type="number" step="1" class="venta-piezas" placeholder="Piezas" style="flex: 1; min-width: 80px; padding: 8px;" value="">
+                            <input type="number" step="0.01" class="producto-precio-unitario" placeholder="Precio unitario" style="flex: 1; min-width: 100px; padding: 8px;" required>
+                            <button type="button" class="btn-eliminar" onclick="eliminarProductoRow(this)" style="font-weight: bold; color: rgba(0,0,0,.7); padding: 8px 12px;">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="form-btn" onclick="agregarProductoRow()" style="margin-top: 10px; padding: 6px 12px;">+ Agregar Producto</button>
+
+                    <div style="margin-top: 20px; text-align: right; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <div style="font-size: 24px; color: #278233;"><strong>TOTAL:</strong> $<span id="ventaTotal">0.00</span></div>
+                    </div>
+
+                    <button type="submit" class="form-btn" style="width: 100%; padding: 12px; margin-top:auto">Facturar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <!-- Panel Historial -->
+        <div id="tabHistorialVentas" class="tab-ventas-contenido" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Historial de Ventas</h3>
+            </div>
+            <div id="tablaHistorialVentas" style="max-height: 450px; overflow-y: auto;">
+                <div class="cargando"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<!-- Modal para registrar pago a proveedor (SIMPLIFICADO) -->
+<div id="modalPagoProveedor" class="form-modal">
+    <div class="form-content" style="width: 550px; max-width: 90%; margin: 5% auto;">
+        <span class="close-cuenta" onclick="cerrarModalPagoProveedor()">&times;</span>
+        <h3 id="modalPagoProveedorTitle" style="margin-bottom: 20px; color: #278233;">Registrar Pago a Proveedor</h3>
+        <form id="formPagoProveedor">
+            <input type="hidden" id="pagoProveedorId">
+            
+            <!-- Período EDITABLE -->
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <div class="form-group" style="width:100%">
+                    <label>Período Inicio:</label>
+                    <input type="date" id="pagoPeriodoInicio" class="form-control" required>
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Período Fin:</label>
+                    <input type="date" id="pagoPeriodoFin" class="form-control" required>
+                </div>
+            </div>
+            
+            <!-- Botón para recalcular según día de corte -->
+            <div style="text-align: right; margin-top: -10px; margin-bottom: 15px;">
+                <button type="button" class="btn-editar" onclick="recalcularPeriodoProveedor()" style="font-size: 12px; padding: 4px 10px;">⟳ Calcular según día de corte</button>
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <div class="form-group" style="width:100%">
+                    <label>Total Leche (litros):</label>
+                    <input type="text" id="pagoTotalLeche" readonly style="background:#f0f0f0; font-weight: bold;">
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Costo Total a Pagar:</label>
+                    <input type="text" id="pagoCostoTotal" readonly style="background:#f0f0f0; font-weight: bold; color:#278233;">
+                </div>
+            </div>
+            
+            <div class="form-group" style="display:none">
+                <label>Deudas Pendientes (préstamos):</label>
+                <input type="text" id="pagoDeudasPendientes" readonly style="background:#f0f0f0;">
+            </div>
+            
+            <!-- Adelantos pendientes -->
+            <div class="form-group">
+                <label>Adelantos Pendientes:</label>
+                <div id="listaAdelantosProveedor" style="max-height: 150px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; padding: 8px;display:flex;flex-direction:column;gap:4px">
+                    <div class="cargando">Cargando adelantos...</div>
+                </div>
+                <small style="color: #666;">Selecciona los adelantos a deducir del pago</small>
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <div class="form-group" style="width:100%">
+                    <label>Método de Pago:</label>
+                    <select id="pagoMetodo">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group" style="width:100%">
+                    <label>Fecha de Pago:</label>
+                    <input type="date" id="pagoFecha" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Observaciones:</label>
+                <textarea id="pagoObservaciones" rows="2" style="width:100%; padding:8px;"></textarea>
+            </div>
+            
+            <button type="submit" class="form-btn" style="width:100%;">Registrar Pago</button>
+        </form>
+    </div>
+</div>
+    
+<!-- Modal para ver historial de pagos del proveedor -->
+<div id="modalHistorialPagosProveedor" class="form-modal">
+    <div class="form-content" style="width: 700px; max-width: 90%;">
+        <span class="close-cuenta" onclick="cerrarModalHistorialPagos()">&times;</span>
+        <h3 id="historialPagosTitle" style="margin-bottom: 20px;">Historial de Pagos</h3>
+        <div id="historialPagosLista" style="max-height: 400px; overflow-y: auto;">
+            <div class="cargando">Cargando...</div>
+        </div>
+    </div>
+</div>
+    
+    
+<!-- Modal para registrar adelanto a proveedor -->
+<div id="modalAdelantoProveedor" class="form-modal">
+    <div class="form-content" style="width: 450px;">
+        <span class="close-cuenta" onclick="cerrarModalAdelantoProveedor()">&times;</span>
+        <h3 id="modalAdelantoTitle" style="margin-bottom: 20px;">Nuevo Adelanto</h3>
+        <form id="formAdelantoProveedor">
+            <input type="hidden" id="adelantoProveedorId">
+            <div class="form-group">
+                <label>Proveedor:</label>
+                <input type="text" id="adelantoProveedorNombre" readonly style="background: #f0f0f0;">
+            </div>
+            <div class="form-group">
+                <label>Monto:</label>
+                <input type="number" step="0.01" id="adelantoMonto" required>
+            </div>
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" id="adelantoFecha" required>
+            </div>
+            <div class="form-group">
+                <label>Método de Pago:</label>
+                <select id="adelantoMetodoPago">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="cheque">Cheque</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Referencia:</label>
+                <input type="text" id="adelantoReferencia" placeholder="N° de cheque, comprobante...">
+            </div>
+            <div class="form-group">
+                <label>Descripción:</label>
+                <textarea id="adelantoDescripcion" rows="2" style="width: 100%; padding: 8px; border: 1px solid rgba(0,0,0,.4); border-radius: 4px;"></textarea>
+            </div>
+            <button type="submit" class="form-btn" style="width: 100%;">Registrar Adelanto</button>
+        </form>
+    </div>
+</div>
+    
+<!-- Modal para Cliente (Nuevo/Editar) -->
+<div id="modalCliente" class="form-modal">
+    <div class="form-content" style="width: 450px;">
+        <span class="close-cuenta" onclick="cerrarModalCliente()">&times;</span>
+        <h3 id="modalClienteTitle" style="margin-bottom: 20px;">Nuevo Cliente</h3>
+        <form id="formCliente">
+            <input type="hidden" id="clienteId">
+            <div class="form-group">
+                <label>Nombre / Razón Social *</label>
+                <input type="text" id="clienteNombre" required>
+            </div>
+            <div class="form-group">
+                <label>RIF / Cédula</label>
+                <input type="text" id="clienteRif">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="clienteTelefono">
+            </div>
+            <div class="form-group">
+                <label>Contacto</label>
+                <input type="text" id="clienteContacto">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="clienteEmail">
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <textarea id="clienteDireccion" rows="2" style="width: 100%; padding: 8px;"></textarea>
+            </div>
+            <button type="submit" class="form-btn" style="width: 100%;">Guardar Cliente</button>
+        </form>
+    </div>
+</div>
+    
+</body>   
+    
+    <script>
+    // Función para formatear nombres (quitar guiones bajos y capitalizar)
+    function formatearNombre(texto) {
+        if (!texto) return '';
+        return texto.split('_').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    }
+</script>
+    
+    
+<!-- Modal para vista previa de cuentas pendientes por cobrar -->
+<div id="modalVistaPreviaCobrar" class="form-modal">
+    <div class="form-content" style="width: 700px; max-width: 90%;">
+        <span class="close-cuenta" onclick="cerrarModalVistaPreviaCobrar()">&times;</span>
+        <h3 style="color: #278233; margin-bottom: 15px;">Cuentas por Cobrar Pendientes</h3>
+        <div id="tablaVistaPreviaCobrar" style="max-height: 500px; overflow-y: auto;">
+            <div class="cargando"><div class="spinner"></div></div>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+            <button class="form-btn" onclick="exportarVistaPreviaExcel()">Exportar a Excel</button>
+            <button class="form-btn" onclick="exportarVistaPreviaPDF()">Exportar a PDF</button>
+        </div>
+    </div>
+</div>
+    
+<script>
+// ========== FUNCIONES PARA EXPORTAR CUENTAS POR COBRAR PENDIENTES ==========
+async function exportarCuentasPendientesCobrar() {
+    try {
+        const response = await fetch('db/cuentas.php?action=obtener_cobrar_pendientes');
+        const data = await response.json();
+        
+        if (!data.success || !data.datos || data.datos.length === 0) {
+            alert('No hay cuentas por cobrar pendientes');
+            return;
+        }
+        
+        mostrarModalVistaPrevia(data.datos);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar las cuentas pendientes');
+    }
+}
+
+function mostrarModalVistaPrevia(cuentas) {
+    const container = document.getElementById('tablaVistaPreviaCobrar');
+    
+    let html = `
+        <table class="tabla-cuentas" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="border-bottom: 2px solid #278233; padding: 10px; text-align: left;">Cliente</th>
+                    <th style="border-bottom: 2px solid #278233; padding: 10px; text-align: left;">Monto Pendiente</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    let totalGeneral = 0;
+    
+    cuentas.forEach(cuenta => {
+        const cliente = cuenta.cliente_nombre || 'Cliente sin nombre';
+        const monto = parseFloat(cuenta.monto_pendiente || cuenta.monto || 0);
+        totalGeneral += monto;
+        
+        html += `
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(cliente)}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; color: #a18f1b;">$${monto.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+            <tfoot>
+                <tr style="background: #e8f5e9; font-weight: bold;">
+                    <td style="padding: 10px; text-align: right;">TOTAL GENERAL:</td>
+                    <td style="padding: 10px; color: #278233;">$${totalGeneral.toFixed(2)}</td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+    
+    container.innerHTML = html;
+    document.getElementById('modalVistaPreviaCobrar').style.display = 'block';
+    
+    // Guardar datos para exportación
+    window.cuentasPendientesExport = cuentas;
+}
+
+function cerrarModalVistaPreviaCobrar() {
+    document.getElementById('modalVistaPreviaCobrar').style.display = 'none';
+}
+
+// Exportar a Excel (XLSX)
+function exportarVistaPreviaExcel() {
+    if (!window.cuentasPendientesExport || window.cuentasPendientesExport.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    const excelData = [['CLIENTE', 'MONTO PENDIENTE ($)']];
+    let total = 0;
+    
+    window.cuentasPendientesExport.forEach(cuenta => {
+        const cliente = cuenta.cliente_nombre || 'Cliente sin nombre';
+        const monto = parseFloat(cuenta.monto_pendiente || cuenta.monto || 0);
+        excelData.push([cliente, monto]);
+        total += monto;
+    });
+    excelData.push(['TOTAL GENERAL', total]);
+    
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Cuentas_Pendientes');
+    
+    const fecha = new Date();
+    const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}`;
+    XLSX.writeFile(wb, `cuentas_pendientes_${timestamp}.xlsx`);
+}
+
+// Exportar a PDF (usando window.print)
+function exportarVistaPreviaPDF() {
+    if (!window.cuentasPendientesExport || window.cuentasPendientesExport.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    let total = 0;
+    window.cuentasPendientesExport.forEach(cuenta => {
+        total += parseFloat(cuenta.monto_pendiente || cuenta.monto || 0);
+    });
+    
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Cuentas por Cobrar Pendientes</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; }
+                .fecha { text-align: center; color: #666; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background: #278233; color: white; }
+                .total { background: #e8f5e9; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <h1>Cuentas por Cobrar Pendientes</h1>
+            <div class="fecha">Generado: ${new Date().toLocaleString()}</div>
+            <table>
+                <thead><tr><th>Cliente</th><th>Monto Pendiente ($)</th></tr></thead>
+                <tbody>
+                    ${window.cuentasPendientesExport.map(c => `
+                        <tr>
+                            <td>${escapeHtml(c.cliente_nombre || 'Cliente sin nombre')}</td>
+                            <td style="text-align:right">$${(parseFloat(c.monto_pendiente || c.monto || 0)).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr class="total">
+                        <td style="text-align:right"><strong>TOTAL GENERAL:</strong></td>
+                        <td style="text-align:right"><strong>$${total.toFixed(2)}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=800,height=600');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+    ventana.print();
+}    
+</script>
+    
+    
+<script>
+    // ========== FUNCIONES DE FILTRADO GENÉRICAS ==========
+
+// Filtro por búsqueda en columnas específicas
+function configurarBusquedaTabla(inputId, tablaContenedorId, columnasIndices) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    input.addEventListener('keyup', function() {
+        const filtro = this.value.toLowerCase();
+        const container = document.getElementById(tablaContenedorId);
+        if (!container) return;
+        
+        const tabla = container.querySelector('table');
+        if (!tabla) return;
+        
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            let mostrar = false;
+            const celdas = fila.querySelectorAll('td');
+            
+            for (let idx of columnasIndices) {
+                if (celdas[idx] && celdas[idx].innerText.toLowerCase().indexOf(filtro) > -1) {
+                    mostrar = true;
+                    break;
+                }
+            }
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    });
+}
+
+// Filtro por rango de fechas en columna específica
+function configurarFiltroFechas(tablaContenedorId, fechaInicioId, fechaFinId, columnaFechaIndex) {
+    const btnFiltrar = document.getElementById('btnFiltrarFechas');
+    const btnLimpiar = document.getElementById('btnLimpiarFechas');
+    
+    if (!btnFiltrar) return;
+    
+    function aplicarFiltro() {
+        const fechaInicio = document.getElementById(fechaInicioId)?.value;
+        const fechaFin = document.getElementById(fechaFinId)?.value;
+        const container = document.getElementById(tablaContenedorId);
+        if (!container) return;
+        
+        const tabla = container.querySelector('table');
+        if (!tabla) return;
+        
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            if (!celdas[columnaFechaIndex]) {
+                fila.style.display = '';
+                return;
+            }
+            
+            let fechaCelda = celdas[columnaFechaIndex].innerText.trim();
+            // Convertir formato DD/MM/YYYY a YYYY-MM-DD
+            let partes = fechaCelda.split('/');
+            if (partes.length === 3) {
+                fechaCelda = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            
+            let mostrar = true;
+            if (fechaInicio && fechaCelda < fechaInicio) mostrar = false;
+            if (fechaFin && fechaCelda > fechaFin) mostrar = false;
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltros() {
+        const fechaInicio = document.getElementById(fechaInicioId);
+        const fechaFin = document.getElementById(fechaFinId);
+        if (fechaInicio) fechaInicio.value = '';
+        if (fechaFin) fechaFin.value = '';
+        aplicarFiltro();
+    }
+    
+    btnFiltrar.onclick = aplicarFiltro;
+    if (btnLimpiar) btnLimpiar.onclick = limpiarFiltros;
+}
+
+// Filtro combinado (búsqueda + fechas)
+function configurarFiltrosCompletos(tablaContenedorId, busquedaId, columnasBusqueda, fechaInicioId, fechaFinId, columnaFechaIndex) {
+    configurarBusquedaTabla(busquedaId, tablaContenedorId, columnasBusqueda);
+    configurarFiltroFechas(tablaContenedorId, fechaInicioId, fechaFinId, columnaFechaIndex);
+}
+</script>
+    
+    
+<script>
+    // Forzar la carga de las gráficas después de que todo esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pequeño retraso para asegurar que los canvas estén en el DOM
+        setTimeout(() => {
+            if (typeof Chart !== 'undefined') {
+                console.log('✅ Chart.js cargado correctamente');
+                cargarEstadisticasResumen();
+            } else {
+                console.error('❌ Chart.js NO está cargado');
+                // Cargar Chart.js dinámicamente si no existe
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+                script.onload = () => {
+                    console.log('✅ Chart.js cargado dinámicamente');
+                    cargarEstadisticasResumen();
+                };
+                document.head.appendChild(script);
+            }
+        }, 500);
+    });
+</script>
+
+<script>
+    // Función mejorada para las gráficas
+    // ========== ESTADÍSTICAS Y GRÁFICAS (VERSIÓN COMPACTA) ==========
+let chartProduccion = null;
+let chartEgresos = null;
+let chartProduccionExpand = null;
+let chartEgresosExpand = null;
+let produccionDataCache = null;
+let egresosDataCache = null;
+
+async function cargarEstadisticasResumen() {
+    try {
+        const response = await fetch('db/estadisticas.php');
+        const data = await response.json();
+        
+        if (!data.success) {
+            console.error('Error en datos');
+            return;
+        }
+        
+        // Guardar datos en caché para expandir
+        produccionDataCache = data.produccion;
+        egresosDataCache = data.egresos.por_categoria;
+        
+        // Actualizar tarjetas
+        document.getElementById('totalPagar').innerHTML = `$${data.cuentas.pagar.toFixed(2)}`;
+        document.getElementById('totalCobrar').innerHTML = `$${data.cuentas.cobrar.toFixed(2)}`;
+        document.getElementById('totalEgresos').innerHTML = `$${data.egresos.total.toFixed(2)}`;
+        document.getElementById('totalDeudas').innerHTML = `$${data.trabajadores.total_deuda.toFixed(2)}`;
+        
+        // Lista de deudas
+        if (data.trabajadores.lista_deudas.length === 0) {
+            document.getElementById('listaDeudas').innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Sin deudas pendientes</div>';
+        } else {
+            let html = '';
+            data.trabajadores.lista_deudas.slice(0, 5).forEach(t => {
+                html += `<div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.05);">
+                            <span>${escapeHtml(t.nombre)}</span>
+                            <span style="color: #ff9800; font-weight: bold;">$${t.deuda.toFixed(2)}</span>
+                        </div>`;
+            });
+            if (data.trabajadores.lista_deudas.length > 5) {
+                html += `<div style="text-align: center; padding-top: 5px; font-size: 10px; color: #999;">+${data.trabajadores.lista_deudas.length - 5} más</div>`;
+            }
+            document.getElementById('listaDeudas').innerHTML = html;
+        }
+        
+        // Producción por producto
+        if (data.produccion.por_producto.length > 0) {
+            let prodHtml = '';
+            data.produccion.por_producto.slice(0, 5).forEach(p => {
+                let valorMostrado;
+                let unidad = p.unidad;
+
+                // Para litros o kg, decidir si mostrar decimales
+                if (unidad === 'litros' || unidad === 'kg') {
+                    if (p.total === Math.floor(p.total)) {
+                        valorMostrado = p.total;
+                    } else {
+                        valorMostrado = p.total.toFixed(1);
+                    }
+                } else if (unidad === 'pz') {
+                    valorMostrado = Math.round(p.total);
+                } else {
+                    valorMostrado = p.total;
+                }
+
+                // Icono según el tipo
+                let icono = '';
+                if (unidad === 'litros') icono = '🥛 ';
+                else if (unidad === 'kg') icono = '⚖️ ';
+                else if (unidad === 'pz') icono = '📦 ';
+
+                prodHtml += `<div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,.05);">
+                                <span>${icono}${p.nombre}</span>
+                                <span style="font-weight: bold; color: #278233;">${valorMostrado} ${unidad}</span>
+                            </div>`;
+            });
+            document.getElementById('totalesProduccion').innerHTML = prodHtml;
+        } else {
+            document.getElementById('totalesProduccion').innerHTML = '<div style="text-align:center;padding:10px;">Sin datos</div>';
+        }
+        
+        // Colores de la empresa
+        const coloresChart = ['#278233', '#276782', '#803c30', '#f4d71b', '#4A90A4', '#6B8E7B', '#9B6B5A'];
+        
+        // Gráfica de producción (mini) - Proporción 6:5
+        if (typeof Chart !== 'undefined') {
+            const canvasProd = document.getElementById('graficaProduccion');
+            if (canvasProd) {
+                // Establecer proporción 6:5 (ancho = 100%, alto = 83.33% de ancho)
+                canvasProd.style.width = '100%';
+                canvasProd.style.height = 'auto';
+                canvasProd.style.aspectRatio = '6/5';
+                canvasProd.width = canvasProd.offsetWidth;
+                canvasProd.height = canvasProd.offsetWidth * 5 / 6;
+                
+                const ctxProd = canvasProd.getContext('2d');
+                if (chartProduccion) chartProduccion.destroy();
+                chartProduccion = new Chart(ctxProd, {
+                    type: 'line',
+                    data: {
+                        labels: data.produccion.dias,
+                        datasets: [{
+                            data: data.produccion.diaria,
+                            borderColor: '#278233',
+                            backgroundColor: 'rgba(39,130,51,0.05)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            pointBackgroundColor: '#278233',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { 
+                            legend: { display: false }, 
+                            tooltip: { 
+                                enabled: true,
+                                callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)} kg/litros` }
+                            }
+                        },
+                        scales: { 
+                            x: { 
+                                ticks: { font: { size: 9 }, color: '#666' }, 
+                                grid: { display: false } 
+                            }, 
+                            y: { 
+                                ticks: { font: { size: 9 }, color: '#666' }, 
+                                grid: { display: false, drawBorder: false }, 
+                                beginAtZero: true 
+                            } 
+                        }
+                    }
+                });
+            }
+            
+            // Gráfica de egresos (mini) - Proporción 6:5
+            const canvasEgr = document.getElementById('graficaEgresosCategoria');
+            if (canvasEgr && data.egresos.por_categoria.length > 0) {
+                canvasEgr.style.width = '100%';
+                canvasEgr.style.height = 'auto';
+                canvasEgr.style.aspectRatio = '6/5';
+                canvasEgr.width = canvasEgr.offsetWidth;
+                canvasEgr.height = canvasEgr.offsetWidth * 5 / 6;
+                
+                const ctxEgr = canvasEgr.getContext('2d');
+                if (chartEgresos) chartEgresos.destroy();
+                chartEgresos = new Chart(ctxEgr, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.egresos.por_categoria.map(c => c.categoria.length > 12 ? c.categoria.substring(0, 10) + '..' : c.categoria),
+                        datasets: [{
+                            data: data.egresos.por_categoria.map(c => c.total),
+                            backgroundColor: coloresChart.slice(0, data.egresos.por_categoria.length),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '60%',
+                        plugins: { 
+                            legend: { display: false }, 
+                            tooltip: { 
+                                enabled: true,
+                                callbacks: { label: (ctx) => `${ctx.label}: $${ctx.raw.toFixed(2)}` }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+    }
+}
+    
+// Función para expandir gráfica de producción
+function expandirGraficaProduccion() {
+    if (!produccionDataCache) return;
+    
+    const modal = document.getElementById('modalExpandProd');
+    const canvas = document.getElementById('graficaProduccionExpand');
+    
+    modal.style.display = 'block';
+    setTimeout(() => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        if (chartProduccionExpand) chartProduccionExpand.destroy();
+        chartProduccionExpand = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: produccionDataCache.dias,
+                datasets: [{
+                    label: 'Producción (kg/litros)',
+                    data: produccionDataCache.diaria,
+                    borderColor: '#278233',
+                    backgroundColor: 'rgba(39,130,51,0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#278233',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'kg / litros' } } }
+            }
+        });
+    }, 50);
+}
+
+// Función para expandir gráfica de egresos
+function expandirGraficaEgresos() {
+    if (!egresosDataCache || egresosDataCache.length === 0) return;
+    
+    const coloresChart = ['#278233', '#276782', '#803c30', '#f4d71b', '#4A90A4', '#6B8E7B', '#9B6B5A'];
+    
+    const modal = document.getElementById('modalExpandEgr');
+    const canvas = document.getElementById('graficaEgresosCategoriaExpand');
+    
+    modal.style.display = 'block';
+    setTimeout(() => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        if (chartEgresosExpand) chartEgresosExpand.destroy();
+        chartEgresosExpand = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: egresosDataCache.map(c => c.categoria),
+                datasets: [{
+                    data: egresosDataCache.map(c => c.total),
+                    backgroundColor: coloresChart.slice(0, egresosDataCache.length),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                cutout: '50%',
+                plugins: { 
+                    legend: { position: 'bottom', labels: { font: { size: 11, family: 'mainFont' } } },
+                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: $${ctx.raw.toFixed(2)}` } }
+                }
+            }
+        });
+    }, 50);
+}
+    
+// Event listeners para expansión
+document.getElementById('expandProd')?.addEventListener('click', expandirGraficaProduccion);
+document.getElementById('expandEgr')?.addEventListener('click', expandirGraficaEgresos);
+// Modificar toggleMenu
+const toggleOriginalResumen = window.toggleMenu;
+window.toggleMenu = async function(menu) {
+    if (toggleOriginalResumen) await toggleOriginalResumen(menu);
+    if (menu === 'resumen') {
+        setTimeout(() => cargarEstadisticasResumen(), 200);
+    }
+};
+
+// Cargar si ya está visible
+setTimeout(() => {
+    if (document.getElementById('panelResumen').style.display === 'flex') {
+        cargarEstadisticasResumen();
+    }
+}, 500);
+    
+    // Modificar toggleMenu
+    const toggleOriginal2 = window.toggleMenu;
+    window.toggleMenu = async function(menu) {
+        if (toggleOriginal2) await toggleOriginal2(menu);
+        if (menu === 'resumen') {
+            setTimeout(() => cargarEstadisticasResumen(), 300);
+        }
+    };
+    
+    // Cargar si el panel ya está visible al inicio
+    setTimeout(() => {
+        if (document.getElementById('panelResumen').style.display === 'flex') {
+            cargarEstadisticasResumen();
+        }
+    }, 1000);
+
+    // Cargar manualmente si es necesario
+function cargarResumenManual() {
+    cargarEstadisticasResumen();
+}    
+</script>    
+    
+    
+    <script>
+    // ========== MÓDULO DE MATERIA PRIMA (RECEPCIÓN DE LECHE) ==========
+    function abrirModalMateriaPrima() {
+        setTimeout(() => window.forzarResetFocus(), 50);
+
+        document.getElementById('modalMateriaPrima').style.display = 'block';
+        cargarProveedores();
+        cargarRecepciones();
+        cargarProductosEnSelect();
+
+        // Resetear filtro
+        proveedorFiltroActual = null;
+        const tituloModal = document.querySelector('#modalMateriaPrima h2');
+        if (tituloModal) {
+            tituloModal.innerHTML = 'Recepción de Material';
+        }
+    }
+
+    function cerrarModalMateriaPrima() {
+        document.getElementById('modalMateriaPrima').style.display = 'none';
+    }    
+        // Ver detalle de recepción
+async function verDetalleRecepcion(id) {
+    const response = await fetch(`db/materia_prima.php?action=obtener_detalle_recepcion&id=${id}`);
+    const data = await response.json();
+    
+    if (!data.success) {
+        alert('Error al cargar el detalle');
+        return;
+    }
+    
+    const r = data.recepcion;
+    
+    let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Detalle de Recepción - ${r.id}</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; background: #f5f5f5; }
+                .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                h3 { color: #333; margin: 20px 0 10px 0; border-left: 4px solid #278233; padding-left: 12px; }
+                .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                .item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding: 8px 0; }
+                .label { font-weight: bold; color: #555; }
+                .value { color: #222; }
+                .observaciones { background: #fff8e1; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107; }
+                .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 14px; }
+                .btn-cerrar:hover { background: #1e6b28; }
+                .badge-si { background: #4CAF50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+                .badge-no { background: #999; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Detalle de Recepción #${r.id}</h2>
+                
+                <div class="grid">
+                    <div class="item">
+                        <span class="label">Fecha:</span>
+                        <span class="value">${formatearFecha(r.fecha)}</span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Proveedor:</span>
+                        <span class="value"><strong>${escapeHtml(r.proveedor_nombre)}</strong></span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Cantidad:</span>
+                        <span class="value"><strong>${parseFloat(r.cantidad_litros).toFixed(2)} litros</strong></span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Costo Total:</span>
+                        <span class="value"><strong>$${parseFloat(r.total_costo).toFixed(2)}</strong></span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Guardar en Cuentas:</span>
+                        <span class="value"><span class="${r.guardar_en_cuentas == 1 ? 'badge-si' : 'badge-no'}">${r.guardar_en_cuentas == 1 ? 'Sí' : 'No'}</span></span>
+                    </div>
+        `;
+    
+    if (r.pago_con_producto == 1) {
+        const unidad = r.producto_entregado === 'suero' ? 'litros' : 'kg';
+        html += `
+                    <div class="item">
+                        <span class="label">Reciclable:</span>
+                        <span class="value"><span class="badge-si">Sí</span></span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Entregado:</span>
+                        <span class="value">${escapeHtml(formatearNombre(r.producto_entregado))}</span>
+                    </div>
+                    <div class="item">
+                        <span class="label">Cantidad entregada:</span>
+                        <span class="value">${parseFloat(r.cantidad_producto).toFixed(2)} ${unidad}</span>
+                    </div>
+        `;
+    } else {
+        html += `
+                    <div class="item">
+                        <span class="label">Reciclable:</span>
+                        <span class="value"><span class="badge-no">No</span></span>
+                    </div>
+        `;
+    }
+    
+    // Información del proveedor
+    if (r.contacto || r.telefono || r.email) {
+        html += `
+                </div>
+                <h3>Información del Proveedor</h3>
+                <div class="grid">
+        `;
+        if (r.contacto) {
+            html += `<div class="item"><span class="label">Contacto:</span><span class="value">${escapeHtml(r.contacto)}</span></div>`;
+        }
+        if (r.telefono) {
+            html += `<div class="item"><span class="label">Teléfono:</span><span class="value">${escapeHtml(r.telefono)}</span></div>`;
+        }
+        if (r.email) {
+            html += `<div class="item"><span class="label">Email:</span><span class="value">${escapeHtml(r.email)}</span></div>`;
+        }
+        if (r.direccion) {
+            html += `<div class="item"><span class="label">Dirección:</span><span class="value">${escapeHtml(r.direccion)}</span></div>`;
+        }
+    }
+    
+    // Observaciones
+    if (r.observaciones && r.observaciones.trim() !== '') {
+        html += `
+                </div>
+                <div class="observaciones">
+                    <strong>Observaciones:</strong><br>
+                    ${escapeHtml(r.observaciones)}
+                </div>
+        `;
+    }
+    
+    html += `
+                </div>
+                <div style="text-align: right;">
+                    <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=750,height=600,scrollbars=yes');
+    ventana.document.write(html);
+}
+
+// Editar proveedor (desde el modal)
+function editarProveedorDesdeLista(id, nombre, contacto, telefono, email, direccion) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('provId').value = id;
+    document.getElementById('provNombre').value = nombre;
+    document.getElementById('provContacto').value = contacto || '';
+    document.getElementById('provTelefono').value = telefono || '';
+    document.getElementById('provEmail').value = email || '';
+    document.getElementById('provDireccion').value = direccion || '';
+    document.getElementById('provDiaCorte').value = dia_corte || '2';
+    
+    document.getElementById('modalProveedorTitle').innerHTML = 'Editar Proveedor';
+    document.getElementById('modalProveedor').style.display = 'block';
+}
+
+// Cargar productos dinámicamente para el select
+// Cargar productos dinámicamente desde la tabla productos (mismo método que producción)
+async function cargarProductosEnSelect() {
+    try {
+        const response = await fetch('db/obtener_productos_mp.php');
+        const data = await response.json();
+        
+        console.log('Productos recibidos:', data); // Para depuración
+        
+        if (data.success && data.productos) {
+            const select = document.getElementById('mpProductoEntregadoSelect');
+            if (select) {
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
+                // Filtrar productos activos, excluyendo la leche
+                const productosFiltrados = data.productos.filter(p => p.nombre !== 'leche' && p.activo == 1);
+                
+                productosFiltrados.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.nombre;
+                    const nombreFormateado = formatearNombre(p.nombre);
+                    option.textContent = nombreFormateado;
+                    option.setAttribute('data-es_leche', p.es_leche);
+                    select.appendChild(option);
+                });
+                
+                console.log('Productos cargados:', productosFiltrados.length);
+            }
+        } else {
+            console.error('Error al cargar productos:', data);
+            // Fallback: opciones manuales
+            const select = document.getElementById('mpProductoEntregadoSelect');
+            if (select) {
+                select.innerHTML = `
+                    <option value="">Seleccionar producto</option>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando productos:', error);
+        // Fallback en caso de error de red
+        const select = document.getElementById('mpProductoEntregadoSelect');
+        if (select) {
+            select.innerHTML = `
+                <option value="">Error cargando productos</option>
+            `;
+        }
+    }
+}
+
+// Calcular automáticamente costo total o precio por litro
+function calcularAutoCosto() {
+    const cantidad = parseFloat(document.getElementById('mpCantidad').value) || 0;
+    const costoTotal = parseFloat(document.getElementById('mpCostoTotal').value) || 0;
+    
+    // Si se ingresa cantidad y costo total, se puede mostrar el precio por litro (solo informativo)
+    if (cantidad > 0 && costoTotal > 0) {
+        const precioLitro = costoTotal / cantidad;
+        console.log(`Precio por litro: $${precioLitro.toFixed(4)}`);
+    }
+}
+
+// Función para obtener el producto entregado (combina select y texto)
+function getProductoEntregado() {
+    const selectValue = document.getElementById('mpProductoEntregadoSelect').value;
+    const textValue = document.getElementById('mpProductoEntregadoText').value.trim();
+    if (textValue) {
+        return textValue.toLowerCase().replace(/\s/g, '_');
+    }
+    return selectValue;
+}
+
+// Actualizar unidad según el producto seleccionado
+document.getElementById('mpProductoEntregadoSelect')?.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const esLeche = selectedOption.getAttribute('data-es_leche') === '1';
+    const unidadLabel = document.getElementById('unidadProducto');
+    if (esLeche) {
+        unidadLabel.innerHTML = 'litros';
+    } else {
+        unidadLabel.innerHTML = 'kg';
+    }
+});
+
+// Limpiar texto cuando se selecciona un producto del select
+document.getElementById('mpProductoEntregadoSelect')?.addEventListener('change', function() {
+    if (this.value) {
+        document.getElementById('mpProductoEntregadoText').value = '';
+    }
+});
+
+// Limpiar select cuando se escribe en texto
+document.getElementById('mpProductoEntregadoText')?.addEventListener('input', function() {
+    if (this.value) {
+        document.getElementById('mpProductoEntregadoSelect').value = '';
+    }
+});
+        
+// Cargar proveedores para el sidebar
+async function cargarProveedores() {
+    try {
+        const response = await fetch('db/materia_prima.php?action=obtener_proveedores');
+        const data = await response.json();
+        if (data.success) {
+            mostrarListaProveedores(data.proveedores);
+            cargarSelectProveedores(data.proveedores);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaProveedores').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarListaProveedores(proveedores) {
+    if (!proveedores || proveedores.length === 0) {
+        document.getElementById('listaProveedores').innerHTML = '<div class="cargando">No hay proveedores</div>';
+        return;
+    }
+    
+    const hoy = new Date();
+    const diaSemanaHoy = hoy.getDay(); // 0=Domingo, 1=Lunes...
+    // Mapear al formato del día de corte (1=Domingo, 2=Lunes...)
+    let diaSemanaNum = diaSemanaHoy + 1;
+    if (diaSemanaNum === 8) diaSemanaNum = 1;
+    
+    let html = '';
+    proveedores.forEach(p => {
+        const diaCorte = p.dia_corte || 2;
+        const esDiaCorte = (diaCorte == diaSemanaNum);
+        
+        html += `
+            <div class="menu-opcion" style="margin-bottom: 8px; padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); ${esDiaCorte ? 'background: rgba(39,130,51,0.15); border-left: 4px solid #278233;' : ''}">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1; cursor: pointer;" onclick="verDetalleRecepcionProveedor(${p.id})">
+                        <strong style="color:#222">${escapeHtml(p.nombre)}</strong>
+                        <p style="font-size: 11px; color: #666; margin: 2px 0;">
+                            ${p.contacto || 'Sin contacto'} | ${p.telefono || 'Sin teléfono'}
+                            ${esDiaCorte ? '<span style="background:#278233; color:white; padding:2px 6px; border-radius:4px; margin-left:8px;">Día de Corte</span>' : ''}
+                        </p>
+                    </div>
+                    <div>
+                        <button class="btn-menu-proveedor" 
+                                data-id="${p.id}"
+                                data-nombre="${escapeHtml(p.nombre)}"
+                                data-contacto="${escapeHtml(p.contacto || '')}"
+                                data-telefono="${escapeHtml(p.telefono || '')}"
+                                data-email="${escapeHtml(p.email || '')}"
+                                data-direccion="${escapeHtml(p.direccion || '')}"
+                                data-dia_corte="${p.dia_corte || 2}"
+                                onclick="mostrarMenuProveedor(event, ${p.id})"
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555; padding: 0 8px;">
+                            ⋮
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('listaProveedores').innerHTML = html;
+}
+        
+// Mostrar menú contextual para proveedor
+function mostrarMenuProveedor(event, proveedorId) {
+    event.stopPropagation();
+    
+    // Eliminar menú existente si hay
+    const menuExistente = document.getElementById('menuContextualProveedor');
+    if (menuExistente) {
+        menuExistente.remove();
+    }
+    
+    // Obtener el botón que disparó el evento
+    const btn = event.currentTarget;
+    
+    // Obtener datos del proveedor desde los atributos del botón
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const contacto = btn.getAttribute('data-contacto') || '';
+    const telefono = btn.getAttribute('data-telefono') || '';
+    const email = btn.getAttribute('data-email') || '';
+    const direccion = btn.getAttribute('data-direccion') || '';
+    
+    // Crear menú
+    const menu = document.createElement('div');
+    menu.id = 'menuContextualProveedor';
+    menu.style.cssText = `
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        min-width: 180px;
+        overflow: hidden;
+    `;
+    
+    menu.innerHTML = `
+        <div style="padding: 8px 12px; background: #278233; color: white; font-weight: bold; font-size: 13px;">
+            ${escapeHtml(nombre)}
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); editarProveedor(${proveedorId}, '${escapeHtml(nombre)}', '${escapeHtml(contacto)}', '${escapeHtml(telefono)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">✎</span>
+            <span>Editar proveedor</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); eliminarProveedorConfirmar(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">∅</span>
+            <span>Eliminar proveedor</span>
+        </div>
+    `;
+    
+    // Posicionar el menú cerca del botón
+    const rect = btn.getBoundingClientRect();
+    menu.style.left = rect.left - 150 + 'px';
+    menu.style.top = rect.bottom + 5 + 'px';
+    
+    document.body.appendChild(menu);
+    
+    // Cerrar menú al hacer clic fuera
+    setTimeout(() => {
+        document.addEventListener('click', function cerrarMenu(e) {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', cerrarMenu);
+            }
+        });
+    }, 10);
+}
+
+// Cerrar menú contextual de proveedor
+function cerrarMenuProveedor() {
+    const menu = document.getElementById('menuContextualProveedor');
+    if (menu) menu.remove();
+}
+
+// Confirmar eliminación de proveedor
+function eliminarProveedorConfirmar(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar al proveedor "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        eliminarProveedor(id);
+    }
+}
+
+// Función eliminarProveedor (ya existe, asegurar que cierre el menú)
+async function eliminarProveedor(id) {
+    if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
+    
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Proveedor eliminado');
+            cargarProveedores();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error al eliminar proveedor');
+    }
+}
+
+// Función para editar proveedor
+async function editarProveedor(id, nombre, contacto, telefono, email, direccion) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('provId').value = id;
+    document.getElementById('provNombre').value = nombre;
+    document.getElementById('provContacto').value = contacto;
+    document.getElementById('provTelefono').value = telefono;
+    document.getElementById('provEmail').value = email;
+    document.getElementById('provDireccion').value = direccion;
+    
+    document.getElementById('modalProveedorTitle').innerHTML = 'Editar Proveedor';
+    document.getElementById('modalProveedor').style.display = 'block';
+}
+
+// Eliminar proveedor
+async function eliminarProveedor(id) {
+    if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
+    
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Proveedor eliminado');
+            cargarProveedores();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al eliminar proveedor');
+    }
+}
+
+function cargarSelectProveedores(proveedores) {
+    const select = document.getElementById('mpProveedor');
+    select.innerHTML = '<option value="">Seleccionar proveedor</option>';
+    proveedores.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        option.textContent = `${p.nombre} ${p.contacto ? `- ${p.contacto}` : ''}`;
+        select.appendChild(option);
+    });
+}
+        
+function agregarFiltrosMateriaPrima() {
+    const container = document.getElementById('listaRecepciones');
+    if (!container) return;
+    
+    if (document.getElementById('filtrosMateriaPrima')) return;
+    
+    const filtrosHtml = `
+        <div id="filtrosMateriaPrima" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="filtro-grupo">
+                    <label>Buscar</label>
+                    <input type="text" id="busquedaMP" placeholder="Proveedor..." style="min-width: 200px;">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Desde</label>
+                    <input type="date" id="fechaInicioMP">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Hasta</label>
+                    <input type="date" id="fechaFinMP">
+                </div>
+                <div class="filtro-grupo">
+                    <button class="btn-filtro" id="btnFiltrarMP" style="padding: 0px 4px">Filtrar</button>
+                    <button class="btn-limpiar-filtros" id="btnLimpiarMP" style="padding: 0px 4px">Limpiar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('afterbegin', filtrosHtml);
+    
+    const inputBusqueda = document.getElementById('busquedaMP');
+    const btnFiltrar = document.getElementById('btnFiltrarMP');
+    const btnLimpiar = document.getElementById('btnLimpiarMP');
+    const fechaInicio = document.getElementById('fechaInicioMP');
+    const fechaFin = document.getElementById('fechaFinMP');
+    
+    function aplicarFiltros() {
+        const tabla = container.querySelector('table');
+        if (!tabla) return;
+        
+        const filtroTexto = inputBusqueda.value.toLowerCase();
+        const fechaInicioVal = fechaInicio.value;
+        const fechaFinVal = fechaFin.value;
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            let coincideTexto = true;
+            let coincideFecha = true;
+            
+            if (filtroTexto && celdas[1]) {
+                coincideTexto = celdas[1].innerText.toLowerCase().indexOf(filtroTexto) > -1;
+            }
+            
+            if (fechaInicioVal || fechaFinVal) {
+                let fechaCelda = celdas[0]?.innerText.trim() || '';
+                let partes = fechaCelda.split('/');
+                if (partes.length === 3) {
+                    fechaCelda = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+                if (fechaInicioVal && fechaCelda < fechaInicioVal) coincideFecha = false;
+                if (fechaFinVal && fechaCelda > fechaFinVal) coincideFecha = false;
+            }
+            
+            fila.style.display = (coincideTexto && coincideFecha) ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltros() {
+        inputBusqueda.value = '';
+        fechaInicio.value = '';
+        fechaFin.value = '';
+        aplicarFiltros();
+    }
+    
+    inputBusqueda.addEventListener('keyup', aplicarFiltros);
+    btnFiltrar.addEventListener('click', aplicarFiltros);
+    btnLimpiar.addEventListener('click', limpiarFiltros);
+}
+
+async function cargarRecepciones(proveedorId = null) {
+    try {
+        let url = 'db/materia_prima.php?action=obtener&modo=tabla';
+        if (proveedorId) {
+            url += `&proveedor_id=${proveedorId}`;
+        }
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarTablaRecepciones(data.datos);
+        } else {
+            document.getElementById('listaRecepciones').innerHTML = '<div class="cargando">Error al cargar datos</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaRecepciones').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarTablaRecepciones(recepciones) {
+    if (!recepciones || recepciones.length === 0) {
+        document.getElementById('listaRecepciones').innerHTML = '<div class="cargando">No hay recepciones registradas</div>';
+        return;
+    }
+
+    let html = `
+        <div style="overflow-x: auto;">
+            <table class="tabla-produccion" style="width: 100%;">
+                <thead>
+                    <tr style="background: #278233; color: white;">
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Tipo Leche</th>
+                        <th>Cantidad (L)</th>
+                        <th>Costo por Litro</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    recepciones.forEach(item => {
+        if (item.es_cabecera) {
+            // ========== ES UNA CABECERA DE PAGO (AGRUPADA POR PAGO REAL) ==========
+            const idGrupo = `grupo-pago-${item.pago_id}`;
+            const fechaInicio = formatearFecha(item.semana_inicio);
+            const fechaFin = formatearFecha(item.semana_fin);
+            const fechaPago = formatearFecha(item.fecha_pago);
+            const totalLitros = parseFloat(item.total_litros).toFixed(2);
+            const totalPagado = parseFloat(item.monto_pagado).toFixed(2);
+            const deducciones = parseFloat(item.deducciones || 0).toFixed(2);
+            
+            // Verificar si el detalle ya está visible en el DOM
+            const filaDetalleExistente = document.getElementById(idGrupo);
+            const estaVisible = filaDetalleExistente && filaDetalleExistente.style.display !== 'none';
+            
+            html += `
+                <tr class="matHover" style="cursor: pointer; background-color: rgba(48,138,15,0.15); border-top:1px solid rgba(0,0,0,.3); border-bottom:1px solid rgba(0,0,0,.3)" onclick="verDetallePagoProveedor(${item.proveedor_id}, '${escapeHtml(item.proveedor_nombre)}', '${item.semana_inicio}', '${item.semana_fin}', ${item.pago_id})">
+                    <td colspan="8" style="padding: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap;">
+                            	<div style="display:flex;width:100%;">
+                                <strong style="font-size: 1em; background: #278233; color: white; padding: 4px 12px; border-radius: 4px;">PAGO - ${escapeHtml(item.proveedor_nombre)} | ${fechaPago}</strong><span id="${idGrupo}-icon" style="font-size: 18px; cursor: pointer; padding: 0 5px;margin-left:auto;" onclick="event.stopPropagation();toggleDetallePago('${idGrupo}')">${estaVisible ? '▼' : '▶'}</span></div>
+                                
+                                <span><strong>Período:</strong> ${fechaInicio} → ${fechaFin}</span>
+                                <span><strong>Litros:</strong> ${totalLitros} L</span>
+                                <span><strong>Deducciones:</strong> <span style="color:#f44336;">$${deducciones}</span></span>
+                                <span><strong>Total Pagado:</strong> <span style="color:#278233; font-weight:bold;">$${totalPagado}</span></span>
+                            </div>
+                        </div>
+                    </br><small>${item.observaciones ? escapeHtml(item.observaciones) : ''}</small>
+                    </td>
+                </tr>
+                <tr id="${idGrupo}" style="display: none; background-color: #f9f9f9;">
+                    <td colspan="8" style="padding: 0;">
+                        <div>
+                            <table class="tabla-produccion" style="width: 100%; border-collapse: collapse; margin: 0;">
+                                <thead style="display:none">
+                                    <tr style="background: #f4d71b; color: rgba(0,0,0,.7);">
+                                        <th>Fecha</th>
+                                        <th>Proveedor</th>
+                                        <th>Tipo Leche</th>
+                                        <th>Cantidad (L)</th>
+                                        <th>Costo x Litro</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            `;
+            
+            // Recorrer las recepciones individuales de este pago
+            if (item.recepciones && item.recepciones.length > 0) {
+                item.recepciones.forEach(r => {
+                    const fechaDetalle = formatearFecha(r.fecha);
+                    const cantidadLitros = parseFloat(r.cantidad_litros).toFixed(2);
+                    const costoPorLitro = parseFloat(r.costo_por_litro).toFixed(2);
+                    const totalCosto = parseFloat(r.total_costo).toFixed(2);
+                    const tipoLecheFormateado = {
+                        'normal': 'Normal',
+                        'especial': 'Especial',
+                        'organica': 'Orgánica'
+                    }[r.tipo_leche] || r.tipo_leche;
+                    
+                    html += `
+                        <tr>
+                            <td style="padding: 8px;">${fechaDetalle}<br><small>${r.hora ? r.hora.substring(0, 5) : '00:00'}</small></td>
+                            <td style="padding: 8px;"><strong>${escapeHtml(r.proveedor_nombre)}</strong><br><small>${r.contacto || ''}</small></td>
+                            <td style="padding: 8px;">${tipoLecheFormateado}</td>
+                            <td style="padding: 8px;"><strong>${cantidadLitros} L</strong></td>
+                            <td style="padding: 8px;"><strong>$${costoPorLitro}</strong></td>
+                            <td style="padding: 8px;"><strong>$${totalCosto}</strong></td>
+                            <td style="padding: 8px;"><span class="estado-pagado" style="background: #278233;">PAGADO</span></td>
+                            <td style="padding: 8px;">
+                                <button class="btn-eliminar" onclick="event.stopPropagation(); eliminarRecepcion(${r.id})" style="background: #f44336; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer;">∅</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html += `<tr><td colspan="8" style="text-align:center; padding:20px;">No hay recepciones registradas para este pago</td></tr>`;
+            }
+            
+            html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </br><small>Pago realizado el ${fechaPago} - Método: ${item.metodo_pago}</small>
+                    </td>
+                </tr>
+            `;
+        } else {
+            // ========== RECEPCIÓN NO PAGADA (DEUDA PENDIENTE) ==========
+            const r = item;
+            const fecha = new Date(r.fecha);
+            const hoy = new Date();
+            const esSemanaActual = (fecha.getTime() >= hoy.getTime() - 7*24*60*60*1000);
+            const costoPorLitro = parseFloat(r.costo_por_litro || 0);
+            const costoTotal = parseFloat(r.total_costo || 0);
+            const tipoLecheFormateado = {
+                'normal': 'Normal',
+                'especial': 'Especial',
+                'organica': 'Orgánica'
+            }[r.tipo_leche] || r.tipo_leche;
+            const estadoLabel = 'PENDIENTE';
+            const estadoClass = 'estado-pendiente';
+            
+            html += `
+                <tr class="matHover" style="cursor: pointer; ${esSemanaActual ? 'background: #fff3cd;' : ''}" onclick="verDetalleRecepcion(${r.id})">
+                    <td>${formatearFecha(r.fecha)}<br><small>${r.hora ? r.hora.substring(0, 5) : '00:00'}</small></td>
+                    <td><strong>${escapeHtml(r.proveedor_nombre)}</strong><br><small>${r.contacto || ''}</small></td>
+                    <td>${tipoLecheFormateado}</td>
+                    <td><strong>${parseFloat(r.cantidad_litros).toFixed(2)} L</strong></td>
+                    <td><strong>$${costoPorLitro.toFixed(2)}</strong></td>
+                    <td><strong>$${costoTotal.toFixed(2)}</strong></td>
+                    <td><span class="${estadoClass}">${estadoLabel}</span></td>
+                    <td><button class="btn-eliminar" onclick="event.stopPropagation(); eliminarRecepcion(${r.id})">∅</button></td>
+                </tr>
+            `;
+        }
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('listaRecepciones').innerHTML = html;
+    
+    setTimeout(() => {
+        agregarFiltrosMateriaPrima();
+    }, 100);
+}
+
+// ========== FUNCIÓN PARA VER DETALLE DE PAGO A PROVEEDOR ==========
+// ========== FUNCIÓN PARA VER DETALLE DE PAGO A PROVEEDOR ==========
+async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInicio, semanaFin, pagoId = null) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    try {
+        // 1. Obtener datos del proveedor
+        const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+        const dataProv = await responseProv.json();
+        
+        if (!dataProv.success) {
+            alert('Error al cargar datos del proveedor');
+            return;
+        }
+        
+        // 2. Obtener las recepciones de leche en ese período
+        const responseRecepciones = await fetch(`db/materia_prima.php?action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`);
+        const dataRecepciones = await responseRecepciones.json();
+        
+        if (!dataRecepciones.success || dataRecepciones.recepciones.length === 0) {
+            alert('No se encontraron recepciones en este período');
+            return;
+        }
+        
+        // 3. Si tenemos pagoId, obtener información adicional del pago
+        let totalPagado = 0;
+        let adelantosDeducidos = 0;
+        let observacionesPago = '';
+        let metodoPago = '';
+        let fechaPago = '';
+        
+        if (pagoId) {
+            const responsePago = await fetch(`db/proveedores_pagos.php?action=obtener_pago&id=${pagoId}`);
+            const dataPago = await responsePago.json();
+            if (dataPago.success && dataPago.pago) {
+                totalPagado = parseFloat(dataPago.pago.monto_pagado);
+                adelantosDeducidos = parseFloat(dataPago.pago.deducciones) || 0;
+                observacionesPago = dataPago.pago.observaciones || '';
+                metodoPago = dataPago.pago.metodo_pago;
+                fechaPago = dataPago.pago.fecha_pago;
+            }
+        } else {
+            // Calcular total pagado (suma de todas las recepciones del grupo)
+            dataRecepciones.recepciones.forEach(r => {
+                totalPagado += parseFloat(r.total_costo);
+            });
+        }
+        
+        // 4. Preparar datos para el comprobante
+        const datosComprobante = {
+            proveedor: {
+                id: dataProv.proveedor.id,
+                nombre: dataProv.proveedor.nombre,
+                contacto: dataProv.proveedor.contacto || '',
+                telefono: dataProv.proveedor.telefono || '',
+                dia_corte: dataProv.proveedor.dia_corte || 2
+            },
+            periodoInicio: semanaInicio,
+            periodoFin: semanaFin,
+            fechaPago: fechaPago,
+            metodoPago: metodoPago,
+            recepciones: dataRecepciones.recepciones,
+            totalPagado: totalPagado,
+            adelantosDeducidos: adelantosDeducidos,
+            observaciones: observacionesPago || `Pago correspondiente al período del ${formatearFecha(semanaInicio)} al ${formatearFecha(semanaFin)}`
+        };
+        
+        // 5. Guardar en sessionStorage y abrir ventana
+        sessionStorage.setItem('pagoProveedorData', JSON.stringify(datosComprobante));
+        window.open('comprobante_pago_proveedor.php', '_blank', 'width=450,height=750,scrollbars=yes');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al generar el comprobante: ' + error.message);
+    }
+}
+        
+// Función auxiliar para toggle de detalles de pago
+window.toggleDetallePago = function(idGrupo) {
+    const filaDetalle = document.getElementById(idGrupo);
+    const iconSpan = document.getElementById(`${idGrupo}-icon`);
+    if (filaDetalle.style.display === 'none') {
+        filaDetalle.style.display = 'table-row';
+        if (iconSpan) iconSpan.innerHTML = '▼';
+    } else {
+        filaDetalle.style.display = 'none';
+        if (iconSpan) iconSpan.innerHTML = '▶';
+    }
+}
+
+// Función para eliminar un grupo completo de recepciones (opcional)
+window.eliminarRecepcionMasiva = function(proveedorId, semanaInicio, semanaFin) {
+    if (confirm(`¿Eliminar TODAS las recepciones pagadas de este período (${formatearFecha(semanaInicio)} al ${formatearFecha(semanaFin)})?\n\nEsta acción no se puede deshacer.`)) {
+        // Aquí deberías implementar una llamada a un nuevo endpoint en materia_prima.php
+        // que elimine todas las recepciones con pagado=1 en ese rango de fechas.
+        // Por ahora, mostramos un mensaje.
+        alert('Funcionalidad de eliminación masiva en desarrollo.');
+        // Ejemplo de cómo sería la llamada:
+        /*
+        fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'eliminar_masivo', 
+                proveedor_id: proveedorId, 
+                inicio: semanaInicio, 
+                fin: semanaFin 
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                alert('Pagos eliminados correctamente');
+                cargarRecepciones(); // Recargar la tabla
+            } else {
+                alert('Error: ' + result.error);
+            }
+        });
+        */
+    }
+}
+
+function toggleRecepcionSemana(semanaId) {
+    const contenido = document.getElementById(`semana-mp-contenido-${semanaId}`);
+    const icon = document.getElementById(`semana-mp-icon-${semanaId}`);
+    if (contenido.style.display === 'none') {
+        contenido.style.display = 'block';
+        if (icon) icon.textContent = '▼';
+    } else {
+        contenido.style.display = 'none';
+        if (icon) icon.textContent = '▶';
+    }
+}
+
+function getNombreDiaMateria(fechaStr) {
+    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const fecha = new Date(fechaStr);
+    return dias[fecha.getDay()];
+}
+
+function abrirFormularioMateriaPrima() {    
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('formMateriaPrima').reset();
+    document.getElementById('mpFecha').value = getFechaActual();
+    document.getElementById('mpHora').value = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('mpTipoLeche').value = 'normal';
+    document.getElementById('divPagoProducto').style.display = 'none';
+    document.getElementById('mpGuardarEnCuentas').checked = false;
+    document.getElementById('mpCostoTotal').value = '0.00';
+    document.getElementById('mpCostoPorLitro').value = '';  // Limpiar
+    document.getElementById('mpCantidad').value = '';       // Limpiar
+    document.getElementById('formMateriaPrimaModal').style.display = 'block';
+}
+
+function cerrarFormularioMateriaPrima() {
+    document.getElementById('formMateriaPrimaModal').style.display = 'none';
+}
+
+function toggleGuardarEnCuentas() {
+    const check = document.getElementById('mpGuardarEnCuentas');
+    const costoInput = document.getElementById('mpCostoLitro');
+    if (check.checked) {
+        costoInput.required = true;
+        costoInput.placeholder = 'Requerido para guardar en cuentas';
+    } else {
+        costoInput.required = false;
+        costoInput.placeholder = '0.00';
+    }
+}
+
+function togglePagoProducto() {
+    setTimeout(() => {
+        cargarProductosEnSelect();
+    }, 100);
+    
+    const check = document.getElementById('mpPagoProducto');
+    const divPago = document.getElementById('divPagoProducto');
+    divPago.style.display = check.checked ? 'block' : 'none';
+    if (check.checked) {
+        document.getElementById('mpProductoEntregadoSelect').dispatchEvent(new Event('change'));
+    }
+}
+
+// Función para calcular costo total automáticamente
+function calcularCostoTotal() {
+    const cantidad = parseFloat(document.getElementById('mpCantidad').value) || 0;
+    const costoPorLitro = parseFloat(document.getElementById('mpCostoPorLitro').value) || 0;
+    const costoTotal = cantidad * costoPorLitro;
+    document.getElementById('mpCostoTotal').value = costoTotal.toFixed(2);
+}
+        
+// En el submit del formulario
+document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fecha = document.getElementById('mpFecha').value;
+    const hora = document.getElementById('mpHora').value;
+    const tipo_leche = document.getElementById('mpTipoLeche').value;
+    const proveedor_id = document.getElementById('mpProveedor').value;
+    const proveedor_nombre = document.getElementById('mpProveedor').options[document.getElementById('mpProveedor').selectedIndex]?.text.split(' -')[0] || '';
+    const cantidad_litros = parseFloat(document.getElementById('mpCantidad').value);
+    const costo_por_litro = parseFloat(document.getElementById('mpCostoPorLitro').value); // CAMBIADO
+    // No enviar costo_total, se calculará en el backend
+    const guardar_en_cuentas = document.getElementById('mpGuardarEnCuentas').checked ? 1 : 0;
+    const pago_con_producto = document.getElementById('mpPagoProducto').checked ? 1 : 0;
+    const producto_entregado = getProductoEntregado();
+    const cantidad_producto = document.getElementById('mpCantidadProducto').value || null;
+    const observaciones = document.getElementById('mpObservaciones').value;
+
+    if (!proveedor_id) {
+        alert('Seleccione un proveedor');
+        return;
+    }
+
+    if (!cantidad_litros || cantidad_litros <= 0) {
+        alert('Ingrese una cantidad válida de litros');
+        return;
+    }
+
+    if (!costo_por_litro || costo_por_litro <= 0) {
+        alert('Ingrese un costo por litro válido');
+        return;
+    }
+
+    const data = {
+        action: 'guardar',
+        fecha: fecha,
+        hora: hora,
+        proveedor_id: proveedor_id,
+        proveedor_nombre: proveedor_nombre,
+        tipo_leche: tipo_leche,
+        cantidad_litros: cantidad_litros,
+        costo_por_litro: costo_por_litro,  // ENVIAR SOLO ESTO
+        guardar_en_cuentas: guardar_en_cuentas,
+        pago_con_producto: pago_con_producto,
+        producto_entregado: producto_entregado,
+        cantidad_producto: cantidad_producto,
+        observaciones: observaciones
+    };
+
+    console.log('Enviando datos:', data);
+
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ Recepción registrada');
+            cerrarFormularioMateriaPrima();
+            cargarRecepciones();
+            cargarProveedores();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar');
+    }
+});   
+        
+async function eliminarRecepcion(id) {
+    if (!confirm('¿Eliminar esta recepción?')) return;
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar', id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ Recepción eliminada');
+            cargarRecepciones();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al eliminar');
+    }
+}
+
+// Proveedores
+function abrirModalProveedor() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('formProveedor').reset();
+    document.getElementById('modalProveedor').style.display = 'block';
+}
+
+function cerrarModalProveedor() {
+    document.getElementById('modalProveedor').style.display = 'none';
+}
+
+document.getElementById('formProveedor')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('provId').value;
+    const nombre = document.getElementById('provNombre').value;
+    const contacto = document.getElementById('provContacto').value;
+    const telefono = document.getElementById('provTelefono').value;
+    const email = document.getElementById('provEmail').value;
+    const direccion = document.getElementById('provDireccion').value;
+    const dia_corte = document.getElementById('provDiaCorte').value;
+
+    if (!nombre) {
+        alert('Ingrese el nombre del proveedor');
+        return;
+    }
+
+    const action = id ? 'actualizar_proveedor' : 'guardar_proveedor';
+    const data = { action, nombre, contacto, telefono, email, direccion };
+    if (id) data.id = id;
+
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert(id ? 'Proveedor actualizado' : 'Proveedor agregado');
+            cerrarModalProveedor();
+            cargarProveedores();
+            // Resetear el ID oculto
+            document.getElementById('provId').value = '';
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al guardar proveedor');
+    }
+});
+
+function abrirFormularioMateriaPrima() {    
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('formMateriaPrima').reset();
+    document.getElementById('mpFecha').value = getFechaActual();
+    document.getElementById('mpHora').value = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('mpTipoLeche').value = 'normal';
+    document.getElementById('divPagoProducto').style.display = 'none';
+    document.getElementById('mpGuardarEnCuentas').checked = false;
+    document.getElementById('mpCostoTotal').value = '0.00';
+    document.getElementById('formMateriaPrimaModal').style.display = 'block';
+}        
+        
+// Cerrar modal
+document.getElementById('closeMateriaPrima')?.addEventListener('click', cerrarModalMateriaPrima);
+
+        
+// ========== MÓDULO DE PAGOS A PROVEEDORES ==========
+// Variables para pagos de proveedores
+let pagoProveedorData = null;
+
+// Abrir modal de pago para un proveedor
+async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('pagoProveedorId').value = proveedorId;
+    document.getElementById('modalPagoProveedorTitle').innerHTML = `Registrar Pago - ${proveedorNombre}`;
+    document.getElementById('pagoFecha').value = getFechaActual();
+    
+    // Obtener día de corte del proveedor
+    const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+    const dataProv = await responseProv.json();
+    const diaCorte = dataProv.proveedor?.dia_corte || 2;
+    
+    // Calcular período sugerido
+    await recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte);
+    
+    
+    document.getElementById('modalPagoProveedor').style.display = 'block';
+}
+
+// Recalcular período según día de corte
+async function recalcularPeriodoProveedor() {
+    const proveedorId = document.getElementById('pagoProveedorId').value;
+    if (!proveedorId) return;
+    
+    const responseProv = await fetch(`db/materia_prima.php?action=obtener_proveedor&id=${proveedorId}`);
+    const dataProv = await responseProv.json();
+    const diaCorte = dataProv.proveedor?.dia_corte || 2;
+    
+    await recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte);
+}
+
+async function recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte) {
+    const responsePeriodo = await fetch(`db/calcular_periodo_por_corte.php?fecha=${getFechaActual()}&dia_corte=${diaCorte}`);
+    const dataPeriodo = await responsePeriodo.json();
+    
+    if (dataPeriodo.success) {
+        document.getElementById('pagoPeriodoInicio').value = dataPeriodo.inicio;
+        document.getElementById('pagoPeriodoFin').value = dataPeriodo.fin;
+        
+        // Actualizar resumen
+        await actualizarResumenPagoProveedor(proveedorId, dataPeriodo.inicio, dataPeriodo.fin);
+    }
+}
+
+// Actualizar resumen al cambiar fechas manualmente
+document.getElementById('pagoPeriodoInicio')?.addEventListener('change', () => {
+    const proveedorId = document.getElementById('pagoProveedorId').value;
+    const inicio = document.getElementById('pagoPeriodoInicio').value;
+    const fin = document.getElementById('pagoPeriodoFin').value;
+    if (proveedorId && inicio && fin) {
+        actualizarResumenPagoProveedor(proveedorId, inicio, fin);
+    }
+});
+
+document.getElementById('pagoPeriodoFin')?.addEventListener('change', () => {
+    const proveedorId = document.getElementById('pagoProveedorId').value;
+    const inicio = document.getElementById('pagoPeriodoInicio').value;
+    const fin = document.getElementById('pagoPeriodoFin').value;
+    if (proveedorId && inicio && fin) {
+        actualizarResumenPagoProveedor(proveedorId, inicio, fin);
+    }
+});
+
+// Modificar la función actualizarResumenPagoProveedor
+async function actualizarResumenPagoProveedor(proveedorId, inicio, fin) {
+    try {
+        const responseResumen = await fetch(`db/materia_prima.php?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`);
+        const dataResumen = await responseResumen.json();
+        
+        if (dataResumen.success) {
+            const totalLeche = dataResumen.total_leche || 0;
+            const costoTotal = dataResumen.total_costo || 0;
+            
+            document.getElementById('pagoTotalLeche').value = totalLeche.toFixed(2) + ' L';
+            document.getElementById('pagoCostoTotal').value = `$${costoTotal.toFixed(2)}`;
+            
+            pagoProveedorData = {
+                costoTotal: costoTotal,
+                totalLeche: totalLeche,
+                proveedorId: proveedorId,
+                periodoInicio: inicio,
+                periodoFin: fin
+            };
+            
+            // Cargar adelantos después de tener el proveedor
+            await cargarAdelantosProveedor(proveedorId);
+            
+        } else {
+            console.error('Error:', dataResumen.error);
+            document.getElementById('pagoTotalLeche').value = '0.00 L';
+            document.getElementById('pagoCostoTotal').value = '$0.00';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('pagoTotalLeche').value = '0.00 L';
+        document.getElementById('pagoCostoTotal').value = '$0.00';
+    }
+}
+
+document.getElementById('formPagoProveedor')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const proveedor_id = document.getElementById('pagoProveedorId').value;
+    const periodoInicio = document.getElementById('pagoPeriodoInicio').value;
+    const periodoFin = document.getElementById('pagoPeriodoFin').value;
+    const total_leche = pagoProveedorData?.totalLeche || 0;
+    const costo_total = pagoProveedorData?.costoTotal || 0;
+    
+    // Obtener adelantos seleccionados
+    const adelantosSeleccionados = [];
+    document.querySelectorAll('.adelanto-checkbox:checked').forEach(cb => {
+        adelantosSeleccionados.push(cb.getAttribute('data-id'));
+    });
+    const adelantosIds = adelantosSeleccionados.join(',');
+    
+    // Calcular total de adelantos
+    let totalAdelantos = 0;
+    document.querySelectorAll('.adelanto-checkbox:checked').forEach(cb => {
+        totalAdelantos += parseFloat(cb.getAttribute('data-monto')) || 0;
+    });
+    
+    const deducciones = totalAdelantos;
+    const neto_pagado = costo_total - deducciones;
+    
+    if (costo_total <= 0) {
+        alert('No hay leche registrada en el período seleccionado para pagar');
+        return;
+    }
+    
+    const data = {
+        action: 'registrar_pago',
+        proveedor_id: proveedor_id,
+        semana_inicio: periodoInicio,
+        semana_fin: periodoFin,
+        total_leche: total_leche,
+        costo_total: costo_total,
+        deducciones: deducciones,
+        monto_pagado: neto_pagado,
+        fecha_pago: document.getElementById('pagoFecha').value,
+        metodo_pago: document.getElementById('pagoMetodo').value,
+        observaciones: document.getElementById('pagoObservaciones').value,
+        adelantos_ids: adelantosIds || null
+    };
+    
+    try {
+        const response = await fetch('db/proveedores_pagos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Pago registrado correctamente');
+            cerrarModalPagoProveedor();
+            cargarProveedores();
+            cargarRecepciones();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al registrar pago');
+    }
+});
+
+function cerrarModalPagoProveedor() {
+    document.getElementById('modalPagoProveedor').style.display = 'none';
+    pagoProveedorData = null;
+}
+
+// Ver historial de pagos de un proveedor
+async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
+    try {
+        const response = await fetch(`db/proveedores_pagos.php?action=obtener_historial&proveedor_id=${proveedorId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar historial');
+            return;
+        }
+        
+        let html = `
+            <div style="overflow-x: auto;">
+                <table class="tabla-produccion" style="width:100%;border-collapse:collapse;border:none">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Período</th>
+                            <th>Total Leche</th>
+                            <th>Costo Total</th>
+                            <th>Pagado</th>
+                            <th>Método</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        if (data.pagos.length === 0) {
+            html += '<tr><td colspan="7" style="text-align:center;">No hay pagos registrados</td></tr>';
+        } else {
+            data.pagos.forEach(p => {
+                html += `
+                    <tr>
+                        <td>${formatearFecha(p.fecha_pago)}</td>
+                        <td><small>${formatearFecha(p.semana_inicio)}<br>→<br>${formatearFecha(p.semana_fin)}</br></small></td>
+                        <td>${parseFloat(p.total_leche).toFixed(2)} L</br><small>litros</small></td>
+                        <td><strong>$${parseFloat(p.costo_total).toFixed(2)}</strong></br><small>costo</small></td>
+                        <td><strong style="color:#278233">$${parseFloat(p.monto_pagado).toFixed(2)}</strong></br><small>pagado</small></td>
+                        <td>${p.metodo_pago}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        document.getElementById('historialPagosTitle').innerHTML = `Historial de Pagos - ${proveedorNombre}`;
+        document.getElementById('historialPagosLista').innerHTML = html;
+        document.getElementById('modalHistorialPagosProveedor').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar historial');
+    }
+}
+
+function cerrarModalHistorialPagos() {
+    document.getElementById('modalHistorialPagosProveedor').style.display = 'none';
+}
+        
+// ========== FUNCIONES PARA ADELANTOS DE PROVEEDORES ==========
+
+async function cargarAdelantosProveedor(proveedorId) {
+    try {
+        const response = await fetch(`db/materia_prima.php?action=obtener_adelantos&proveedor_id=${proveedorId}`);
+        const data = await response.json();
+        
+        const container = document.getElementById('listaAdelantosProveedor');
+        if (!container) return;
+        
+        if (!data.success || data.adelantos.length === 0) {
+            container.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No hay adelantos pendientes</div>';
+            return;
+        }
+        
+        let html = '';
+        data.adelantos.forEach(adelanto => {
+            if (adelanto.estado === 'pendiente') {
+                html += `
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee;width:100%;text-wrap:nowrap">
+                        <input type="checkbox" class="adelanto-checkbox" data-id="${adelanto.id}" data-monto="${parseFloat(adelanto.monto).toFixed(2)}" value="${adelanto.id}" style="width:auto">
+                        <div style="flex: 1;">
+                            <strong>$${parseFloat(adelanto.monto).toFixed(2)}</strong>
+                            <br><small>${adelanto.fecha} - ${adelanto.descripcion || 'Sin descripción'}</small>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        
+        if (html === '') {
+            container.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">No hay adelantos pendientes</div>';
+        } else {
+            container.innerHTML = html;
+        }
+        
+        document.querySelectorAll('.adelanto-checkbox').forEach(cb => {
+            cb.addEventListener('change', recalcularTotalConAdelantos);
+        });
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaAdelantosProveedor').innerHTML = '<div class="cargando">Error al cargar adelantos</div>';
+    }
+}
+
+function recalcularTotalConAdelantos() {
+    const costoTotal = parseFloat(document.getElementById('pagoCostoTotal').value.replace('$', '')) || 0;
+    let totalAdelantos = 0;
+    
+    document.querySelectorAll('.adelanto-checkbox:checked').forEach(cb => {
+        totalAdelantos += parseFloat(cb.getAttribute('data-monto')) || 0;
+    });
+    
+    const deudaTexto = document.getElementById('pagoDeudasPendientes').value;
+    const deuda = parseFloat(deudaTexto.replace('$', '')) || 0;
+    
+    const netoPagado = Math.max(0, costoTotal - (totalAdelantos + deuda));
+    
+    document.getElementById('pagoDeudasPendientes').innerHTML = `$${deuda.toFixed(2)} (Adelantos: $${totalAdelantos.toFixed(2)})`;
+    
+    const inputMonto = document.getElementById('pagoMontoPagado');
+    if (inputMonto) {
+        inputMonto.value = netoPagado.toFixed(2);
+    }
+}
+
+function abrirModalAdelantoProveedor(id, nombre) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('adelantoProveedorId').value = id;
+    document.getElementById('adelantoProveedorNombre').value = nombre;
+    document.getElementById('adelantoFecha').value = getFechaActual();
+    document.getElementById('modalAdelantoProveedor').style.display = 'block';
+}
+
+function cerrarModalAdelantoProveedor() {
+    document.getElementById('modalAdelantoProveedor').style.display = 'none';
+}
+
+document.getElementById('formAdelantoProveedor')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const proveedor_id = document.getElementById('adelantoProveedorId').value;
+    const monto = document.getElementById('adelantoMonto').value;
+    const fecha = document.getElementById('adelantoFecha').value;
+    const metodo_pago = document.getElementById('adelantoMetodoPago').value;
+    const referencia = document.getElementById('adelantoReferencia').value;
+    const descripcion = document.getElementById('adelantoDescripcion').value;
+    
+    if (!monto || monto <= 0) {
+        alert('Ingrese un monto válido');
+        return;
+    }
+    
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'guardar_adelanto', 
+                proveedor_id, 
+                monto, 
+                fecha, 
+                metodo_pago, 
+                referencia, 
+                descripcion 
+            })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Adelanto registrado correctamente');
+            cerrarModalAdelantoProveedor();
+            document.getElementById('formAdelantoProveedor').reset();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al registrar adelanto');
+    }
+});
+
+async function verHistorialAdelantosProveedor(proveedorId, proveedorNombre) {
+    try {
+        const response = await fetch(`db/materia_prima.php?action=obtener_adelantos&proveedor_id=${proveedorId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar adelantos');
+            return;
+        }
+        
+        let html = `
+            <div style="overflow-x: auto;">
+                <table class="tabla-produccion" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        if (data.adelantos.length === 0) {
+            html += '<tr><td colspan="7" style="text-align:center;">No hay adelantos registrados</td><tr>';
+        } else {
+            data.adelantos.forEach(a => {
+                const estadoClass = a.estado === 'aplicado' ? 'estado-pagado' : 'estado-pendiente';
+                const estadoTexto = a.estado === 'aplicado' ? 'APLICADO' : 'PENDIENTE';
+                
+                html += `
+                    <tr>
+                        <td>${formatearFecha(a.fecha)}<br><small>${a.metodo_pago}</small></td>
+                        <td><strong>$${parseFloat(a.monto).toFixed(2)}</strong></td>
+                        <td>${a.metodo_pago}</td>
+                        <td>${a.referencia || '-'}</td>
+                        <td>${a.descripcion || '-'}<br><small>adelanto</small></td>
+                        <td><span class="${estadoClass}">${estadoTexto}</span></td>
+                        <td>
+                            ${a.estado === 'pendiente' ? `<button class="btn-eliminar" onclick="eliminarAdelantoProveedor(${a.id})">∅</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        document.getElementById('historialPagosTitle').innerHTML = `Adelantos - ${proveedorNombre}`;
+        document.getElementById('historialPagosLista').innerHTML = html;
+        document.getElementById('modalHistorialPagosProveedor').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar adelantos');
+    }
+}
+
+async function eliminarAdelantoProveedor(id) {
+    if (!confirm('¿Estás seguro de eliminar este adelanto?')) return;
+    
+    try {
+        const response = await fetch('db/materia_prima.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar_adelanto', id: id })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Adelanto eliminado');
+            const modal = document.getElementById('modalHistorialPagosProveedor');
+            if (modal.style.display === 'block') {
+                const proveedorId = document.getElementById('pagoProveedorId')?.value;
+                const proveedorNombre = document.getElementById('modalPagoProveedorTitle')?.innerHTML?.replace('Registrar Pago - ', '');
+                if (proveedorId && proveedorNombre) {
+                    verHistorialAdelantosProveedor(proveedorId, proveedorNombre);
+                }
+            }
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error al eliminar adelanto');
+    }
+}
+
+// Mostrar menú contextual para proveedor - VERSIÓN COMPLETA
+function mostrarMenuProveedor(event, proveedorId) {
+    event.stopPropagation();
+    
+    const menuExistente = document.getElementById('menuContextualProveedor');
+    if (menuExistente) menuExistente.remove();
+    
+    const btn = event.currentTarget;
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const contacto = btn.getAttribute('data-contacto') || '';
+    const telefono = btn.getAttribute('data-telefono') || '';
+    const email = btn.getAttribute('data-email') || '';
+    const direccion = btn.getAttribute('data-direccion') || '';
+    
+    const menu = document.createElement('div');
+    menu.id = 'menuContextualProveedor';
+    menu.style.cssText = `
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        min-width: 220px;
+        overflow: hidden;
+    `;
+    
+    menu.innerHTML = `
+        <div style="padding: 8px 12px; background: #278233; color: white; font-weight: bold; font-size: 13px;">
+            ${escapeHtml(nombre)}
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); filtrarPorProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver solo sus entregas</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalPagoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Registrar Pago</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalAdelantoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee;">
+            <span>Registrar Adelanto</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); verHistorialDeudasProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver Historial de Pagos</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); editarProveedor(${proveedorId}, '${escapeHtml(nombre)}', '${escapeHtml(contacto)}', '${escapeHtml(telefono)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">✎</span>
+            <span>Editar proveedor</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); eliminarProveedorConfirmar(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">∅</span>
+            <span style="color: #f44336;">Eliminar proveedor</span>
+        </div>
+    `;
+    
+    const rect = btn.getBoundingClientRect();
+    menu.style.left = rect.left - 200 + 'px';
+    menu.style.top = rect.bottom + 5 + 'px';
+    
+    document.body.appendChild(menu);
+    
+    setTimeout(() => {
+        document.addEventListener('click', function cerrarMenu(e) {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', cerrarMenu);
+            }
+        });
+    }, 10);
+}
+
+// Variable para filtro de proveedor actual
+let proveedorFiltroActual = null;
+
+function filtrarPorProveedor(proveedorId, proveedorNombre) {
+    proveedorFiltroActual = { id: proveedorId, nombre: proveedorNombre };
+    
+    // Cambiar el título del modal para indicar el filtro
+    const tituloModal = document.querySelector('#modalMateriaPrima h2');
+    if (tituloModal) {
+        tituloModal.innerHTML = `Recepción de Material - Mostrando: ${proveedorNombre} <span style="font-size:12px; cursor:pointer; margin-left:10px;" onclick="limpiarFiltroProveedor()">Limpiar filtro</span>`;
+    }
+    
+    // Recargar recepciones filtradas
+    cargarRecepciones(proveedorId);
+}
+
+function limpiarFiltroProveedor() {
+    proveedorFiltroActual = null;
+    const tituloModal = document.querySelector('#modalMateriaPrima h2');
+    if (tituloModal) {
+        tituloModal.innerHTML = 'Recepción de Material';
+    }
+    cargarRecepciones();
+}
+    </script>    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script>
+    
+async function cargarTrabajadoresEnSelect() {
+    const response = await fetch('db/obtener_trabajadores_select.php');
+    const data = await response.json();
+    const select = document.getElementById('trabajadorSelect');
+    if (data.success) {
+        select.innerHTML = '<option value="">Seleccionar trabajador</option>';
+        data.trabajadores.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.id;
+            option.textContent = `${t.nombre} ${t.cargo ? `- ${t.cargo}` : ''}`;
+            select.appendChild(option);
+        });
+    }
+}
+    
+// main.html - Nueva función para eliminar registros de producción
+async function eliminarRegistroProduccion(elemento) {
+    // Obtener datos del elemento
+    const fecha = elemento.getAttribute('data-fecha');
+    const producto = elemento.getAttribute('data-producto');
+    const tipo = elemento.getAttribute('data-tipo'); // 'peso', 'piezas', o 'leche'
+    let sucursalId = elemento.getAttribute('data-sucursal-id');
+    
+    // Mostrar confirmación
+    const nombreProducto = formatearNombre(producto);
+    let mensaje = '';
+    
+    if (tipo === 'leche') {
+        mensaje = `¿Eliminar el registro de ${nombreProducto} del día ${fecha}?`;
+    } else if (tipo === 'peso') {
+        mensaje = `¿Eliminar SOLO el peso (kg) de ${nombreProducto} del día ${fecha}?`;
+    } else if (tipo === 'piezas') {
+        mensaje = `¿Eliminar SOLO las piezas de ${nombreProducto} del día ${fecha}?`;
+    }
+    
+    if (!confirm(mensaje)) {
+        return;
+    }
+    
+    try {
+        // Enviar solicitud para eliminar
+        const response = await fetch('db/produccion_sucursal.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'eliminar_registro',
+                fecha: fecha,
+                producto: producto,
+                tipo: tipo,
+                sucursal_id: sucursalId || 0
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Registro eliminado correctamente');
+            // Recargar la tabla para reflejar los cambios
+            cargarProduccionSucursal();
+        } else {
+            alert('Error: ' + result.error);
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar el registro');
+    }
+}
+    
+async function verDetalleProduccion(elemento) {
+    const fecha = elemento.getAttribute('data-fecha');
+    const producto = elemento.getAttribute('data-producto');
+    let sucursalId = elemento.getAttribute('data-sucursal-id');
+    
+    // Construir URL
+    let url = `db/obtener_detalle_produccion.php?fecha=${fecha}&producto=${producto}`;
+    if (sucursalId && sucursalId !== '0') {
+        url += `&sucursal_id=${sucursalId}`;
+    }
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (!data.success) {
+        alert('Error al cargar detalle');
+        return;
+    }
+    
+    if (data.detalle.length === 0) {
+        alert('No hay registros de producción para este día');
+        return;
+    }
+    
+    // Determinar si el producto es leche o no
+    const esLeche = data.detalle[0]?.es_leche == 1;
+    const nombreProducto = formatearNombre(producto);
+    
+    let html = `
+        <html>
+        <head>
+            <title>Detalle de Producción - ${fecha}</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; background: #f5f5f5; }
+                .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                h2 { color: #278233; margin-top: 0; border-bottom: 2px solid #278233; padding-bottom: 10px; }
+                h3 { color: #333; margin: 5px 0 20px 0; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .total-row { background: #e8f5e9 !important; font-weight: bold; }
+                .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; font-size: 14px; }
+                .btn-cerrar:hover { background: #1e6b28; }
+                .unidad { font-size: 12px; color: #666; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Detalle de Producción</h2>
+                <h3>${fecha} - ${nombreProducto}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Sucursal</th>
+    `;
+    
+    if (esLeche) {
+        html += `<th>Cantidad (litros)</th>`;
+    } else {
+        html += `<th>Peso (kg)</th><th>Piezas</th>`;
+    }
+    
+    html += `  
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    let totalPeso = 0;
+    let totalPiezas = 0;
+    
+    data.detalle.forEach(d => {
+        const peso = parseFloat(d.cantidad_peso) || 0;
+        const piezas = parseInt(d.cantidad_piezas) || 0;
+        totalPeso += peso;
+        totalPiezas += piezas;
+        
+        html += `<tr>`;
+        html += `<td>${escapeHtml(d.trabajador)}</td>`;
+        html += `<td>${escapeHtml(d.sucursal)}</td>`;
+        
+        if (esLeche) {
+            html += `<td><strong>${peso.toFixed(2)} L</strong></td>`;
+        } else {
+            html += `<td>${peso > 0 ? peso.toFixed(2) + ' kg' : '-'}</td>`;
+            html += `<td>${piezas > 0 ? piezas + ' pz' : '-'}</td>`;
+        }
+        
+        html += `</tr>`;
+    });
+    
+    // Fila de totales
+    html += `<tr class="total-row">`;
+    html += `<td><strong>TOTALES</strong></td>`;
+    html += `<td>-</td>`;
+    
+    if (esLeche) {
+        html += `<td><strong>${totalPeso.toFixed(2)} litros</strong></td>`;
+    } else {
+        html += `<td><strong>${totalPeso.toFixed(2)} kg</strong></td>`;
+        html += `<td><strong>${totalPiezas} piezas</strong></td>`;
+    }
+    
+    html += `</tr>`;
+    
+    html += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=650,height=500,scrollbars=yes');
+    ventana.document.write(html);
+}
+    
+async function cargarSucursalesEnSelectTrabajador() {
+    try {
+        const res = await fetch('db/obtener_sucursales.php');
+        const data = await res.json();
+        const select = document.getElementById('trabajadorSucursal');
+        
+        if (!select) {
+            console.error('No se encontró el select con id "trabajadorSucursal"');
+            return;
+        }
+        
+        if (data.success) {
+            // Guardar el valor seleccionado actualmente si existe
+            const valorActual = select.value;
+            
+            // Limpiar y agregar opciones
+            select.innerHTML = '<option value="">Seleccionar sucursal</option>';
+            
+            data.sucursales.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = formatearNombre(s.nombre);
+                select.appendChild(option);
+            });
+            
+            // Restaurar el valor seleccionado si existía
+            if (valorActual) {
+                select.value = valorActual;
+            }
+            
+            console.log('Sucursales cargadas:', data.sucursales.length);
+        } else {
+            console.error('Error al cargar sucursales:', data);
+        }
+    } catch (error) {
+        console.error('Error en cargarSucursalesEnSelectTrabajador:', error);
+    }
+}
+    
+async function calcularPeriodoPersonalizado(trabajador_id) {
+    const response = await fetch(`db/calcular_periodo_pago.php?trabajador_id=${trabajador_id}`);
+    const data = await response.json();
+    if (data.success) {
+        document.getElementById('periodoInicio').value = data.inicio;
+        document.getElementById('periodoFin').value = data.fin;
+    }
+}
+    
+// Variables para sucursales
+let sucursalActual = 'principal';
+    
+    document.querySelector('.close-produccion-legal').addEventListener('click', () => {
+    cerrarModalProduccion();
+    });
+
+// Funciones para el módulo de producción con sucursales
+function cerrarModalProduccion() {
+    document.getElementById('modalProduccion').style.display = 'none';
+}
+
+function cerrarFormularioSucursal() {
+    document.getElementById('formModalSucursal').style.display = 'none';
+}
+    
+// ========== FUNCIÓN DE EXPORTAR PARA PRODUCCIÓN ==========
+function exportarTablaProduccion() {
+    // Mostrar modal de opciones de exportación
+    const modalOpciones = document.createElement('div');
+    modalOpciones.id = 'modalExportarOpciones';
+    modalOpciones.style.cssText = `
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    modalOpciones.innerHTML = `
+        <div style="background: white; border-radius: 8px; padding: 25px; width: 300px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+            <h3 style="color: #278233; margin-bottom: 20px;">Exportar Tabla</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="form-btn" id="btnExportarExcel" style="background: #278233; color: white; padding: 10px;">Exportar a Excel</button>
+                <button class="form-btn" id="btnExportarPDF" style="background: #278233; color: white; padding: 10px;">Exportar a PDF</button>
+                <button class="form-btn" id="btnExportarImprimir" style="background: #278233; color: white; padding: 10px;">Imprimir</button>
+                <button class="form-btn-limpiar" id="btnCancelarExportar" style="margin-top: 10px;">Cancelar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modalOpciones);
+    
+    document.getElementById('btnExportarExcel').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionExcel();
+    };
+    
+    document.getElementById('btnExportarPDF').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionPDF();
+    };
+    
+    document.getElementById('btnExportarImprimir').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionImprimir();
+    };
+    
+    document.getElementById('btnCancelarExportar').onclick = () => {
+        modalOpciones.remove();
+    };
+}
+
+function exportarProduccionExcel() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles (respetando filtros)
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none' && fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar. Aplica filtros o limpia los filtros primero.');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir datos para Excel
+    const excelData = [encabezados];
+    
+    filasVisibles.forEach(fila => {
+        const rowData = [];
+        const celdas = fila.querySelectorAll('td');
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            // Limpiar HTML interno
+            text = text.replace(/<[^>]*>/g, '');
+            text = text.replace(/\s+/g, ' ').trim();
+            rowData.push(text);
+        });
+        excelData.push(rowData);
+    });
+    
+    // Agregar filtros aplicados como información adicional
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Filtro de fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        excelData.push([]);
+        excelData.push(['Filtros aplicados:', filtrosActivos.join(' | ')]);
+    }
+    
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Produccion');
+    
+    const fecha = new Date();
+    const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}_${fecha.getHours().toString().padStart(2,'0')}${fecha.getMinutes().toString().padStart(2,'0')}`;
+    const nombreSucursal = sucursalActual === 'total' ? 'Todas' : (sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde');
+    
+    XLSX.writeFile(wb, `produccion_${nombreSucursal}_${timestamp}.xlsx`);
+    alert(`✅ Exportadas ${filasVisibles.length} filas de producción`);
+}
+
+function exportarProduccionPDF() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir HTML para PDF
+    let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    // Información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += `
+        <table>
+            <thead>
+                <tr>
+    `;
+    
+    encabezados.forEach(th => {
+        htmlContent += `<th>${th}</th>`;
+    });
+    
+    htmlContent += `
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filasVisibles.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        htmlContent += `<tr>`;
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            text = text.replace(/<[^>]*>/g, '');
+            htmlContent += `<td>${text}</td>`;
+        });
+        htmlContent += `</tr>`;
+    });
+    
+    htmlContent += `
+            </tbody>
+        </table>
+        <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+    
+    // Esperar a que cargue y luego imprimir
+    ventana.print();
+}
+
+function exportarProduccionImprimir() {
+    const container = document.getElementById('contenidoTabla');
+    const tablaOriginal = container.querySelector('table');
+    
+    if (!tablaOriginal) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Clonar la tabla para no modificar la original
+    const tabla = tablaOriginal.cloneNode(true);
+    
+    // Filtrar SOLO las filas visibles
+    const filasOriginales = Array.from(tablaOriginal.querySelectorAll('tbody tr'));
+    const filasVisiblesIndices = [];
+    
+    filasOriginales.forEach((fila, index) => {
+        if (fila.style.display !== 'none') {
+            filasVisiblesIndices.push(index);
+        }
+    });
+    
+    const tbody = tabla.querySelector('tbody');
+    const filasClonadas = tbody.querySelectorAll('tr');
+    
+    filasClonadas.forEach((fila, index) => {
+        if (!filasVisiblesIndices.includes(index)) {
+            fila.remove();
+        }
+    });
+    
+    // Obtener información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    // Crear HTML para impresión
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+                @media print {
+                    body { margin: 0; padding: 15px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += tabla.outerHTML;
+    htmlContent += `
+            <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #278233; color: white; border: none; border-radius: 4px; cursor: pointer;">Imprimir</button>
+                <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cerrar</button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+}
+
+// ========== FUNCIÓN DE EXPORTAR PARA PRODUCCIÓN ==========
+function exportarTablaProduccion() {
+    // Mostrar modal de opciones de exportación
+    const modalOpciones = document.createElement('div');
+    modalOpciones.id = 'modalExportarOpciones';
+    modalOpciones.style.cssText = `
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    modalOpciones.innerHTML = `
+        <div style="background: white; border-radius: 8px; padding: 25px; width: 300px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+            <h3 style="color: #278233; margin-bottom: 20px;">Exportar Tabla</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="form-btn" id="btnExportarExcel" style="background: #278233; color: white; padding: 10px;">Exportar a Excel</button>
+                <button class="form-btn" id="btnExportarPDF" style="background: #278233; color: white; padding: 10px;">Exportar a PDF</button>
+                <button class="form-btn" id="btnExportarImprimir" style="background: #278233; color: white; padding: 10px;">Imprimir</button>
+                <button class="form-btn-limpiar" id="btnCancelarExportar" style="margin-top: 10px;">Cancelar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modalOpciones);
+    
+    document.getElementById('btnExportarExcel').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionExcel();
+    };
+    
+    document.getElementById('btnExportarPDF').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionPDF();
+    };
+    
+    document.getElementById('btnExportarImprimir').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionImprimir();
+    };
+    
+    document.getElementById('btnCancelarExportar').onclick = () => {
+        modalOpciones.remove();
+    };
+}
+
+function exportarProduccionExcel() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles (respetando filtros)
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none' && fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar. Aplica filtros o limpia los filtros primero.');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir datos para Excel
+    const excelData = [encabezados];
+    
+    filasVisibles.forEach(fila => {
+        const rowData = [];
+        const celdas = fila.querySelectorAll('td');
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            // Limpiar HTML interno
+            text = text.replace(/<[^>]*>/g, '');
+            text = text.replace(/\s+/g, ' ').trim();
+            rowData.push(text);
+        });
+        excelData.push(rowData);
+    });
+    
+    // Agregar filtros aplicados como información adicional
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Filtro de fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        excelData.push([]);
+        excelData.push(['Filtros aplicados:', filtrosActivos.join(' | ')]);
+    }
+    
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Produccion');
+    
+    const fecha = new Date();
+    const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}_${fecha.getHours().toString().padStart(2,'0')}${fecha.getMinutes().toString().padStart(2,'0')}`;
+    const nombreSucursal = sucursalActual === 'total' ? 'Todas' : (sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde');
+    
+    XLSX.writeFile(wb, `produccion_${nombreSucursal}_${timestamp}.xlsx`);
+    alert(`Exportadas ${filasVisibles.length} filas de producción`);
+}
+
+function exportarProduccionPDF() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir HTML para PDF
+    let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    // Información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += `
+        <table>
+            <thead>
+                <tr>
+    `;
+    
+    encabezados.forEach(th => {
+        htmlContent += `<th>${th}</th>`;
+    });
+    
+    htmlContent += `
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filasVisibles.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        htmlContent += `<tr>`;
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            text = text.replace(/<[^>]*>/g, '');
+            htmlContent += `<td>${text}</td>`;
+        });
+        htmlContent += `</tr>`;
+    });
+    
+    htmlContent += `
+            </tbody>
+        </table>
+        <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+    
+    // Esperar a que cargue y luego imprimir
+    ventana.print();
+}
+
+function exportarProduccionImprimir() {
+    const container = document.getElementById('contenidoTabla');
+    const tablaOriginal = container.querySelector('table');
+    
+    if (!tablaOriginal) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Clonar la tabla para no modificar la original
+    const tabla = tablaOriginal.cloneNode(true);
+    
+    // Filtrar SOLO las filas visibles
+    const filasOriginales = Array.from(tablaOriginal.querySelectorAll('tbody tr'));
+    const filasVisiblesIndices = [];
+    
+    filasOriginales.forEach((fila, index) => {
+        if (fila.style.display !== 'none') {
+            filasVisiblesIndices.push(index);
+        }
+    });
+    
+    const tbody = tabla.querySelector('tbody');
+    const filasClonadas = tbody.querySelectorAll('tr');
+    
+    filasClonadas.forEach((fila, index) => {
+        if (!filasVisiblesIndices.includes(index)) {
+            fila.remove();
+        }
+    });
+    
+    // Obtener información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    // Crear HTML para impresión
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+                @media print {
+                    body { margin: 0; padding: 15px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += tabla.outerHTML;
+    htmlContent += `
+            <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #278233; color: white; border: none; border-radius: 4px; cursor: pointer;">Imprimir</button>
+                <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cerrar</button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+}
+    
+// main.html - Reemplazar la función agregarFiltroProduccion completa // 30-05-2026
+function agregarFiltroProduccion() {
+    const container = document.getElementById('contenidoTabla');
+    if (!container) return;
+    
+    if (document.getElementById('filtroProduccion')) return;
+    
+    const filtrosHtml = `
+        <div id="filtroProduccion" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="filtro-grupo">
+                    <label>Fecha Desde</label>
+                    <input type="date" id="fechaDesdeProduccion" style="min-width: 160px;">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Fecha Hasta</label>
+                    <input type="date" id="fechaHastaProduccion" style="min-width: 160px;">
+                </div>
+                <div class="filtro-grupo">
+                    <button class="btn-filtro" id="btnFiltrarProduccion">Filtrar</button>
+                    <button class="btn-limpiar-filtros" id="btnLimpiarProduccion">Limpiar</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-agregar" id="btnExportarProduccion" style="font-size: 14px; padding: 8px 16px; background: white; box-shadow: none; color: #278233;">Exportar</button>
+                <div style="background: rgba(0,0,0,.7); border-radius: 4px; width: 3px; height: 100%;"></div>
+                <button class="btn-agregar" onclick="abrirModalNuevoProducto()" style="font-size: 14px; padding: 8px 16px;">+ Producto</button>
+                <button class="btn-agregar" onclick="abrirFormularioSucursal()" style="font-size: 24px; padding: 8px 16px;">+</button>
+            </div>
+        </div>
+    `;
+    
+    const tabla = container.querySelector('table');
+    if (tabla) {
+        tabla.insertAdjacentHTML('beforebegin', filtrosHtml);
+    }
+    
+    const btnFiltrar = document.getElementById('btnFiltrarProduccion');
+    const btnLimpiar = document.getElementById('btnLimpiarProduccion');
+    const fechaDesde = document.getElementById('fechaDesdeProduccion');
+    const fechaHasta = document.getElementById('fechaHastaProduccion');
+    const btnExportar = document.getElementById('btnExportarProduccion');
+    
+    async function aplicarFiltro() {
+        const desde = fechaDesde.value;
+        const hasta = fechaHasta.value;
+        
+        // Aplicar filtro directamente en la tabla actual
+        const tablaActual = container.querySelector('table');
+        if (!tablaActual) return;
+        
+        const filas = tablaActual.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            // Obtener la primera celda (fecha) de cada fila
+            const fechaCelda = fila.querySelector('td:first-child');
+            if (!fechaCelda) {
+                fila.style.display = '';
+                return;
+            }
+            
+            let fechaTexto = fechaCelda.innerText.trim();
+            // Extraer solo la fecha (primeras 10 caracteres o buscar formato DD/MM/YYYY)
+            const partes = fechaTexto.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+            if (partes) {
+                fechaTexto = `${partes[3]}-${partes[2]}-${partes[1]}`;
+            }
+            
+            let mostrar = true;
+            if (desde && fechaTexto < desde) mostrar = false;
+            if (hasta && fechaTexto > hasta) mostrar = false;
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltro() {
+        fechaDesde.value = '';
+        fechaHasta.value = '';
+        const tablaActual = container.querySelector('table');
+        if (tablaActual) {
+            const filas = tablaActual.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+                fila.style.display = '';
+            });
+        }
+    }
+    
+    if (btnFiltrar) {
+         console.log('What');
+        btnFiltrar.addEventListener('click', aplicarFiltro);
+    }
+    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFiltro);
+    if (btnExportar) btnExportar.addEventListener('click', exportarTablaProduccion);
+    
+    const botonesOriginales = document.querySelector('#modalProduccion .tabs-container + div');
+    if (botonesOriginales) {
+        botonesOriginales.style.display = 'none';
+    }
+}
+    
+// ========== FUNCIÓN DE EXPORTAR PARA PRODUCCIÓN ==========
+function exportarTablaProduccion() {
+    // Mostrar modal de opciones de exportación
+    const modalOpciones = document.createElement('div');
+    modalOpciones.id = 'modalExportarOpciones';
+    modalOpciones.style.cssText = `
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    modalOpciones.innerHTML = `
+        <div style="background: white; border-radius: 8px; padding: 25px; width: 300px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+            <h3 style="color: #278233; margin-bottom: 20px;">Exportar Tabla</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="form-btn" id="btnExportarExcel" style="background: #278233; color: white; padding: 10px;">📊 Exportar a Excel</button>
+                <button class="form-btn" id="btnExportarPDF" style="background: #278233; color: white; padding: 10px;">📄 Exportar a PDF</button>
+                <button class="form-btn" id="btnExportarImprimir" style="background: #278233; color: white; padding: 10px;">🖨️ Imprimir</button>
+                <button class="form-btn-limpiar" id="btnCancelarExportar" style="margin-top: 10px;">Cancelar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modalOpciones);
+    
+    document.getElementById('btnExportarExcel').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionExcel();
+    };
+    
+    document.getElementById('btnExportarPDF').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionPDF();
+    };
+    
+    document.getElementById('btnExportarImprimir').onclick = () => {
+        modalOpciones.remove();
+        exportarProduccionImprimir();
+    };
+    
+    document.getElementById('btnCancelarExportar').onclick = () => {
+        modalOpciones.remove();
+    };
+}
+
+function exportarProduccionExcel() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles (respetando filtros)
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none' && fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar. Aplica filtros o limpia los filtros primero.');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir datos para Excel
+    const excelData = [encabezados];
+    
+    filasVisibles.forEach(fila => {
+        const rowData = [];
+        const celdas = fila.querySelectorAll('td');
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            // Limpiar HTML interno
+            text = text.replace(/<[^>]*>/g, '');
+            text = text.replace(/\s+/g, ' ').trim();
+            rowData.push(text);
+        });
+        excelData.push(rowData);
+    });
+    
+    // Agregar filtros aplicados como información adicional
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Filtro de fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        excelData.push([]);
+        excelData.push(['Filtros aplicados:', filtrosActivos.join(' | ')]);
+    }
+    
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Produccion');
+    
+    const fecha = new Date();
+    const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}_${fecha.getHours().toString().padStart(2,'0')}${fecha.getMinutes().toString().padStart(2,'0')}`;
+    const nombreSucursal = sucursalActual === 'total' ? 'Todas' : (sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde');
+    
+    XLSX.writeFile(wb, `produccion_${nombreSucursal}_${timestamp}.xlsx`);
+    alert(`✅ Exportadas ${filasVisibles.length} filas de producción`);
+}
+
+function exportarProduccionPDF() {
+    const container = document.getElementById('contenidoTabla');
+    const tabla = container.querySelector('table');
+    
+    if (!tabla) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Obtener SOLO las filas visibles
+    const filasVisibles = Array.from(tabla.querySelectorAll('tbody tr')).filter(fila => 
+        fila.style.display !== 'none'
+    );
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay datos visibles para exportar');
+        return;
+    }
+    
+    // Obtener encabezados
+    const encabezados = [];
+    const ths = tabla.querySelectorAll('thead th');
+    ths.forEach(th => {
+        encabezados.push(th.innerText.trim());
+    });
+    
+    // Construir HTML para PDF
+    let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    // Información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += `
+        <table>
+            <thead>
+                <tr>
+    `;
+    
+    encabezados.forEach(th => {
+        htmlContent += `<th>${th}</th>`;
+    });
+    
+    htmlContent += `
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    filasVisibles.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        htmlContent += `<tr>`;
+        celdas.forEach(celda => {
+            let text = celda.innerText.trim();
+            text = text.replace(/<[^>]*>/g, '');
+            htmlContent += `<td>${text}</td>`;
+        });
+        htmlContent += `</tr>`;
+    });
+    
+    htmlContent += `
+            </tbody>
+        </table>
+        <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+    
+    // Esperar a que cargue y luego imprimir
+    ventana.print();
+}
+
+function exportarProduccionImprimir() {
+    const container = document.getElementById('contenidoTabla');
+    const tablaOriginal = container.querySelector('table');
+    
+    if (!tablaOriginal) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Clonar la tabla para no modificar la original
+    const tabla = tablaOriginal.cloneNode(true);
+    
+    // Filtrar SOLO las filas visibles
+    const filasOriginales = Array.from(tablaOriginal.querySelectorAll('tbody tr'));
+    const filasVisiblesIndices = [];
+    
+    filasOriginales.forEach((fila, index) => {
+        if (fila.style.display !== 'none') {
+            filasVisiblesIndices.push(index);
+        }
+    });
+    
+    const tbody = tabla.querySelector('tbody');
+    const filasClonadas = tbody.querySelectorAll('tr');
+    
+    filasClonadas.forEach((fila, index) => {
+        if (!filasVisiblesIndices.includes(index)) {
+            fila.remove();
+        }
+    });
+    
+    // Obtener información de filtros
+    const filtrosActivos = [];
+    const fechaDesde = document.getElementById('fechaDesdeProduccion')?.value;
+    const fechaHasta = document.getElementById('fechaHastaProduccion')?.value;
+    
+    if (fechaDesde || fechaHasta) {
+        filtrosActivos.push(`Fechas: ${fechaDesde || 'inicio'} → ${fechaHasta || 'actual'}`);
+    }
+    
+    if (sucursalActual !== 'total') {
+        const nombreSucursal = sucursalActual === 'principal' ? 'Principal' : 'Cerro Verde';
+        filtrosActivos.push(`Sucursal: ${nombreSucursal}`);
+    }
+    
+    // Crear HTML para impresión
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Producción - Agroindustria Láctea J.K.V. C.A.</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; }
+                h1 { color: #278233; text-align: center; margin-bottom: 5px; }
+                .info { text-align: center; color: #666; margin-bottom: 20px; font-size: 12px; }
+                .filtros { background: #f5f5f5; padding: 10px; margin-bottom: 20px; font-size: 12px; border-radius: 4px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+                @media print {
+                    body { margin: 0; padding: 15px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Agroindustria Láctea J.K.V. C.A.</h1>
+            <div class="info">Reporte de Producción - Generado: ${new Date().toLocaleString()}</div>
+    `;
+    
+    if (filtrosActivos.length > 0) {
+        htmlContent += `<div class="filtros"><strong>Filtros aplicados:</strong> ${filtrosActivos.join(' | ')}</div>`;
+    }
+    
+    htmlContent += tabla.outerHTML;
+    htmlContent += `
+            <div class="footer">© Agroindustria Láctea J.K.V. C.A. - Todos los derechos reservados</div>
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #278233; color: white; border: none; border-radius: 4px; cursor: pointer;">🖨️ Imprimir</button>
+                <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cerrar</button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    ventana.document.write(htmlContent);
+    ventana.document.close();
+}
+
+async function cargarProduccionSucursal() {
+    try {
+        let url = `db/produccion_sucursal.php?action=obtener_tabla`;
+        
+        // Si no es "total", pasar el ID de sucursal para filtrar
+        if (sucursalActual !== 'total') {
+            let sucursalId = sucursalActual === 'principal' ? 1 : 2;
+            url += `&sucursal_id=${sucursalId}`;
+        }
+        
+        console.log('Cargando URL:', url);
+        const response = await fetch(url);
+        const html = await response.text();
+        document.getElementById('contenidoTabla').innerHTML = html;
+        
+        setTimeout(() => {
+            agregarFiltroProduccion();
+        }, 100);
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('contenidoTabla').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function cambiarSucursal(sucursal) {
+    sucursalActual = sucursal;
+    console.log('Sucursal cambiada a:', sucursalActual);
+    const btns = document.querySelectorAll('.tab-sucursal-btn');
+    btns.forEach(btn => {
+        if (btn.getAttribute('data-sucursal') === sucursal) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = '#ddd';
+            btn.style.color = '#333';
+        }
+    });
+    cargarProduccionSucursal();
+}
+
+function abrirFormularioSucursal() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    // Obtener el ID de la sucursal actual según la pestaña seleccionada
+    let sucursalId = 1; // Principal por defecto
+    if (sucursalActual === 'cerro_verde') sucursalId = 2;
+    else if (sucursalActual === 'principal') sucursalId = 1;
+    else if (sucursalActual === 'total') sucursalId = 0;
+    
+    cargarTrabajadoresPorSucursal(sucursalId);
+    
+    console.log('Sucursal actual al abrir formulario:', sucursalActual);
+    document.getElementById('fechaSucursal').value = getFechaActual();
+    document.getElementById('formModalSucursal').style.display = 'block';
+}
+
+// main.html - Versión modificada del event listener 'submit'
+const formSucursal = document.getElementById('formProduccionSucursal');
+if (formSucursal) {
+    formSucursal.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Asegurarse de que el select de trabajadores tenga opciones
+        const trabajadorSelect = document.getElementById('trabajadorSelect');
+        if (trabajadorSelect.options.length === 0) {
+            alert('Error: No se han cargado los trabajadores. Por favor, recarga la página.');
+            return;
+        }
+        // Seleccionar el primer trabajador de la lista (índice 1 porque el 0 es "Seleccionar trabajador")
+        // Si no existe un trabajador por defecto, puedes obtener el primero que no esté vacío.
+        let trabajadorIdPorDefecto = trabajadorSelect.options[1]?.value;
+        
+        // Si por alguna razón el primer trabajador no existe (índice 1), busca el primer option con value > 0
+        if (!trabajadorIdPorDefecto) {
+            for (let i = 1; i < trabajadorSelect.options.length; i++) {
+                if (trabajadorSelect.options[i].value > 0) {
+                    trabajadorIdPorDefecto = trabajadorSelect.options[i].value;
+                    break;
+                }
+            }
+        }
+
+        if (!trabajadorIdPorDefecto) {
+            alert('Error crítico: No hay trabajadores registrados en el sistema. No se puede registrar producción.');
+            return;
+        }
+
+        // Asignar este ID al select (que ahora está oculto)
+        trabajadorSelect.value = trabajadorIdPorDefecto;
+        // --- FIN DE LA MODIFICACIÓN ---
+
+        const fecha = document.getElementById('fechaSucursal').value;
+        const tipoProducto = document.getElementById('tipoProductoSucursal').value;
+        let pesoKg = document.getElementById('pesoKgSucursal').value;
+        let piezas = document.getElementById('piezasSucursal').value;
+        
+        // Esta línea ya usará el trabajador_id que acabamos de asignar
+        const trabajador_id = document.getElementById('trabajadorSelect').value;
+
+        // El resto del código permanece IGUAL...
+        const data = { 
+            fecha: fecha, 
+            trabajador_id: trabajador_id,
+            tipo_producto: tipoProducto, 
+            peso_kg: pesoKg || null, 
+            piezas: piezas || null 
+        };
+        
+        try {
+            const response = await fetch('db/produccion_sucursal.php?action=guardar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            console.log('Respuesta:', result);
+            
+            if (result.success) {
+                alert('Registro guardado');
+                document.getElementById('formModalSucursal').style.display = 'none';
+                document.getElementById('formProduccionSucursal').reset();
+                cargarProduccionSucursal();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al guardar');
+        }
+    });
+}
+
+// Mostrar/ocultar campos según tipo de producto
+// Mostrar/ocultar campos según tipo de producto (usando data-es_leche)
+const tipoProductoSucursal = document.getElementById('tipoProductoSucursal');
+if (tipoProductoSucursal) {
+    tipoProductoSucursal.addEventListener('change', (e) => {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        const esLeche = selectedOption.getAttribute('data-es_leche') === '1';
+        
+        if (esLeche) {
+            document.getElementById('grupoPiezasSucursal').style.display = 'none';
+            document.getElementById('pesoKgSucursal').required = true;
+            document.getElementById('weight-label-sucursal').innerHTML = 'Cantidad (litros):';
+        } else {
+            document.getElementById('grupoPiezasSucursal').style.display = 'block';
+            document.getElementById('pesoKgSucursal').required = false;
+            document.getElementById('weight-label-sucursal').innerHTML = 'Peso (kg):';
+        }
+    });
+}
+    
+// Función global para abrir el modal de producción
+window.abrirModalProduccion = async function() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    const modal = document.getElementById('modalProduccion');
+    modal.style.display = 'block';
+    
+    // Mostrar spinner
+    document.getElementById('contenidoTabla').innerHTML = '<div class="cargando"><div class="spinner"></div></div>';
+    
+    // Forzar recarga completa de sucursales y tabla
+    await cargarSucursalesEnSelect();
+    
+    // Pequeña pausa para asegurar que el DOM se actualice
+    setTimeout(async () => {
+        await cargarProduccionSucursal();
+    }, 100);
+};
+
+// Función auxiliar para fecha actual
+function getFechaActual() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+    </script>
+<script>
+    const obtenerproduccion = 'db/produccion_sucursal.php';
+    const guardarproduccion = 'db/guardar_produccion.php';
+    
+    let menuActual = null;
+    let animando = false;
+    let usuarioActual = null;
+    
+    async function toggleMenu(menu) {
+        if (animando) return;
+        
+        const mainContainer = document.getElementById('mainContainer');
+        const panelResumen = document.getElementById('panelResumen');
+        const panelUsuarios = document.getElementById('panelUsuarios');
+        
+        if (menuActual === menu && mainContainer.classList.contains('menu-abierto')) {
+            animando = true;
+            mainContainer.classList.remove('menu-abierto');
+            setTimeout(() => {
+                menuActual = null;
+                animando = false;
+            }, 400);
+            return;
+        }
+        
+        if (mainContainer.classList.contains('menu-abierto')) {
+            animando = true;
+            mainContainer.classList.remove('menu-abierto');
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+        
+        if (menu === 'resumen') {
+            panelResumen.style.display = 'flex';
+            panelUsuarios.style.display = 'none';
+        } else if (menu === 'usuarios') {
+            panelResumen.style.display = 'none';
+            panelUsuarios.style.display = 'flex';
+            cargarPerfilUsuario();
+            if (usuarioActual && usuarioActual.rol === 'admin') {
+                cargarListaUsuarios();
+            }
+        }
+        
+        mainContainer.classList.add('menu-abierto');
+        menuActual = menu;
+        
+        setTimeout(() => {
+            animando = false;
+        }, 400);
+    }
+    
+    async function cargarPerfilUsuario() {
+        try {
+            const response = await fetch('db/obtener_usuario.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                usuarioActual = data.user;
+                mostrarPerfil(data.user);
+            } else {
+                document.getElementById('submenuPerfil').innerHTML = '<div class="cargando">Error al cargar perfil</div>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('submenuPerfil').innerHTML = '<div class="cargando">Error de conexión</div>';
+        }
+    }
+    
+    function mostrarPerfil(user) {
+        const rolTexto = {
+            'admin': 'Administrador',
+            'supervisor': 'Supervisor',
+            'operador': 'Operador'
+        };
+        
+        const html = `
+            <div class="perfil-usuario" style="overflow-y:auto">
+                <div class="avatar-usuario">
+                    <span>${user.nombre.charAt(0).toUpperCase()}</span>
+                </div>
+                <h3>${escapeHtml(user.nombre)}</h3>
+                <p style="color: #666; margin-top: 5px;">${escapeHtml(user.email)}</p>
+                <p style="color: #666;">Rol: ${rolTexto[user.rol] || user.rol}</p>
+
+			<br>
+			<br>
+
+			<h3>Modifica tus datos</h3>
+			<br>
+			<hr>
+            
+            <form id="formActualizarPerfil">
+                <div class="formPerfil" style="display:flex;justify-content:center;">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="perfilNombre" value="${escapeHtml(user.nombre)}" required>
+                </div>
+                
+                <div class="formPerfil" style="display:flex;justify-content:center;">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="perfilEmail" value="${escapeHtml(user.email)}" required>
+                </div>
+                
+                <div class="formPerfil" style="display:flex;justify-content:center;">
+                    <label>Nueva Contraseña</label>
+                    <input type="password" id="perfilPassword" placeholder="Dejar en blanco para no cambiar">
+                </div>
+                
+                <div class="formPerfil" style="display:flex;justify-content:center;">
+                    <label>Confirmar Contraseña</label>
+                    <input type="password" id="perfilConfirmPassword" placeholder="Confirmar nueva contraseña">
+                </div>
+                
+                <button type="submit" class="form-btn" style="margin-bottom:14px;margin-top:24px;margin-left:auto">Guardar Cambios</button>
+            </form>
+            
+            <button class="form-btn-limpiar" onclick="cerrarSesion()" style="margin-left:auto;">Cerrar Sesión</button>
+			</div>
+        `;
+        
+        document.getElementById('submenuPerfil').innerHTML = html;
+        
+        document.getElementById('formActualizarPerfil').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await actualizarPerfil();
+        });
+    }
+    
+    async function actualizarPerfil() {
+        const nombre = document.getElementById('perfilNombre').value;
+        const email = document.getElementById('perfilEmail').value;
+        const password = document.getElementById('perfilPassword').value;
+        const confirmPassword = document.getElementById('perfilConfirmPassword').value;
+        
+        if (password && password !== confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+        
+        const data = { nombre, email };
+        if (password) data.password = password;
+        
+        try {
+            const response = await fetch('db/actualizar_usuario.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Perfil actualizado correctamente');
+                cargarPerfilUsuario();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('❌ Error al actualizar perfil');
+        }
+    }
+    
+    async function cargarListaUsuarios() {
+        if (usuarioActual && usuarioActual.rol !== 'admin') {
+            document.getElementById('submenuLista').innerHTML = '<div class="cargando">No tienes permisos para ver esta sección</div>';
+            return;
+        }
+        
+        try {
+            const response = await fetch('db/lista_usuarios.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarListaUsuarios(data.usuarios);
+            } else {
+                document.getElementById('submenuLista').innerHTML = '<div class="cargando">Error al cargar usuarios</div>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('submenuLista').innerHTML = '<div class="cargando">Error de conexión</div>';
+        }
+    }
+    
+    function mostrarListaUsuarios(usuarios) {
+        const rolTexto = {
+            'admin': 'Administrador',
+            'supervisor': 'Supervisor',
+            'operador': 'Operador'
+        };
+        
+        const rolClase = {
+            'admin': 'rol-admin',
+            'supervisor': 'rol-supervisor',
+            'operador': 'rol-operador'
+        };
+        
+        let html = `
+            <button class="form-btn" onclick="mostrarFormularioNuevoUsuario()" style="margin-bottom: 15px">Nuevo Usuario</button>
+            <div style="overflow-x: auto;">
+                <table class="tabla-produccion" style="border-radius:3px;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody style="overflow-y:auto;font-size:14px">
+        `;
+        
+        usuarios.forEach(user => {
+            html += `
+                <tr>
+                    <td><span style="cursor:pointer">${user.id}</span></td>
+                    <td><span style="cursor:pointer">${escapeHtml(user.nombre)}</span></td>
+                    <td><span style="cursor:pointer">${escapeHtml(user.email)}</span></td>
+                    <td><span class="${rolClase[user.rol]}"  style="cursor:pointer">${rolTexto[user.rol]}</span></td>
+                    <td>
+                        <button class="btn-editar" onclick="editarUsuario(${user.id}, '${escapeHtml(user.nombre)}', '${escapeHtml(user.email)}', '${user.rol}')">✎</button>
+                        ${user.id !== usuarioActual.id ? `<button class="btn-eliminar" onclick="eliminarUsuario(${user.id})">∅</button>` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        document.getElementById('submenuLista').innerHTML = html;
+    }
+    
+    function mostrarFormularioNuevoUsuario() {
+        setTimeout(() => window.forzarResetFocus(), 50);
+        const html = `
+            <div class="campo-config" style="margin-top: 20px;">
+                <h3>Agregar Nuevo Usuario</h3>
+                <form id="formNuevoUsuario">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="nuevoNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="nuevoEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" id="nuevoPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rol:</label>
+                        <select id="nuevoRol">
+                            <option value="admin">Administrador</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="operador">Operador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-guardar-config">Crear Usuario</button>
+                    <button type="button" class="btn-guardar-config" onclick="cargarListaUsuarios()" style="background: #666; margin-top: 5px;">Cancelar</button>
+                </form>
+            </div>
+        `;
+        
+        document.getElementById('submenuLista').innerHTML = html;
+        
+        document.getElementById('formNuevoUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await crearUsuario();
+        });
+    }
+    
+    async function crearUsuario() {
+        const nombre = document.getElementById('nuevoNombre').value;
+        const email = document.getElementById('nuevoEmail').value;
+        const password = document.getElementById('nuevoPassword').value;
+        const rol = document.getElementById('nuevoRol').value;
+        
+        try {
+            const response = await fetch('db/crear_usuario.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, email, password, rol })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Usuario creado correctamente');
+                cargarListaUsuarios();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('❌ Error al crear usuario');
+        }
+    }
+    
+    function editarUsuario(id, nombre, email, rol) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editNombre').value = nombre;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editRol').value = rol;
+        document.getElementById('editPassword').value = '';
+        document.getElementById('modalEditarUsuario').style.display = 'block';
+    }
+    
+    document.getElementById('formEditarUsuario').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id = document.getElementById('editUserId').value;
+        const nombre = document.getElementById('editNombre').value;
+        const email = document.getElementById('editEmail').value;
+        const rol = document.getElementById('editRol').value;
+        const password = document.getElementById('editPassword').value;
+        
+        try {
+            const response = await fetch('db/actualizar_usuario_admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, nombre, email, rol, password })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Usuario actualizado');
+                document.getElementById('modalEditarUsuario').style.display = 'none';
+                cargarListaUsuarios();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('❌ Error al actualizar usuario');
+        }
+    });
+    
+    async function eliminarUsuario(id) {
+        if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+        
+        try {
+            const response = await fetch('db/eliminar_usuario.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Usuario eliminado');
+                cargarListaUsuarios();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('❌ Error al eliminar usuario');
+        }
+    }
+    
+    function cerrarSesion() {
+        window.location.href = 'db/logout.php';
+    }
+    
+    let submenuActual = 'perfil';
+    
+    function cambiarSubmenu(submenu) {
+        const perfilPanel = document.getElementById('submenuPerfil');
+        const listaPanel = document.getElementById('submenuLista');
+        const btnPerfil = document.querySelector('[data-submenu="perfil"]');
+        const btnLista = document.querySelector('[data-submenu="lista"]');
+        
+        if (submenu === 'perfil') {
+            perfilPanel.classList.remove('oculto');
+            listaPanel.classList.add('oculto');
+            btnPerfil.classList.add('activo');
+            btnLista.classList.remove('activo');
+            submenuActual = 'perfil';
+            cargarPerfilUsuario();
+        } else if (submenu === 'lista') {
+            perfilPanel.classList.add('oculto');
+            listaPanel.classList.remove('oculto');
+            btnPerfil.classList.remove('activo');
+            btnLista.classList.add('activo');
+            submenuActual = 'lista';
+            cargarListaUsuarios();
+        }
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function getFechaActual() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    
+    function abrirFormulario() {
+        setTimeout(() => window.forzarResetFocus(), 50);
+        
+        document.getElementById('fecha').value = getFechaActual();
+        document.getElementById('formModal').style.display = 'block';
+    }
+    
+    document.getElementById('formProduccion').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const fecha = document.getElementById('fecha').value;
+        const tipoProducto = document.getElementById('tipoProducto').value;
+        let pesoKg = document.getElementById('pesoKg').value;
+        let piezas = document.getElementById('piezas').value;
+        
+        const data = { fecha, tipo_producto: tipoProducto, peso_kg: pesoKg || null, piezas: piezas || null };
+        
+        try {
+            const response = await fetch(guardarproduccion, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Registro guardado');
+                document.getElementById('formModal').style.display = 'none';
+                document.getElementById('formProduccion').reset();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('❌ Error al guardar');
+        }
+    });
+    
+    document.getElementById('tipoProducto').addEventListener('change', (e) => {
+        const tipo = e.target.value;
+        if (tipo === 'leche') {
+            document.getElementById('grupoPiezas').style.display = 'none';
+            document.getElementById('pesoKg').required = true;
+        } else {
+            document.getElementById('grupoPiezas').style.display = 'block';
+            document.getElementById('pesoKg').required = false;
+        }
+    });
+    
+    document.querySelectorAll('.close-produccion').forEach(btn => {
+        btn.onclick = function() {
+            document.getElementById('modalProduccion').style.display = 'none';
+            document.getElementById('formModal').style.display = 'none';
+            document.getElementById('modalEditarUsuario').style.display = 'none';
+        };
+    });
+    
+    document.getElementById('tipoProducto').dispatchEvent(new Event('change'));
+    
+    // Verificar si ya hay sesión activa
+    async function verificarSesion() {
+        try {
+            const response = await fetch('db/obtener_usuario.php');
+            const data = await response.json();
+            if (!data.success) {
+                window.location.href = 'index.php';
+            } else {
+                usuarioActual = data.user;
+            }
+        } catch (error) {
+            console.log('Error');
+        }
+    }
+    
+    verificarSesion();
+    
+    // Inicializar paneles
+    document.getElementById('panelResumen').style.display = 'flex';
+    document.getElementById('panelUsuarios').style.display = 'none';
+</script>
+    
+    
+    
+    
+<script>
+    
+document.getElementById('closeNomina').addEventListener('click', () => {
+	cerrarModalNomina();
+});
+// ========== MÓDULO DE NÓMINA CORREGIDO ==========
+
+function cerrarModalNomina() {
+    document.getElementById('modalNomina').style.display = 'none';
+}
+
+function toggleSueldoFijo() {
+    const tipoPago = document.getElementById('trabajadorTipoPago').value;
+    const grupoSueldo = document.getElementById('grupoSueldoFijo');
+    const inputSueldo = document.getElementById('trabajadorSueldoFijo');
+    
+    if (tipoPago === 'fijo') {
+        grupoSueldo.style.display = 'block';
+        inputSueldo.required = true;
+        inputSueldo.disabled = false;
+    } else {
+        grupoSueldo.style.display = 'none';
+        inputSueldo.required = false;
+        inputSueldo.disabled = true;  // ← DESHABILITAR el campo cuando está oculto
+        inputSueldo.value = '';       // ← Limpiar valor
+    }
+}
+    
+// Cargar trabajadores para el sidebar
+async function cargarTrabajadores() {
+    try {
+        const response = await fetch('db/trabajadores.php?action=obtener');
+        const data = await response.json();
+        if (data.success) {
+            mostrarListaTrabajadores(data.trabajadores);
+        } else {
+            document.getElementById('listaTrabajadores').innerHTML = '<div class="cargando">Error al cargar trabajadores</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaTrabajadores').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarListaTrabajadores(trabajadores) {
+    if (!trabajadores || trabajadores.length === 0) {
+        document.getElementById('listaTrabajadores').innerHTML = '<div class="cargando">No hay trabajadores registrados</div>';
+        return;
+    }
+    
+    let html = '';
+    trabajadores.forEach(t => {
+        const deuda = parseFloat(t.deuda_pendiente || 0);
+        
+        html += `
+            <div class="menu-opcion" style="margin-bottom: 8px; padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <strong style="color:#222">${escapeHtml(t.nombre)}</strong>
+                        <p style="font-size: 11px; color: #666;">${t.cargo || 'Sin cargo'} | 
+                            <span onclick="verDetallePrestamos(${t.id}, '${escapeHtml(t.nombre)}')" style="cursor: pointer; color: ${deuda > 0 ? '#f44336' : '#278233'}; text-decoration: underline; text-decoration-style: dotted;">
+                                Deuda: $${deuda.toFixed(2)}
+                            </span>
+                        </p>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="btn-menu-trabajador" 
+                                data-id="${t.id}" 
+                                data-nombre="${escapeHtml(t.nombre)}" 
+                                data-cargo="${escapeHtml(t.cargo || '')}" 
+                                data-cedula="${t.cedula || ''}" 
+                                data-telefono="${t.telefono || ''}" 
+                                data-sucursal="${t.sucursal_id || ''}" 
+                                data-dia_corte="${t.dia_corte || '2'}" 
+                                data-tipo_pago="${t.tipo_pago || 'produccion'}" 
+                                data-sueldo_fijo="${parseFloat(t.sueldo_fijo || 0)}" 
+                                onclick="mostrarMenuTrabajador(event, ${t.id})" 
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555; padding: 0 8px;">
+                            ⋮
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('listaTrabajadores').innerHTML = html;
+}
+    
+// Ver detalle de préstamos de un trabajador
+async function verDetallePrestamos(trabajadorId, nombre) {
+    try {
+        const response = await fetch(`db/trabajadores.php?action=obtener_prestamos&trabajador_id=${trabajadorId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar los préstamos');
+            return;
+        }
+        
+        const prestamos = data.prestamos;
+        const deudaTotal = data.deuda_total;
+        
+        if (prestamos.length === 0) {
+            alert(`El trabajador ${nombre} no tiene préstamos registrados.`);
+            return;
+        }
+        
+        // Generar HTML para el modal de detalles
+        let prestamosHtml = `
+            <html>
+            <head>
+                <title>Préstamos - ${escapeHtml(nombre)}</title>
+                <meta charset="UTF-8">
+                <style>
+                    * { font-family: 'Segoe UI', Arial, sans-serif; }
+                    body { padding: 20px; background: #f5f5f5; }
+                    .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                    h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                    h3 { color: #333; margin: 20px 0 10px 0; }
+                    .total-deuda { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+                    .total-deuda span { font-size: 24px; font-weight: bold; color: #f44336; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                    th { background: #278233; color: white; font-weight: bold; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .estado-pendiente { color: #f44336; font-weight: bold; }
+                    .estado-pagado { color: #4CAF50; font-weight: bold; }
+                    .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 14px; }
+                    .btn-cerrar:hover { background: #1e6b28; }
+                    .descripcion { max-width: 250px; word-wrap: break-word; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2>Préstamos de ${escapeHtml(nombre)}</h2>
+                    
+                    <div class="total-deuda">
+                        <strong>Deuda total pendiente:</strong><br>
+                        <span>$${deudaTotal.toFixed(2)}</span>
+                    </div>
+                    
+                    <h3>Historial de Préstamos</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        prestamos.forEach(p => {
+            const fechaFormateada = formatearFecha(p.fecha);
+            const estado = p.estado === 'pendiente' ? 'Pendiente' : 'Pagado';
+            const estadoClass = p.estado === 'pendiente' ? 'estado-pendiente' : 'estado-pagado';
+            const monto = parseFloat(p.monto).toFixed(2);
+            const descripcion = p.descripcion && p.descripcion.trim() !== '' ? escapeHtml(p.descripcion) : 'Sin descripción';
+            
+            prestamosHtml += `
+                <tr>
+                    <td style="white-space: nowrap;">${fechaFormateada}</td>
+                    <td><strong>$${monto}</strong></td>
+                    <td class="descripcion">${descripcion}</td>
+                    <td class="${estadoClass}">${estado}</td>
+                </tr>
+            `;
+        });
+        
+        prestamosHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        const ventana = window.open('', '_blank', 'width=750,height=500,scrollbars=yes');
+        ventana.document.write(prestamosHtml);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar los préstamos');
+    }
+}
+    
+// Mostrar menú contextual para trabajador
+function mostrarMenuTrabajador(event, trabajadorId) {
+    event.stopPropagation();
+    
+    // Eliminar menú existente si hay
+    const menuExistente = document.getElementById('menuContextualTrabajador');
+    if (menuExistente) {
+        menuExistente.remove();
+    }
+    
+    // Obtener el botón que disparó el evento
+    const btn = event.currentTarget;
+    
+    // Obtener datos del trabajador desde los atributos del botón
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const cargo = btn.getAttribute('data-cargo') || '';
+    const cedula = btn.getAttribute('data-cedula') || '';
+    const telefono = btn.getAttribute('data-telefono') || '';
+    const sucursal_id = btn.getAttribute('data-sucursal') || '';
+    const dia_corte = btn.getAttribute('data-dia_corte') || '2';
+    const tipo_pago = btn.getAttribute('data-tipo_pago') || 'produccion';
+    const sueldo_fijo = btn.getAttribute('data-sueldo_fijo') || '0';
+    
+    console.log('Datos del trabajador:', { nombre, cedula, sucursal_id, dia_corte }); // Para depuración
+    
+    // Crear menú
+    const menu = document.createElement('div');
+    menu.id = 'menuContextualTrabajador';
+    menu.style.cssText = `
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        min-width: 180px;
+        overflow: hidden;
+    `;
+    
+    menu.innerHTML = `
+    	<div class="menu-opcion-item" onclick="cerrarMenuContextual(); calcularPagoTrabajador(${trabajadorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;"></span>
+            <span>Registrar pago</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuContextual(); editarTrabajador(${trabajadorId}, '${escapeHtml(nombre)}', '${escapeHtml(cedula)}', '${escapeHtml(cargo)}', '${escapeHtml(telefono)}', '${sucursal_id}', '${dia_corte}', '${tipo_pago}', '${sueldo_fijo}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>✎ Editar trabajador</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuContextual(); abrirModalPrestamo(${trabajadorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">$</span>
+            <span>Registrar préstamo</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuContextual(); eliminarTrabajadorConfirmar(${trabajadorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">∅</span>
+            <span style="color: #f44336;">Eliminar trabajador</span>
+        </div>
+    `;
+    
+    // Posicionar el menú cerca del botón
+    const rect = btn.getBoundingClientRect();
+    menu.style.left = rect.left - 150 + 'px';
+    menu.style.top = rect.bottom + 5 + 'px';
+    
+    document.body.appendChild(menu);
+    
+    // Cerrar menú al hacer clic fuera
+    setTimeout(() => {
+        document.addEventListener('click', function cerrarMenu(e) {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', cerrarMenu);
+            }
+        });
+    }, 10);
+}
+
+// Cerrar menú contextual
+function cerrarMenuContextual() {
+    const menu = document.getElementById('menuContextualTrabajador');
+    if (menu) menu.remove();
+}
+    
+async function calcularPagoTrabajador(trabajadorId, nombre) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    try {
+        const responseTrabajador = await fetch(`db/trabajadores.php?action=obtener_uno&id=${trabajadorId}`);
+        const dataTrabajador = await responseTrabajador.json();
+        
+        if (!dataTrabajador.success) {
+            alert('Error al cargar datos del trabajador');
+            return;
+        }
+        
+        const trabajador = dataTrabajador.trabajador;
+        const responseDeuda = await fetch(`db/trabajadores.php?action=obtener_deuda&trabajador_id=${trabajadorId}`);
+        const dataDeuda = await responseDeuda.json();
+        const deudaPendiente = dataDeuda.success ? dataDeuda.deuda : 0;
+        
+        const hoy = new Date();
+        const fechaActual = hoy.toISOString().split('T')[0];
+        const diaCorte = trabajador.dia_corte || 2;
+        
+        const responsePeriodo = await fetch(`db/calcular_periodo_por_corte.php?fecha=${fechaActual}&dia_corte=${diaCorte}`);
+        const dataPeriodo = await responsePeriodo.json();
+        
+        if (!dataPeriodo.success) {
+            alert('Error al calcular el período');
+            return;
+        }
+        
+        const periodoInicio = dataPeriodo.inicio;
+        const periodoFin = dataPeriodo.fin;
+        
+        let produccion = [];
+        
+        // Si es sueldo fijo, crear un registro virtual con la estructura correcta
+        if (trabajador.tipo_pago === 'fijo') {
+            // Crear un registro virtual para el sueldo fijo con los campos correctos
+            produccion = [{
+                fecha: periodoInicio,
+                tipo_producto: 'sueldo_fijo',
+                peso_kg: parseFloat(trabajador.sueldo_fijo) || 0,
+                piezas: 0,
+                es_leche: 0,
+                cantidad: parseFloat(trabajador.sueldo_fijo) || 0
+            }];
+        } else {
+            const responseProd = await fetch(`db/obtener_produccion_por_periodo.php?trabajador_id=${trabajadorId}&inicio=${periodoInicio}&fin=${periodoFin}`);
+            const dataProd = await responseProd.json();
+            if (!dataProd.success) {
+                alert('Error al cargar la producción');
+                return;
+            }
+            produccion = dataProd.produccion;
+            
+            if (produccion.length === 0) {
+                alert(`El trabajador ${nombre} no tiene producción registrada en el período ${formatearFecha(periodoInicio)} - ${formatearFecha(periodoFin)}`);
+                return;
+            }
+        }
+        
+        const datosComprobante = {
+            trabajador: {
+                id: trabajador.id,
+                nombre: trabajador.nombre,
+                cedula: trabajador.cedula,
+                cargo: trabajador.cargo,
+                sucursal: trabajador.sucursal_nombre || 'N/A',
+                dia_corte: trabajador.dia_corte,
+                tipo_pago: trabajador.tipo_pago || 'produccion',
+                sueldo_fijo: parseFloat(trabajador.sueldo_fijo) || 0
+            },
+            deuda_pendiente: deudaPendiente,
+            produccion: produccion,
+            periodoInicio: periodoInicio,
+            periodoFin: periodoFin
+        };
+        
+        console.log('Datos del comprobante:', datosComprobante);
+        
+        // Guardar en sessionStorage
+        sessionStorage.setItem('comprobanteData', JSON.stringify(datosComprobante));
+        
+        // ABRIR EL COMPROBANTE CORRECTO SEGÚN EL TIPO DE PAGO
+        const comprobanteUrl = trabajador.tipo_pago === 'fijo' ? 'comprobante_pago_fijo.php' : 'comprobante_pago.php';
+        window.open(comprobanteUrl, '_blank', 'width=950,height=750,scrollbars=yes');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al calcular el pago: ' + error.message);
+    }
+}
+    
+// Confirmar eliminación de trabajador
+function eliminarTrabajadorConfirmar(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar al trabajador "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        eliminarTrabajador(id);
+    }
+}
+
+// Eliminar trabajador
+async function eliminarTrabajador(id) {
+    try {
+        const response = await fetch('db/trabajadores.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar', id: id })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Trabajador eliminado correctamente');
+            // Recargar la lista de trabajadores
+            cargarTrabajadores();
+            // También recargar las pestañas de pagos si es necesario
+            if (typeof cargarDiasConPagos === 'function') {
+                cargarDiasConPagos();
+            }
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar trabajador');
+    }
+}
+
+function editarTrabajador(id, nombre, cedula, cargo, telefono, sucursal_id, dia_corte, tipo_pago, sueldo_fijo) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    console.log('Editando trabajador:', { id, nombre, cedula, sucursal_id, dia_corte });
+    
+    // Establecer los valores básicos
+    document.getElementById('trabajadorId').value = id;
+    document.getElementById('trabajadorNombre').value = nombre;
+    document.getElementById('trabajadorCedula').value = cedula;
+    document.getElementById('trabajadorCargo').value = cargo;
+    document.getElementById('trabajadorTelefono').value = telefono;
+    document.getElementById('trabajadorDiaCorte').value = dia_corte || '2';
+    
+    // ==== MODIFICACIÓN: Forzar select a 'fijo' y mostrar grupo ====
+    document.getElementById('trabajadorTipoPago').value = 'fijo';
+    const grupoSueldo = document.getElementById('grupoSueldoFijo');
+    const inputSueldo = document.getElementById('trabajadorSueldoFijo');
+    
+    grupoSueldo.style.display = 'block';
+    inputSueldo.required = true;
+    inputSueldo.disabled = false;
+    inputSueldo.value = sueldo_fijo || 0;
+    // ================================================================
+    
+    // Cargar sucursales y luego establecer el valor
+    cargarSucursalesEnSelectTrabajador().then(() => {
+        const selectSucursal = document.getElementById('trabajadorSucursal');
+        if (selectSucursal && sucursal_id) {
+            selectSucursal.value = sucursal_id;
+            console.log('Sucursal establecida a:', sucursal_id);
+        }
+        
+        document.getElementById('modalTrabajadorTitle').innerHTML = 'Editar Trabajador';
+        document.getElementById('modalTrabajador').style.display = 'block';
+    }).catch(error => {
+        console.error('Error al cargar sucursales:', error);
+        document.getElementById('modalTrabajadorTitle').innerHTML = 'Editar Trabajador';
+        document.getElementById('modalTrabajador').style.display = 'block';
+    });
+}
+
+
+// Préstamos
+function abrirModalPrestamo(id, nombre) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('prestamoTrabajadorId').value = id;
+    document.getElementById('prestamoTrabajadorNombre').value = nombre;
+    document.getElementById('prestamoFecha').value = getFechaActual();
+    document.getElementById('modalPrestamo').style.display = 'block';
+}
+
+function cerrarModalPrestamo() {
+    document.getElementById('modalPrestamo').style.display = 'none';
+}
+
+document.getElementById('formPrestamo')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const trabajador_id = document.getElementById('prestamoTrabajadorId').value;
+    const monto = document.getElementById('prestamoMonto').value;
+    const fecha = document.getElementById('prestamoFecha').value;
+    const descripcion = document.getElementById('prestamoDescripcion').value;
+    
+    try {
+        const response = await fetch('db/trabajadores.php?action=guardar_prestamo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trabajador_id, monto, fecha, descripcion })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Préstamo registrado');
+            cerrarModalPrestamo();
+            cargarTrabajadores();
+            cargarDiasConPagos();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al registrar préstamo');
+    }
+});
+
+// Calcular semana actual (miércoles a martes)
+function calcularSemanaActual() {
+    const hoy = new Date();
+    const diaSemana = hoy.getDay();
+    
+    let diasParaMiercoles;
+    if (diaSemana === 3) diasParaMiercoles = 0;
+    else if (diaSemana === 4) diasParaMiercoles = -1;
+    else if (diaSemana === 5) diasParaMiercoles = -2;
+    else if (diaSemana === 6) diasParaMiercoles = -3;
+    else if (diaSemana === 0) diasParaMiercoles = -4;
+    else if (diaSemana === 1) diasParaMiercoles = -5;
+    else if (diaSemana === 2) diasParaMiercoles = -6;
+    
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() + diasParaMiercoles);
+    const fin = new Date(inicio);
+    fin.setDate(inicio.getDate() + 6);
+    
+    return {
+        inicio: inicio.toISOString().split('T')[0],
+        fin: fin.toISOString().split('T')[0]
+    };
+}
+    
+// Cargar SOLO días que tienen pagos
+async function cargarDiasConPagos() {
+    try {
+        const response = await fetch('db/nomina.php?action=obtener_dias_con_pagos');
+        const data = await response.json();
+        
+        // Ocultar o mostrar el enlace de historial completo según si hay pagos
+        const enlaceHistorial = document.querySelector('#listaSemanas + div label');
+        
+        if (data.success && data.dias && data.dias.length > 0) {
+            mostrarDiasConPagos(data.dias);
+            if (enlaceHistorial) {
+                enlaceHistorial.style.display = 'inline-block'; // Mostrar enlace
+            }
+        } else {
+            document.getElementById('listaSemanas').innerHTML = '<div class="cargando">No hay pagos registrados</div>';
+            if (enlaceHistorial) {
+                enlaceHistorial.style.display = 'none'; // Ocultar enlace
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaSemanas').innerHTML = '<div class="cargando">Error de conexión</div>';
+        const enlaceHistorial = document.querySelector('#listaSemanas + div label');
+        if (enlaceHistorial) {
+            enlaceHistorial.style.display = 'none';
+        }
+    }
+}
+
+function mostrarDiasConPagos(dias) {
+    if (!dias || dias.length === 0) {
+        document.getElementById('listaSemanas').innerHTML = '<div class="cargando">No hay pagos registrados</div>';
+        return;
+    }
+    
+    let html = '<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; border-bottom: 2px solid #278233; padding-bottom: 10px;">';
+    
+    dias.forEach((dia, index) => {
+        const fechaMostrar = formatearFecha(dia.fecha_pago);
+        const nombreDia = dia.nombre_dia;
+        const isActive = index === 0 ? 'active' : '';
+        const cantidadPagos = dia.pagos.length;
+        
+        html += `
+            <button class="tab-dia-btn ${isActive}" 
+                    data-fecha="${dia.fecha_pago}"
+                    onclick="cambiarDiaPago('${dia.fecha_pago}')"
+                    style="background: ${isActive ? '#278233' : '#ddd'}; 
+                           color: ${isActive ? 'white' : '#333'}; 
+                           border: none; 
+                           padding: 8px 16px; 
+                           cursor: pointer; 
+                           border-radius: 5px 5px 0 0;
+                           font-size: 14px;">
+                ${nombreDia}
+                <span style="background: ${isActive ? 'white' : '#278233'}; 
+                             color: ${isActive ? '#278233' : 'white'}; 
+                             border-radius: 10px; 
+                             padding: 1px 6px; 
+                             font-size: 10px; 
+                             margin-left: 5px;">
+                    ${cantidadPagos}
+                </span>
+            </button>
+        `;
+    });
+    
+    html += '</div>';
+    html += '<div id="contenidoPagosDia"></div>';
+    
+    document.getElementById('listaSemanas').innerHTML = html;
+    
+    if (dias.length > 0) {
+        mostrarPagosDeDia(dias[0].fecha_pago, dias[0].pagos);
+    }
+}
+
+function cambiarDiaPago(fecha) {
+    document.querySelectorAll('.tab-dia-btn').forEach(btn => {
+        if (btn.getAttribute('data-fecha') === fecha) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+            // Actualizar badge
+            const badge = btn.querySelector('span');
+            if (badge) {
+                badge.style.background = 'white';
+                badge.style.color = '#278233';
+            }
+        } else {
+            btn.style.background = '#ddd';
+            btn.style.color = '#333';
+            const badge = btn.querySelector('span');
+            if (badge) {
+                badge.style.background = '#278233';
+                badge.style.color = 'white';
+            }
+        }
+    });
+    
+    cargarPagosPorDia(fecha);
+}
+
+async function cargarPagosPorDia(fecha) {
+    const response = await fetch(`db/nomina.php?action=obtener_pagos_por_dia&fecha=${fecha}`);
+    const data = await response.json();
+    if (data.success) {
+        mostrarPagosDeDia(fecha, data.pagos);
+    }
+}
+
+function mostrarPagosDeDia(fecha, pagos) {
+    const fechaMostrar = formatearFecha(fecha);
+    
+    let html = `
+        <div style="margin-bottom: 10px; padding: 8px; background: #278233; border-radius: 4px; color: white;">
+            <strong>Pagos realizados el ${fechaMostrar}</strong>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="tabla-usuarios" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Trabajador</th>
+                        <th>Producción</th>
+                        <th>Deducción</th>
+                        <th>Pagado</th>
+                        <th>Método</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    pagos.forEach(pago => {
+        html += `
+            <tr class="nominaCell" onclick="verDetallePago(${pago.id});">
+                <td>${escapeHtml(pago.trabajador_nombre)}<br><small>${pago.cargo || ''}</small></td>
+                <td>$${parseFloat(pago.salario_semanal).toFixed(2)}</br><small>producción</small></td>
+                <td>$${parseFloat(pago.deducciones).toFixed(2)}</br><small>préstamos</small></td>
+                <td><strong>$${parseFloat(pago.total_pagado).toFixed(2)}</strong></td>
+                <td>${pago.metodo_pago}</td>
+                <td>
+                    <button class="btn-eliminar" onclick="event.stopPropagation(); eliminarPago(${pago.id})">∅</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('contenidoPagosDia').innerHTML = html;
+}
+
+// Actualizar después de registrar/eliminar un pago
+async function actualizarPestañasPagos() {
+    await cargarDiasConPagos();
+}
+
+// Ver historial completo
+async function verHistorialCompleto() {
+    const response = await fetch('db/nomina.php?action=obtener_historial_completo');
+    const data = await response.json();
+    
+    if (!data.success) {
+        alert('Error al cargar historial');
+        return;
+    }
+    
+    let html = `
+        <html>
+        <head>
+            <title>Historial Completo de Pagos</title>
+            <style>
+                * { font-family: 'mainFont', calibri; }
+                body { padding: 20px; background: #f4d71b; }
+                .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; }
+                h2 { color: #278233; margin-top: 0; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #278233; color: white; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Historial Completo de Pagos</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha Pago</th>
+                                <th>Trabajador</th>
+                                <th>Monto Producción</th>
+                                <th>Deducción</th>
+                                <th>Total Pagado</th>
+                                <th>Método</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    `;
+    
+    data.pagos.forEach(pago => {
+        const periodo = `${formatearFecha(pago.semana_inicio)} - ${formatearFecha(pago.semana_fin)}`;
+        html += `
+            <tr>
+                <td>${pago.fecha_pago}</td>
+                <td>${escapeHtml(pago.trabajador_nombre)}<br><small>${pago.cargo || ''}</small></td>
+                <td>$${parseFloat(pago.salario_semanal).toFixed(2)}</br><small>producción</small></td>
+                <td>$${parseFloat(pago.deducciones).toFixed(2)}</br><small>préstamos</small></td>
+                <td><strong>$${parseFloat(pago.total_pagado).toFixed(2)}</strong></td>
+                <td>${pago.metodo_pago}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align: right;">
+                    <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=1000,height=600,scrollbars=yes');
+    ventana.document.write(html);
+}
+
+// Abrir modal de registrar pago de nómina
+async function abrirModalRegistrarPago() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    try {
+        const response = await fetch('db/trabajadores.php?action=obtener');
+        const data = await response.json();
+        if (data.success) {
+            const select = document.getElementById('nominaSelectTrabajador');
+            select.innerHTML = '<option value="">Seleccionar trabajador</option>';
+            data.trabajadores.forEach(t => {
+                const option = document.createElement('option');
+                option.value = t.id;
+                const deuda = parseFloat(t.deuda_pendiente || 0);
+                option.textContent = `${t.nombre} - Deuda: $${deuda.toFixed(2)}`;
+                option.setAttribute('data-deuda', deuda);
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar trabajadores');
+        return;
+    }
+    
+    document.getElementById('nominaDeuda').value = '';
+    document.getElementById('nominaMonto').value = '';
+    document.getElementById('nominaTotalNeto').value = '';
+    document.getElementById('modalRegistrarPago').style.display = 'block';
+}
+
+function cerrarModalRegistrarPago() {
+    document.getElementById('modalRegistrarPago').style.display = 'none';
+}
+    
+document.getElementById('nominaSelectTrabajador').addEventListener('change', async function() {
+    const trabajadorId = this.value;
+    if (!trabajadorId) return;
+    
+    const response = await fetch(`db/calcular_periodo_pago.php?trabajador_id=${trabajadorId}`);
+    const data = await response.json();
+    
+    if (data.success) {
+        // Mostrar período sugerido (puedes agregar campos ocultos o mostrarlos)
+        console.log(`Período: ${data.inicio} al ${data.fin}`);
+        // Opcional: mostrar en el formulario
+    }
+});
+
+
+// Calcular total en tiempo real
+function setupCalculoTotal() {
+    const select = document.getElementById('nominaSelectTrabajador');
+    const montoInput = document.getElementById('nominaMonto');
+    const deudaInput = document.getElementById('nominaDeuda');
+    const totalInput = document.getElementById('nominaTotalNeto');
+    
+    const calcular = () => {
+        const selectedOption = select.options[select.selectedIndex];
+        const deuda = parseFloat(selectedOption?.getAttribute('data-deuda') || 0);
+        const monto = parseFloat(montoInput.value) || 0;
+        const total = monto - deuda;
+        
+        deudaInput.value = `$${deuda.toFixed(2)}`;
+        totalInput.value = total >= 0 ? `$${total.toFixed(2)}` : `$${total.toFixed(2)} (adeuda)`;
+        totalInput.style.color = total < 0 ? '#f44336' : '#278233';
+    };
+    
+    select.removeEventListener('change', calcular);
+    montoInput.removeEventListener('input', calcular);
+    select.addEventListener('change', calcular);
+    montoInput.addEventListener('input', calcular);
+}
+    
+// Registrar pago de nómina - VERSIÓN CORREGIDA
+document.getElementById('formRegistrarPagoNomina')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const trabajador_id = document.getElementById('nominaSelectTrabajador').value;
+    if (!trabajador_id) {
+        alert('Seleccione un trabajador');
+        return;
+    }
+    
+    const selectedOption = document.getElementById('nominaSelectTrabajador').options[document.getElementById('nominaSelectTrabajador').selectedIndex];
+    const trabajador_nombre = selectedOption.textContent.split(' -')[0];
+    const montoProduccion = parseFloat(document.getElementById('nominaMonto').value) || 0;
+    const deuda = parseFloat(selectedOption.getAttribute('data-deuda') || 0);
+    const diaCorte = parseInt(selectedOption.getAttribute('data-dia_corte') || '2');
+    
+    const deducciones = Math.min(deuda, montoProduccion);
+    const total_pagado = montoProduccion - deducciones;
+    
+    if (total_pagado < 0) {
+        alert(`El monto a pagar ($${montoProduccion.toFixed(2)}) es insuficiente para cubrir la deuda de $${deuda.toFixed(2)}`);
+        return;
+    }
+    
+    // Calcular el período correcto según el día de corte
+    const hoy = new Date();
+    const fecha_pago = getFechaActual();
+    
+    // Calcular período basado en el día de corte
+    let periodo = calcularPeriodoSegunDiaCorte(fecha_pago, diaCorte);
+    
+    const dataToSend = {
+        trabajador_id: parseInt(trabajador_id),
+        semana_inicio: periodo.inicio,
+        semana_fin: periodo.fin,
+        salario_semanal: montoProduccion,
+        deducciones: deducciones,
+        total_pagado: total_pagado,
+        fecha_pago: fecha_pago,
+        metodo_pago: document.getElementById('nominaMetodo').value,
+        observaciones: document.getElementById('nominaObs').value
+    };
+    
+    try {
+        const response = await fetch('db/nomina.php?action=guardar_pago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Pago registrado para ${trabajador_nombre}\nPeríodo: ${periodo.inicio} al ${periodo.fin}\nMonto: $${montoProduccion.toFixed(2)}\nNeto: $${total_pagado.toFixed(2)}`);
+            cerrarModalRegistrarPago();
+            cargarTrabajadores();
+            cargarPagosPorDia(fecha);
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al registrar pago: ' + error.message);
+    }
+});
+
+// Función para calcular período según día de corte
+function calcularPeriodoSegunDiaCorte(fechaPagoStr, diaCorte) {
+    const fechaPago = new Date(fechaPagoStr);
+    fechaPago.setHours(12, 0, 0, 0);
+    
+    // Mapeo de días de corte (2=Lunes, 3=Martes, 4=Miércoles, 5=Jueves, 6=Viernes, 7=Sábado, 1=Domingo)
+    // Convertir a formato de Date (1=Lunes, 7=Domingo)
+    let diaCorteJS;
+    if (diaCorte === 1) diaCorteJS = 7; // Domingo
+    else diaCorteJS = diaCorte - 1; // Lunes=1, Martes=2...
+    
+    // Buscar el día de corte más cercano (puede ser hoy o hacia atrás)
+    let finPeriodo = new Date(fechaPago);
+    let diaSemana = finPeriodo.getDay(); // 0=Domingo, 1=Lunes...
+    if (diaSemana === 0) diaSemana = 7; // Convertir Domingo a 7
+    
+    // Si hoy no es el día de corte, retroceder hasta encontrar el día de corte
+    while (diaSemana !== diaCorteJS) {
+        finPeriodo.setDate(finPeriodo.getDate() - 1);
+        diaSemana = finPeriodo.getDay();
+        if (diaSemana === 0) diaSemana = 7;
+    }
+    
+    // El inicio es 6 días antes
+    let inicioPeriodo = new Date(finPeriodo);
+    inicioPeriodo.setDate(finPeriodo.getDate() - 6);
+    
+    // Formatear fechas
+    const inicio = `${inicioPeriodo.getFullYear()}-${String(inicioPeriodo.getMonth() + 1).padStart(2, '0')}-${String(inicioPeriodo.getDate()).padStart(2, '0')}`;
+    const fin = `${finPeriodo.getFullYear()}-${String(finPeriodo.getMonth() + 1).padStart(2, '0')}-${String(finPeriodo.getDate()).padStart(2, '0')}`;
+    
+    return { inicio, fin };
+}
+    
+    /*
+    
+// Cargar días de pago agrupados
+async function cargarDiasPago() {
+    try {
+        const response = await fetch('db/nomina.php?action=obtener_agrupado_por_dia');
+        const data = await response.json();
+        if (data.success) {
+            mostrarDiasPago(data.dias);
+        } else {
+            document.getElementById('listaSemanas').innerHTML = '<div class="cargando">Error al cargar historial</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaSemanas').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarDiasPago(dias) {
+    if (!dias || dias.length === 0) {
+        document.getElementById('listaSemanas').innerHTML = '<div class="cargando">No hay pagos registrados</div>';
+        return;
+    }
+    
+    let html = '<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; border-bottom: 2px solid #278233; padding-bottom: 10px;">';
+    
+    dias.forEach((dia, index) => {
+        const fechaMostrar = formatearFecha(dia.fecha_pago);
+        const isActive = index === 0 ? 'active' : '';
+        
+        html += `
+            <button class="tab-dia-btn ${isActive}" 
+                    data-fecha="${dia.fecha_pago}"
+                    onclick="cambiarDiaPago('${dia.fecha_pago}')"
+                    style="background: ${isActive ? 'rgba(39,130,51,0.1)' : '#ddd'}; 
+                           color: ${isActive ? 'rgba(0,0,0,.8)' : '#333'}; 
+                           border: none; 
+                           padding: 8px 16px; 
+                           cursor: pointer; 
+                           border-radius: 5px 5px 0 0;
+                           font-size: 14px;">
+                ${fechaMostrar}
+            </button>
+        `;
+    });
+    
+    html += '</div>';
+    html += '<div id="contenidoPagosDia"></div>';
+    
+    document.getElementById('listaSemanas').innerHTML = html;
+    
+    if (dias.length > 0) {
+        mostrarPagosDeDia(dias[0].fecha_pago, dias[0].pagos);
+    }
+}
+
+function cambiarDiaPago(fecha) {
+    document.querySelectorAll('.tab-dia-btn').forEach(btn => {
+        if (btn.getAttribute('data-fecha') === fecha) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = '#ddd';
+            btn.style.color = '#333';
+        }
+    });
+    
+    cargarPagosPorDia(fecha);
+}
+
+async function cargarPagosPorDia(fecha) {
+    const response = await fetch(`db/nomina.php?action=obtener_pagos_por_dia&fecha=${fecha}`);
+    const data = await response.json();
+    if (data.success) {
+        mostrarPagosDeDia(fecha, data.pagos);
+    }
+}
+
+function mostrarPagosDeDia(fecha, pagos) {
+    const fechaMostrar = formatearFecha(fecha);
+    
+    let html = `
+        <div style="margin-bottom: 10px; padding: 8px; background: #278233; border-radius: 4px;color:white;">
+            <strong>Pagos realizados el ${fechaMostrar}</strong>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="tabla-usuarios" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Trabajador</th>
+                        <th>Período</th>
+                        <th>Producción</th>
+                        <th>Deducción</th>
+                        <th>Pagado</th>
+                        <th>Fecha</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    pagos.forEach(pago => {
+        const periodo = `${formatearFecha(pago.semana_inicio)} - ${formatearFecha(pago.semana_fin)}`;
+        html += `
+            <tr class="nominaCell" onclick="verDetallePago(${pago.id});">
+                <td>${escapeHtml(pago.trabajador_nombre)}<br><small>${pago.cargo || ''}</small></td>
+                <td><small>${periodo}</small></td>
+                <td>$${parseFloat(pago.salario_semanal).toFixed(2)}</td>
+                <td>$${parseFloat(pago.deducciones).toFixed(2)}</td>
+                <td><strong>$${parseFloat(pago.total_pagado).toFixed(2)}</strong></td>
+                <td>${pago.fecha_pago}</td>
+                <td>
+                    <button class="btn-eliminar" onclick="eliminarPago(${pago.id})">∅</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('contenidoPagosDia').innerHTML = html;
+}
+    
+*/
+    
+async function verDetallePago(pagoId) {
+    const response = await fetch(`db/obtener_detalle_pago.php?id=${pagoId}`);
+    const data = await response.json();
+    
+    if (!data.success) {
+        alert('Error al cargar los detalles del pago');
+        return;
+    }
+    
+    const pago = data.pago;
+    const produccion = data.produccion;
+    const totales = data.totales_productos;
+    const periodoInicio = data.periodo_inicio;
+    const periodoFin = data.periodo_fin;
+    
+    // Formatear fechas
+    const fechaInicio = formatearFecha(periodoInicio);
+    const fechaFin = formatearFecha(periodoFin);
+    const fechaPago = formatearFecha(pago.fecha_pago);
+    
+    // Determinar método de pago con ícono
+    const metodoIcono = {
+        'efectivo': '',
+        'transferencia': '',
+        'cheque': ''
+    }[pago.metodo_pago] || '';
+    
+    let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Detalle de Pago - ${escapeHtml(pago.trabajador_nombre)}</title>
+            <meta charset="UTF-8">
+            <style>
+                * { font-family: 'Segoe UI', Arial, sans-serif; }
+                body { padding: 20px; background: #f5f5f5; }
+                .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                h3 { color: #333; margin: 20px 0 10px 0; border-left: 4px solid #278233; padding-left: 12px; }
+                .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                .info-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding: 8px 0; }
+                .info-label { font-weight: bold; color: #555; }
+                .info-value { color: #222; font-weight: 500; }
+                .monto-produccion { color: #222; font-size: 18px; }
+                .deduccion { color: #f44336; }
+                .total { color: #278233; font-size: 20px; font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background: #278233; color: white; font-weight: bold; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                .total-row { background: #e8f5e9 !important; font-weight: bold; }
+                .observaciones { background: #fff8e1; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107; }
+                .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 14px; }
+                .btn-cerrar:hover { background: #1e6b28; }
+                .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+                .badge-efectivo { background: #4CAF50; color: white; }
+                .badge-transferencia { background: #2196F3; color: white; }
+                .badge-cheque { background: #ff9800; color: white; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Detalle de Pago de Nómina</h2>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Trabajador:</span>
+                        <span class="info-value">${escapeHtml(pago.trabajador_nombre)}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cédula:</span>
+                        <span class="info-value">${pago.cedula || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cargo:</span>
+                        <span class="info-value">${pago.cargo || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Sucursal:</span>
+                        <span class="info-value">${pago.sucursal_nombre || 'N/A'}</span>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Período:</span>
+                        <span class="info-value"><strong>${fechaInicio}</strong> → <strong>${fechaFin}</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha de Pago:</span>
+                        <span class="info-value">${fechaPago}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Monto Producción:</span>
+                        <span class="info-value monto-produccion">$${parseFloat(pago.salario_semanal).toFixed(2)}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Pagado:</span>
+                        <span class="info-value total">$${parseFloat(pago.total_pagado).toFixed(2)}</span>
+                    </div>
+                </div>
+    `;
+    
+    // Mostrar producción por día
+    if (produccion.length > 0) {
+        // Verificar si hay valores unitarios registrados
+        const tieneValores = data.valores_unitarios && data.valores_unitarios.length > 0;
+
+        html += `
+            <h3>Producción del trabajador en este período</h3>
+            <div style="overflow-x: auto;">
+                <table class="tabla-usuarios" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Valor Unitario</th>
+                            <th>Subtotal</th>
+                            <th>Piezas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Crear un mapa de valores unitarios por fecha+producto
+        const valoresMap = new Map();
+        if (tieneValores) {
+            data.valores_unitarios.forEach(v => {
+                const key = `${v.fecha}|${v.producto}`;
+                valoresMap.set(key, { 
+                    valor: parseFloat(v.valor_unitario) || 0, 
+                    subtotal: parseFloat(v.subtotal) || 0 
+                });
+            });
+        }
+
+        let totalPeso = 0;
+        let totalPiezas = 0;
+        let totalValor = 0;
+
+        produccion.forEach(prod => {
+            const fecha = formatearFecha(prod.fecha);
+            const nombreProducto = formatearNombre(prod.tipo_producto);
+            const esLeche = prod.es_leche == 1;
+            const peso = parseFloat(prod.peso_kg) || 0;
+            const piezas = parseInt(prod.piezas) || 0;
+
+            totalPeso += peso;
+            totalPiezas += piezas;
+
+            const key = `${prod.fecha}|${prod.tipo_producto}`;
+            const valorInfo = valoresMap.get(key);
+            const valorUnitario = (valorInfo && !isNaN(valorInfo.valor)) ? valorInfo.valor : 0;
+            const subtotalItem = (valorInfo && !isNaN(valorInfo.subtotal)) ? valorInfo.subtotal : 0;
+            totalValor += subtotalItem;
+
+            // Formatear números con verificación
+            const pesoFormateado = !isNaN(peso) ? peso.toFixed(2) : '0.00';
+            const valorFormateado = !isNaN(valorUnitario) ? valorUnitario.toFixed(2) : '0.00';
+            const subtotalFormateado = !isNaN(subtotalItem) ? subtotalItem.toFixed(2) : '0.00';
+
+            html += `<tr>`;
+            html += `<td>${fecha}</td>`;
+            html += `<td>${nombreProducto}</td>`;
+
+            if (esLeche) {
+                html += `<td><strong>${pesoFormateado} litros</strong></td>`;
+                html += `<td>$${valorFormateado}</br><small>por unidad</small></td>`;
+                html += `<td>$${subtotalFormateado}</td>`;
+                html += `<td>-</br><small>-</small></td>`;
+            } else {
+                const pesoKgTexto = peso > 0 ? `${pesoFormateado} kg` : '-';
+                html += `<td>${pesoKgTexto}</td>`;
+                html += `<td>$${valorFormateado}</br><small>por kg</small></td>`;
+                html += `<td>$${subtotalFormateado}</td>`;
+                const piezasTexto = piezas > 0 ? `${piezas} pz` : '-';
+                html += `<td>${piezasTexto}</td>`;
+            }
+
+            html += `</tr>`;
+        });
+
+        // Fila de totales
+        const totalPesoFormateado = !isNaN(totalPeso) ? totalPeso.toFixed(2) : '0.00';
+        const totalValorFormateado = !isNaN(totalValor) ? totalValor.toFixed(2) : '0.00';
+
+        html += `<tr style="background: #e8f5e9; font-weight: bold;">`;
+        html += `<td><strong>TOTALES</strong></td>`;
+        html += `<td>-</br><small>-</small></td>`;
+        html += `<td><strong>${totalPesoFormateado} kg</strong></br><small>peso total</small></td>`;
+        html += `<td>-</br><small>-</small></td>`;
+        html += `<td><strong>$${totalValorFormateado}</strong></br><small>valor total</small></td>`;
+        html += `<td><strong>${totalPiezas} pz</strong></br><small>piezas totales</small></td>`;
+        html += `</tr>`;
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } else {
+        html += `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center; margin: 15px 0;">
+                No hay registros de producción para este trabajador en el período seleccionado.
+            </div>
+        `;
+    }
+    
+    // Observaciones
+    if (pago.observaciones) {
+        html += `
+            <div class="observaciones">
+                <strong>Observaciones:</strong><br>
+                ${escapeHtml(pago.observaciones)}
+            </div>
+        `;
+    }
+    
+    html += `
+                <div style="text-align: right;">
+                    <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const ventana = window.open('', '_blank', 'width=850,height=700,scrollbars=yes');
+    ventana.document.write(html);
+    
+}
+
+// Función principal para abrir el modal de nómina
+function abrirModalNomina() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('modalNomina').style.display = 'block';
+    cargarTrabajadores();
+    cargarDiasConPagos();
+    setupCalculoTotal();
+    
+    // Agregar filtros al contenido de pagos (se ejecuta después de cargar)
+    setTimeout(() => {
+        agregarFiltrosNomina();
+    }, 500);
+}
+    
+function agregarFiltrosNomina() {
+    const container = document.getElementById('contenidoPagosDia');
+    if (!container) return;
+    
+    // Verificar si ya existen los filtros
+    if (document.getElementById('filtrosNomina')) return;
+    
+    const filtrosHtml = `
+        <div id="filtrosNomina" class="filtros-container" style="margin-bottom: 15px;">
+            <div class="filtro-grupo" style="flex:2;">
+                <label>Buscar</label>
+                <input type="text" id="busquedaNomina" placeholder="Buscar por trabajador...">
+            </div>
+            <div class="filtro-grupo">
+                <label>Desde</label>
+                <input type="date" id="fechaInicioNomina">
+            </div>
+            <div class="filtro-grupo">
+                <label>Hasta</label>
+                <input type="date" id="fechaFinNomina">
+            </div>
+            <div class="filtro-grupo">
+                <button class="btn-filtro" id="btnFiltrarNomina">Filtrar</button>
+                <button class="btn-limpiar-filtros" id="btnLimpiarNomina">Limpiar</button>
+            </div>
+        </div>
+    `;
+    
+    // Insertar filtros antes de la tabla
+    const tablaContainer = container.querySelector('div:not(.filtros-container)');
+    if (tablaContainer && !container.querySelector('#filtrosNomina')) {
+        container.insertAdjacentHTML('afterbegin', filtrosHtml);
+    }
+    
+    // Configurar eventos
+    const inputBusqueda = document.getElementById('busquedaNomina');
+    const btnFiltrar = document.getElementById('btnFiltrarNomina');
+    const btnLimpiar = document.getElementById('btnLimpiarNomina');
+    const fechaInicio = document.getElementById('fechaInicioNomina');
+    const fechaFin = document.getElementById('fechaFinNomina');
+    
+    function aplicarFiltros() {
+        const tabla = container.querySelector('table');
+        if (!tabla) return;
+        
+        const filtroTexto = inputBusqueda.value.toLowerCase();
+        const fechaInicioVal = fechaInicio.value;
+        const fechaFinVal = fechaFin.value;
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            let coincideTexto = true;
+            let coincideFecha = true;
+            
+            // Búsqueda por trabajador (columna 0)
+            if (filtroTexto && celdas[0]) {
+                coincideTexto = celdas[0].innerText.toLowerCase().indexOf(filtroTexto) > -1;
+            }
+            
+            // Filtro por fecha (columna 5 es la fecha)
+            if (fechaInicioVal || fechaFinVal) {
+                let fechaCelda = celdas[5]?.innerText.trim() || '';
+                let partes = fechaCelda.split('/');
+                if (partes.length === 3) {
+                    fechaCelda = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+                if (fechaInicioVal && fechaCelda < fechaInicioVal) coincideFecha = false;
+                if (fechaFinVal && fechaCelda > fechaFinVal) coincideFecha = false;
+            }
+            
+            fila.style.display = (coincideTexto && coincideFecha) ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltros() {
+        inputBusqueda.value = '';
+        fechaInicio.value = '';
+        fechaFin.value = '';
+        aplicarFiltros();
+    }
+    
+    inputBusqueda.addEventListener('keyup', aplicarFiltros);
+    btnFiltrar.addEventListener('click', aplicarFiltros);
+    btnLimpiar.addEventListener('click', limpiarFiltros);
+}
+
+function abrirModalTrabajador() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    // Resetear el formulario
+    document.getElementById('formTrabajador').reset();
+    document.getElementById('trabajadorId').value = '';
+    
+    // ==== MODIFICACIÓN: Forzar tipo fijo y mostrar grupo ====
+    document.getElementById('trabajadorTipoPago').value = 'fijo';
+    const grupoSueldo = document.getElementById('grupoSueldoFijo');
+    const inputSueldo = document.getElementById('trabajadorSueldoFijo');
+    
+    grupoSueldo.style.display = 'block';
+    inputSueldo.required = true;
+    inputSueldo.disabled = false;
+    // ======================================================
+    
+    // Cargar sucursales primero
+    cargarSucursalesEnSelectTrabajador().then(() => {
+        document.getElementById('modalTrabajadorTitle').innerHTML = 'Nuevo Trabajador';
+        document.getElementById('modalTrabajador').style.display = 'block';
+    });
+}
+
+function cerrarModalTrabajador() {
+    document.getElementById('modalTrabajador').style.display = 'none';
+}
+
+document.getElementById('formTrabajador')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('trabajadorId').value;
+    const nombre = document.getElementById('trabajadorNombre').value;
+    const cedula = document.getElementById('trabajadorCedula').value;
+    const cargo = document.getElementById('trabajadorCargo').value;
+    const telefono = document.getElementById('trabajadorTelefono').value;
+    const sucursal_id = document.getElementById('trabajadorSucursal').value;
+    const dia_corte = document.getElementById('trabajadorDiaCorte').value;
+    
+    // ==== MODIFICACIÓN: Forzar tipo de pago a "fijo" ====
+    const tipo_pago = 'fijo';  // Siempre fijo, ignorando el select oculto
+    const sueldo_fijo = parseFloat(document.getElementById('trabajadorSueldoFijo').value) || 0;
+    // ===================================================
+    
+    // Validaciones
+    if (!nombre || !cedula) {
+        alert('Nombre y cédula son obligatorios');
+        return;
+    }
+    
+    if (!sueldo_fijo || sueldo_fijo <= 0) {
+        alert('Debe ingresar un monto válido para el sueldo');
+        return;
+    }
+    
+    console.log('Datos a enviar:', { id, nombre, cedula, cargo, telefono, sucursal_id, dia_corte, tipo_pago, sueldo_fijo });
+    
+    const action = id ? 'actualizar' : 'guardar';
+    const data = { 
+        action, 
+        nombre, 
+        cedula, 
+        cargo, 
+        telefono, 
+        sucursal_id, 
+        dia_corte,
+        tipo_pago,      // Siempre 'fijo'
+        sueldo_fijo     // El monto ingresado
+    };
+    if (id) data.id = id;
+    
+    try {
+        const response = await fetch('db/trabajadores.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log('Respuesta del servidor:', result);
+        
+        if (result.success) {
+            alert(id ? 'Trabajador actualizado' : 'Trabajador agregado');
+            cerrarModalTrabajador();
+            cargarTrabajadores();
+            cargarDiasConPagos();
+            document.getElementById('trabajadorId').value = '';
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar trabajador');
+    }
+});
+
+// Eliminar pago
+async function eliminarPago(id) {
+    if (!confirm('¿Estás seguro de eliminar este pago? Esta acción también restaurará los préstamos pagados en esta transacción.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('db/nomina.php?action=eliminar_pago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Pago eliminado correctamente');
+            // Recargar todo
+            
+            cargarTrabajadores();
+            cargarDiasConPagos();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar el pago');
+    }
+}
+
+// Funciones auxiliares
+function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const partes = fecha.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function getFechaActual() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+</script>    
+    
+    
+    
+    
+    
+<script>
+    
+// ========== MÓDULO DE VENTAS ==========
+let productosVentaGlobal = [];
+
+function abrirModalVentas() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('modalVentas').style.display = 'block';
+    document.getElementById('ventaFecha').value = getFechaActual();
+    cargarProductosVenta();
+    cargarHistorialVentas();
+}
+    
+document.querySelector('.close-ventas')?.addEventListener('click', () => {
+    cerrarModalVentas();
+});
+
+function cerrarModalVentas() {
+    document.getElementById('modalVentas').style.display = 'none';
+}
+
+function cambiarTabVentas(tab) {
+    const tabNueva = document.getElementById('tabNuevaVenta');
+    const tabHistorial = document.getElementById('tabHistorialVentas');
+    const btns = document.querySelectorAll('.tab-ventas-btn');
+    
+    if (tab === 'nueva') {
+        tabNueva.style.display = 'block';
+        tabHistorial.style.display = 'none';
+        btns[0].style.background = '#278233';
+        btns[0].style.color = 'white';
+        btns[1].style.background = '#ddd';
+        btns[1].style.color = '#333';
+    } else {
+        tabNueva.style.display = 'none';
+        tabHistorial.style.display = 'block';
+        btns[1].style.background = '#278233';
+        btns[1].style.color = 'white';
+        btns[0].style.background = '#ddd';
+        btns[0].style.color = '#333';
+        cargarHistorialVentas();
+    }
+}
+
+async function cargarProductosVenta() {
+    try {
+        const response = await fetch('db/obtener_productos_venta.php');
+        const data = await response.json();
+        if (data.success) {
+            productosVentaGlobal = data.productos;
+            actualizarSelectsProductos();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function actualizarSelectsProductos() {
+    const selects = document.querySelectorAll('#listaProductosVenta .producto-select');
+    selects.forEach(select => {
+        const valorActual = select.value;
+        select.innerHTML = '<option value="">Seleccionar producto</option>';
+        productosVentaGlobal.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = `${formatearNombre(p.nombre)}`;
+            option.setAttribute('data-precio', p.precio || 0);
+            option.setAttribute('data-es_leche', p.es_leche);
+            select.appendChild(option);
+        });
+        if (valorActual && [...select.options].some(o => o.value == valorActual)) {
+            select.value = valorActual;
+        }
+    });
+}
+
+function agregarProductoRow() {
+    const container = document.getElementById('listaProductosVenta');
+    const newRow = document.createElement('div');
+    newRow.className = 'producto-row';
+    newRow.style.cssText = 'display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;';
+    newRow.innerHTML = `
+        <select class="producto-select" style="flex: 2; min-width: 150px; padding: 8px;" required>
+            <option value="">Seleccionar producto</option>
+        </select>
+        <input type="number" step="0.01" class="producto-cantidad" placeholder="kg/L" style="flex: 1; min-width: 100px; padding: 8px;" required>
+        <input type="number" step="1" class="venta-piezas" placeholder="Piezas" style="flex: 1; min-width: 80px; padding: 8px;" value="">
+        <input type="number" step="0.01" class="producto-precio-unitario" placeholder="Precio unitario" style="flex: 1; min-width: 100px; padding: 8px;" required>
+        <button type="button" class="btn-eliminar" onclick="eliminarProductoRow(this)" style="font-weight: bold; color: rgba(0,0,0,.7); padding: 8px 12px;">×</button>
+    `;
+    container.appendChild(newRow);
+    
+    // Llenar el nuevo select con productos
+    const select = newRow.querySelector('.producto-select');
+    productosVentaGlobal.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        const nombreFormateado = formatearNombre(p.nombre);
+        option.textContent = nombreFormateado;
+        option.setAttribute('data-precio', p.precio || 0);
+        option.setAttribute('data-es_leche', p.es_leche);
+        select.appendChild(option);
+    });
+    
+    // Agregar event listeners
+    const cantidadInput = newRow.querySelector('.producto-cantidad');
+    const precioInput = newRow.querySelector('.producto-precio-unitario');
+    cantidadInput.addEventListener('input', calcularTotalVenta);
+    precioInput.addEventListener('input', calcularTotalVenta);
+}
+
+function eliminarProductoRow(btn) {
+    const row = btn.closest('.producto-row');
+    if (document.querySelectorAll('#listaProductosVenta .producto-row').length > 1) {
+        row.remove();
+        calcularTotalVenta();
+    } else {
+        // Limpiar en lugar de eliminar
+        row.querySelector('.producto-select').value = '';
+        row.querySelector('.producto-cantidad').value = '';
+        row.querySelector('.venta-piezas').value = '0';  // <-- CAMBIADO
+        row.querySelector('.producto-precio-unitario').value = '';
+        calcularTotalVenta();
+    }
+}
+
+// Calcular total de venta (suma de cantidad * precio unitario)
+function calcularTotalVenta() {
+    let total = 0;
+    const rows = document.querySelectorAll('#listaProductosVenta .producto-row');
+    
+    rows.forEach(row => {
+        const cantidad = parseFloat(row.querySelector('.producto-cantidad').value) || 0;
+        const precioUnitario = parseFloat(row.querySelector('.producto-precio-unitario').value) || 0;
+        const subtotal = cantidad * precioUnitario;
+        total += subtotal;
+    });
+    
+    document.getElementById('ventaTotal').innerText = total.toFixed(2);
+}
+
+// Pre-cargar precio del producto al seleccionar
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('producto-select')) {
+        const precio = parseFloat(e.target.options[e.target.selectedIndex]?.getAttribute('data-precio')) || 0;
+        const precioInput = e.target.closest('.producto-row').querySelector('.producto-precio-unitario');
+        if (precioInput && !precioInput.value) {
+            precioInput.value = precio.toFixed(2);
+            calcularTotalVenta();
+        }
+    }
+});
+
+    
+function agregarFiltrosVentas() {
+    const container = document.getElementById('tablaHistorialVentas');
+    if (!container) return;
+    
+    // Eliminar filtros existentes para evitar duplicados
+    const filtrosExistentes = document.getElementById('filtrosVentas');
+    if (filtrosExistentes) {
+        filtrosExistentes.remove();
+    }
+    
+    const filtrosHtml = `
+        <div id="filtrosVentas" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="filtro-grupo" style="flex:2;">
+                    <label>Buscar</label>
+                    <input type="text" id="busquedaVentas" placeholder="Cliente..." style="min-width: 200px;">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Sucursal</label>
+                    <select id="filtroSucursalVentas" style="min-width: 120px; padding: 8px;">
+                        <option value="">Todas</option>
+                        <option value="Principal">Principal</option>
+                        <option value="Cerro Verde">Cerro Verde</option>
+                    </select>
+                </div>
+                <div class="filtro-grupo">
+                    <label>Desde</label>
+                    <input type="date" id="fechaInicioVentas">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Hasta</label>
+                    <input type="date" id="fechaFinVentas">
+                </div>
+                <div class="filtro-grupo">
+                    <button class="btn-filtro" id="btnFiltrarVentas" style="padding: 0px 4px">Filtrar</button>
+                    <button class="btn-limpiar-filtros" id="btnLimpiarVentas" style="padding: 0px 4px">Limpiar</button>
+                </div>
+            </div>
+            <div>
+                <button class="btn-agregar" onclick="exportarVentasCSV()" style="font-size: 14px; padding: 8px 16px;">Exportar CSV</button>
+            </div>
+        </div>
+    `;
+    
+    // Insertar filtros al principio del contenedor
+    container.insertAdjacentHTML('afterbegin', filtrosHtml);
+    
+    const inputBusqueda = document.getElementById('busquedaVentas');
+    const btnFiltrar = document.getElementById('btnFiltrarVentas');
+    const btnLimpiar = document.getElementById('btnLimpiarVentas');
+    const fechaInicio = document.getElementById('fechaInicioVentas');
+    const fechaFin = document.getElementById('fechaFinVentas');
+    const filtroSucursal = document.getElementById('filtroSucursalVentas');
+    
+    function aplicarFiltros() {
+        const tabla = container.querySelector('table');
+        if (!tabla) return;
+        
+        const filtroTexto = inputBusqueda.value.toLowerCase();
+        const fechaInicioVal = fechaInicio.value;
+        const fechaFinVal = fechaFin.value;
+        const sucursalVal = filtroSucursal.value.toLowerCase();
+        const filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            let coincideTexto = true;
+            let coincideFecha = true;
+            let coincideSucursal = true;
+            
+            // Búsqueda por cliente (columna 2)
+            if (filtroTexto && celdas[2]) {
+                coincideTexto = celdas[2].innerText.toLowerCase().indexOf(filtroTexto) > -1;
+            }
+            
+            // Filtro por sucursal (columna 5)
+            if (sucursalVal && celdas[5]) {
+                coincideSucursal = celdas[5].innerText.toLowerCase().indexOf(sucursalVal) > -1;
+            }
+            
+            // Filtro por fecha (columna 1)
+            if (fechaInicioVal || fechaFinVal) {
+                let fechaCelda = celdas[1]?.innerText.trim() || '';
+                let partes = fechaCelda.split('/');
+                if (partes.length === 3) {
+                    fechaCelda = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+                if (fechaInicioVal && fechaCelda < fechaInicioVal) coincideFecha = false;
+                if (fechaFinVal && fechaCelda > fechaFinVal) coincideFecha = false;
+            }
+            
+            fila.style.display = (coincideTexto && coincideFecha && coincideSucursal) ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltros() {
+        inputBusqueda.value = '';
+        fechaInicio.value = '';
+        fechaFin.value = '';
+        filtroSucursal.value = '';
+        aplicarFiltros();
+    }
+    
+    // Remover event listeners anteriores para evitar duplicados
+    inputBusqueda.removeEventListener('keyup', aplicarFiltros);
+    btnFiltrar.removeEventListener('click', aplicarFiltros);
+    btnLimpiar.removeEventListener('click', limpiarFiltros);
+    filtroSucursal.removeEventListener('change', aplicarFiltros);
+    
+    // Agregar event listeners
+    inputBusqueda.addEventListener('keyup', aplicarFiltros);
+    btnFiltrar.addEventListener('click', aplicarFiltros);
+    btnLimpiar.addEventListener('click', limpiarFiltros);
+    filtroSucursal.addEventListener('change', aplicarFiltros);
+}
+
+
+// Historial de ventas - asegurar que la sucursal se muestre correctamente
+async function cargarHistorialVentas() {
+    try {
+        const response = await fetch('db/ventas.php?action=obtener');
+        const data = await response.json();
+        if (data.success) {
+            mostrarHistorialVentas(data.ventas);
+        } else {
+            document.getElementById('tablaHistorialVentas').innerHTML = '<div class="cargando">Error al cargar historial</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tablaHistorialVentas').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarHistorialVentas(ventas) {
+    if (!ventas || ventas.length === 0) {
+        document.getElementById('tablaHistorialVentas').innerHTML = '<div class="cargando">No hay ventas registradas</div>';
+        return;
+    }
+    
+    let html = '<div style="overflow-x: auto;"><table class="tabla-produccion" style="width:100%;">';
+    // IMPORTANTE: El orden de las columnas debe coincidir con los índices del filtro
+    html += '<thead><tr><th>N° Factura</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Método Pago</th><th>Sucursal</th><th></th></tr></thead><tbody>';
+    
+    ventas.forEach(v => {
+        // Asegurar que sucursal_nombre exista, si no, mostrar vacío
+        const sucursalNombre = v.sucursal_nombre || '—';
+        
+        
+        let sucursal = '';
+        if (sucursalNombre === '') {
+        	sucursal = '';
+        }else { 
+            if (sucursalNombre === 'principal') { sucursal = 'Principal'; }
+            else if (sucursalNombre === 'cerro_verde') { sucursal = 'Cerro Verde'; }
+        }
+        
+        html += `
+            <tr>
+                <td>${String(v.id).padStart(6, '0')}</br><small>Factura</small></td>
+                <td>${formatearFecha(v.fecha)}</br></td>
+                <td>${escapeHtml(v.cliente)}</br><small>${v.rif || ''}</small></td>
+                <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></td>
+                <td>${v.metodo_pago}</br></td>
+                <td>${sucursal}</br></td>
+                <td><button class="btn-ver" onclick="verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:8px;border-radius:3px;cursor:pointer;">Ver</button>
+                    <button class="btn-eliminar" onclick="eliminarVenta(${v.id})">∅</button></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody><table></div>';
+    document.getElementById('tablaHistorialVentas').innerHTML = html;
+    
+    // Agregar filtros después de que la tabla esté en el DOM
+    setTimeout(() => {
+        agregarFiltrosVentas();
+    }, 50);
+}
+
+async function verFactura(id) {
+    try {
+        const response = await fetch(`db/ventas.php?action=obtener_detalle&id=${id}`);
+        const data = await response.json();
+        
+        if (data.success && data.detalles && data.detalles.length > 0) {
+            // data.venta contiene los datos de la venta (ya incluye cliente del JOIN)
+            const ventaData = data.venta;
+            
+            const facturaData = {
+                venta: {
+                    id: ventaData.venta_id,
+                    cliente: ventaData.cliente,  // Ya viene del JOIN
+                    rif: ventaData.rif || '',
+                    telefono: ventaData.telefono || '',
+                    contacto: ventaData.contacto || '',
+                    email: ventaData.email || '',
+                    direccion: ventaData.direccion || '',
+                    fecha: ventaData.fecha,
+                    metodo_pago: ventaData.metodo_pago,
+                    tiene_descuento: ventaData.tiene_descuento || false,
+                    descuento_porcentaje: ventaData.descuento_porcentaje || 0,
+                    descuento_monto: ventaData.descuento_monto || 0,
+                    es_credito: ventaData.es_credito || false,
+                    subtotal: ventaData.subtotal,
+                    total: ventaData.total,
+                    observaciones: ventaData.observaciones || ''
+                },
+                detalles: data.detalles.map(d => ({
+                    ...d,
+                    producto_nombre: d.producto_nombre || 'Producto',
+                    es_leche: d.es_leche || 0
+                })),
+                empresa: {
+                    nombre: 'Agroindustria Láctea J.K.V. C.A.',
+                    rif: 'J-41022340-5',
+                    telefono: '(0412) 302-7063',
+                    direccion: 'Carretera Lara-Zulia (82Km) | Palmarito - Cerro Verde, Finca Las Vegas',
+                    email: ''
+                }
+            };
+            
+            sessionStorage.setItem('facturaData', JSON.stringify(facturaData));
+            window.open('factura.php', '_blank', 'width=900,height=700,scrollbars=yes');
+        } else {
+            alert('Error al cargar los datos de la factura');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar la factura: ' + error.message);
+    }
+}
+
+async function eliminarVenta(id) {
+    if (!confirm('¿Estás seguro de eliminar esta venta? Esta acción no se puede deshacer.')) return;
+    
+    try {
+        const response = await fetch('db/ventas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ Venta eliminada');
+            cargarHistorialVentas();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar');
+    }
+}
+
+function exportarVentasCSV() {
+    const container = document.getElementById('tablaHistorialVentas');
+    if (!container) return;
+    
+    // Buscar la tabla dentro del contenedor
+    const tabla = container.querySelector('table');
+    if (!tabla) return;
+    
+    // Obtener SOLO las filas visibles (no ocultas por filtros)
+    const filasVisibles = tabla.querySelectorAll('tbody tr:not([style*="display: none"])');
+    
+    if (filasVisibles.length === 0) {
+        alert('No hay ventas visibles para exportar. Aplica filtros o limpia los filtros primero.');
+        return;
+    }
+    
+    let csv = [];
+    const BOM = "\uFEFF";
+    
+    // Encabezados
+    csv.push(['Factura', 'Fecha', 'Cliente', 'Total', 'Método Pago', 'Sucursal'].join(','));
+    
+    // Recorrer SOLO las filas visibles
+    filasVisibles.forEach(fila => {
+        const rowData = [];
+        const celdas = fila.querySelectorAll('td');
+        
+        // Tomar columnas: Factura(0), Fecha(1), Cliente(2), Total(3), Método(4), Sucursal(5)
+        for (let i = 0; i <= 5; i++) {
+            if (celdas[i]) {
+                let text = celdas[i].innerText || '';
+                // Limpiar HTML y saltos de línea
+                text = text.replace(/<[^>]*>/g, '');
+                text = text.replace(/\s+/g, ' ').trim();
+                // Escapar comillas dobles
+                text = text.replace(/"/g, '""');
+                // Si contiene comas, comillas o saltos, encerrar entre comillas
+                if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+                    text = `"${text}"`;
+                }
+                rowData.push(text);
+            } else {
+                rowData.push('');
+            }
+        }
+        csv.push(rowData.join(','));
+    });
+    
+    // Agregar una fila de resumen con el total de ventas y monto
+    let totalVentas = filasVisibles.length;
+    let totalMonto = 0;
+    
+    filasVisibles.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas[3]) {
+            let montoTexto = celdas[3].innerText || '0';
+            // Extraer solo números y puntos
+            const montoMatch = montoTexto.match(/[\d,]+\.?\d*/);
+            if (montoMatch) {
+                const monto = parseFloat(montoMatch[0].replace(/,/g, ''));
+                if (!isNaN(monto)) totalMonto += monto;
+            }
+        }
+    });
+    
+    csv.push(''); // línea en blanco
+    csv.push([`Total de ventas exportadas: ${totalVentas}`, `Monto total: $${totalMonto.toFixed(2)}`].join(','));
+    
+    const csvContent = BOM + csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    // Generar timestamp y nombre de archivo indicando filtros
+    const fecha = new Date();
+    const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}_${fecha.getHours().toString().padStart(2,'0')}${fecha.getMinutes().toString().padStart(2,'0')}`;
+    
+    // Detectar filtro de sucursal activo para el nombre del archivo
+    const filtroSucursal = document.getElementById('filtroSucursalVentas');
+    let sufijo = '';
+    if (filtroSucursal && filtroSucursal.value) {
+        sufijo = `_${filtroSucursal.value.toLowerCase().replace(/\s/g, '_')}`;
+    }
+    
+    a.href = url;
+    a.download = `ventas${sufijo}_${timestamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Mostrar mensaje de confirmación
+    alert(`✅ Exportadas ${totalVentas} ventas por un total de $${totalMonto.toFixed(2)}`);
+}
+
+// Inicializar al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    cargarProductosVenta();
+    // Agregar event listener para calcular total al modificar inputs
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('producto-cantidad') || e.target.classList.contains('producto-precio-unitario')) {
+            calcularTotalVenta();
+        }
+    });
+});    
+</script>    
+    
+    
+    
+    
+    
+<script>
+    let tipoEgresoActual = 'gasto';
+	let categoriaActual = 'Todos';
+
+function abrirModalEgresos() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('modalEgresos').style.display = 'block';
+    cargarCategoriasEgresos();
+    cargarEgresos();
+}
+
+function cerrarModalEgresos() {
+    document.getElementById('modalEgresos').style.display = 'none';
+}
+
+function cambiarTabEgresos(tipo) {
+    tipoEgresoActual = tipo;
+    categoriaActual = 0;
+    
+    const btns = document.querySelectorAll('.tab-egresos-btn');
+    btns.forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(tipo === 'gasto' ? 'gastos' : 'costos')) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = '#ddd';
+            btn.style.color = '#333';
+        }
+    });
+    
+    cargarCategoriasEgresos();
+    cargarEgresos();
+}
+
+function cambiarCategoriaEgreso(categoriaNombre) {
+    categoriaActual = categoriaNombre;
+    
+    // Actualizar estilos de pestañas
+    document.querySelectorAll('.tab-categoria-btn').forEach(btn => {
+        if (btn.getAttribute('data-categoria') === categoriaNombre) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = '#ddd';
+            btn.style.color = '#333';
+        }
+    });
+    
+    cargarEgresos();
+}
+
+async function cargarCategoriasEgresos() {
+    try {
+        const response = await fetch(`db/egresos.php?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+        const data = await response.json();
+        if (data.success) {
+            mostrarCategoriasEgresos(data.categorias);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function mostrarCategoriasEgresos(categorias) {
+    const wrapper = document.getElementById('tabsCategoriasEgresos');
+    if (!wrapper) return;
+    
+    wrapper.innerHTML = '';
+    
+    // Botón "Todos"
+    const btnTodos = document.createElement('button');
+    btnTodos.className = 'tab-categoria-btn';
+    btnTodos.setAttribute('data-categoria', 'Todos');
+    btnTodos.onclick = () => cambiarCategoriaEgreso('Todos');
+    btnTodos.textContent = 'Todos';
+    btnTodos.style.cssText = 'background: #ddd; color: #333; border: none; padding: 6px 14px; cursor: pointer; border-radius: 5px; font-size: 13px;';
+    if (categoriaActual === 'Todos' || categoriaActual === '0' || !categoriaActual) {
+        btnTodos.style.background = '#278233';
+        btnTodos.style.color = 'white';
+        categoriaActual = 'Todos';
+    }
+    wrapper.appendChild(btnTodos);
+    
+    // Botones para cada categoría
+    categorias.forEach(cat => {
+        const container = document.createElement('div');
+        container.style.display = 'inline-flex';
+        container.style.alignItems = 'center';
+        container.style.gap = '3px';
+        
+        const btn = document.createElement('button');
+        btn.className = 'tab-categoria-btn';
+        btn.setAttribute('data-categoria', cat.nombre);
+        btn.onclick = () => cambiarCategoriaEgreso(cat.nombre);
+        btn.textContent = cat.nombre;
+        btn.style.cssText = 'background: #ddd; color: #333; border: none; padding: 6px 14px; cursor: pointer; border-radius: 5px; font-size: 13px;';
+        if (categoriaActual === cat.nombre) {
+            btn.style.background = '#278233';
+            btn.style.color = 'white';
+        }
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.style.cssText = 'background: none; border: none; font-size: 16px; cursor: pointer; color: #999; padding: 0 4px;';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            eliminarCategoriaEgreso(cat.id, cat.nombre);
+        };
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✎';
+        editBtn.style.cssText = 'background: none; border: none; font-size: 14px; cursor: pointer; color: #999; padding: 0 4px;';
+        editBtn.onclick = (e) => {
+            e.stopPropagation();
+            editarCategoriaEgreso(cat.id, cat.nombre);
+        };
+        
+        container.appendChild(btn);
+        container.appendChild(editBtn);
+        container.appendChild(deleteBtn);
+        wrapper.appendChild(container);
+    });
+}
+    
+function agregarFiltroEgresos() {
+    const container = document.getElementById('tablaEgresos');
+    if (!container) return;
+    
+    if (document.getElementById('filtroEgresos')) return;
+    
+    const filtrosHtml = `
+        <div id="filtroEgresos" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; flex:1;">
+                <div class="filtro-grupo" style="flex:2;">
+                    <input type="text" id="busquedaEgresos" placeholder="Buscar por descripción..." style="min-width: 250px;">
+                </div>
+                <div class="filtro-grupo">
+                    <button class="btn-limpiar-filtros" id="btnLimpiarEgresos">Limpiar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const tabla = container.querySelector('table');
+    if (tabla) {
+        tabla.insertAdjacentHTML('beforebegin', filtrosHtml);
+    }
+    
+    const inputBusqueda = document.getElementById('busquedaEgresos');
+    const btnLimpiar = document.getElementById('btnLimpiarEgresos');
+    
+    function aplicarFiltro() {
+        const tablaActual = container.querySelector('table');
+        if (!tablaActual) return;
+        
+        const filtroTexto = inputBusqueda.value.toLowerCase();
+        const filas = tablaActual.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            let mostrar = true;
+            
+            if (filtroTexto && celdas[1]) {
+                mostrar = celdas[1].innerText.toLowerCase().indexOf(filtroTexto) > -1;
+            }
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltro() {
+        inputBusqueda.value = '';
+        aplicarFiltro();
+    }
+    
+    inputBusqueda.addEventListener('keyup', aplicarFiltro);
+    btnLimpiar.addEventListener('click', limpiarFiltro);
+}
+
+async function cargarEgresos() {
+    try {
+        let url = `db/egresos.php?action=obtener&tipo=${tipoEgresoActual}`;
+        if (categoriaActual && categoriaActual !== '0' && categoriaActual !== 'Todos') {
+            url += `&categoria=${encodeURIComponent(categoriaActual)}`;
+        }
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.success) {
+            mostrarTablaEgresos(data.datos);
+        } else {
+            document.getElementById('tablaEgresos').innerHTML = '<div class="cargando">Error al cargar datos</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tablaEgresos').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarTablaEgresos(egresos) {
+    if (!egresos || egresos.length === 0) {
+        document.getElementById('tablaEgresos').innerHTML = '<div class="cargando">No hay registros</div>';
+        return;
+    }
+
+    let html = '<div style="overflow-x: auto;"><table class="tabla-cuentas" style="width:100%;border:1px solid rgba(0,0,0,.4)">';
+    html += '<thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th><th>Categoría</th><th>Método Pago</th><th>Referencia</th><th></th></tr></thead><tbody>';
+
+    egresos.forEach(e => {
+        html += `
+            <tr>
+                <td>${formatearFecha(e.fecha)}</br><small>${e.metodo_pago}</small></td>
+                <td>${escapeHtml(e.descripcion)}</br><small>${e.observaciones ? escapeHtml(e.observaciones) : ''}</small></td>
+                <td><strong>$${parseFloat(e.monto).toFixed(2)}</strong></td>
+                <td>${e.categoria ? escapeHtml(e.categoria) : 'Sin categoría'}</td>
+                <td>${e.referencia ? escapeHtml(e.referencia) : '-'}</td>
+                <td><button class="btn-eliminar" onclick="eliminarEgreso(${e.id})">∅</button></td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table></div>';
+    document.getElementById('tablaEgresos').innerHTML = html;
+    
+    setTimeout(() => {
+        agregarFiltroEgresos();
+    }, 100);
+}
+
+function abrirFormularioEgreso() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('egresoTipo').value = tipoEgresoActual;
+    const title = document.getElementById('formEgresoTitle');
+    title.innerHTML = tipoEgresoActual === 'gasto' ? 'Nuevo Gasto' : 'Nuevo Costo';
+    document.getElementById('formEgreso').reset();
+    document.getElementById('egresoFecha').value = getFechaActual();
+    
+    // Cargar categorías en el select del formulario
+    cargarSelectCategorias();
+    
+    document.getElementById('formEgresoModal').style.display = 'block';
+}
+
+async function cargarSelectCategorias() {
+    try {
+        const response = await fetch(`db/egresos.php?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+        const data = await response.json();
+        const select = document.getElementById('egresoCategoria');
+        if (data.success && select) {
+            select.innerHTML = '<option value="">Sin categoría</option>';
+            data.categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.nombre;
+                option.textContent = cat.nombre;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando categorías:', error);
+    }
+}
+
+function cerrarFormularioEgreso() {
+    document.getElementById('formEgresoModal').style.display = 'none';
+}
+
+document.getElementById('formEgreso')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const tipo = document.getElementById('egresoTipo').value;
+    const fecha = document.getElementById('egresoFecha').value;
+    const descripcion = document.getElementById('egresoDescripcion').value;
+    const monto = document.getElementById('egresoMonto').value;
+    const categoria = document.getElementById('egresoCategoria').value; // texto, no ID
+    const metodo_pago = document.getElementById('egresoMetodoPago').value;
+    const referencia = document.getElementById('egresoReferencia').value;
+    const observaciones = document.getElementById('egresoObservaciones').value;
+
+    const data = {
+        action: 'guardar',
+        tipo, fecha, descripcion, monto, categoria, metodo_pago, referencia, observaciones
+    };
+
+    try {
+        const response = await fetch('db/egresos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Registro guardado');
+            cerrarFormularioEgreso();
+            cargarEgresos();
+            cargarEstadisticasResumen();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar');
+    }
+});
+
+async function eliminarEgreso(id) {
+    if (!confirm('¿Estás seguro de eliminar este egreso?')) return;
+
+    try {
+        const response = await fetch('db/egresos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Egreso eliminado');
+            cargarEgresos();
+            cargarEstadisticasResumen(); // Actualizar gráfica
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar');
+    }
+}
+
+// Funciones para gestionar categorías
+function abrirModalNuevaCategoriaEgreso() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('categoriaEgresoId').value = '';
+    document.getElementById('categoriaEgresoNombre').value = '';
+    document.getElementById('categoriaEgresoTipo').value = tipoEgresoActual;
+    document.getElementById('modalCategoriaTitle').innerHTML = 'Nueva Categoría';
+    document.getElementById('modalCategoriaEgreso').style.display = 'block';
+}
+
+function cerrarModalCategoriaEgreso() {
+    document.getElementById('modalCategoriaEgreso').style.display = 'none';
+}
+
+function editarCategoriaEgreso(id, nombre) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('categoriaEgresoId').value = id;
+    document.getElementById('categoriaEgresoNombre').value = nombre;
+    document.getElementById('categoriaEgresoTipo').value = tipoEgresoActual;
+    document.getElementById('modalCategoriaTitle').innerHTML = 'Editar Categoría';
+    document.getElementById('modalCategoriaEgreso').style.display = 'block';
+}
+
+async function eliminarCategoriaEgreso(id, nombre) {
+    if (!confirm(`¿Estás seguro de eliminar la categoría "${nombre}"?`)) return;
+    
+    try {
+        const response = await fetch('db/egresos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar_categoria', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Categoría eliminada');
+            if (categoriaActual === id) {
+                categoriaActual = 0;
+            }
+            cargarCategoriasEgresos();
+            cargarEgresos();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar categoría');
+    }
+}
+
+document.getElementById('formCategoriaEgreso')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('categoriaEgresoId').value;
+    const nombre = document.getElementById('categoriaEgresoNombre').value;
+    const tipo = document.getElementById('categoriaEgresoTipo').value;
+    
+    if (!nombre) {
+        alert('Ingrese un nombre para la categoría');
+        return;
+    }
+    
+    const action = id ? 'actualizar_categoria' : 'guardar_categoria';
+    const data = { action, nombre, tipo };
+    if (id) data.id = id;
+    
+    try {
+        const response = await fetch('db/egresos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert(id ? 'Categoría actualizada' : 'Categoría creada');
+            cerrarModalCategoriaEgreso();
+            cargarCategoriasEgresos();
+            if (!id) {
+                // Si es nueva, recargar el select del formulario
+                cargarSelectCategorias();
+            }
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar categoría');
+    }
+});
+    
+document.getElementById('closeEgresos').addEventListener('click', () => {
+	cerrarModalEgresos();
+});
+</script>    
+    
+    
+    
+<script>
+    // Funciones para gestión de productos
+function abrirModalNuevoProducto() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('modalNuevoProducto').style.display = 'block';
+}
+
+function cerrarModalProducto() {
+    document.getElementById('modalNuevoProducto').style.display = 'none';
+}
+
+document.getElementById('formNuevoProducto')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombreProducto').value.toLowerCase().replace(/\s/g, '_');
+    const es_leche = document.getElementById('esLeche').checked;
+    
+    try {
+        const response = await fetch('db/crear_producto.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, es_leche })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Producto creado: ' + nombre);
+            cerrarModalProducto();
+            document.getElementById('formNuevoProducto').reset();
+            // Recargar la tabla para mostrar el nuevo producto
+            cargarProduccionSucursal();
+            // Actualizar selects si es necesario
+            cargarProductosEnSelects();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al crear producto');
+    }
+});
+
+// Funciones para gestión de sucursales
+function abrirModalNuevaSucursal() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('modalNuevaSucursal').style.display = 'block';
+}
+
+function cerrarModalSucursal() {
+    document.getElementById('modalNuevaSucursal').style.display = 'none';
+}
+
+document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombreSucursal').value.toLowerCase().replace(/\s/g, '_');
+    const ubicacion = document.getElementById('ubicacionSucursal').value;
+    
+    try {
+        const response = await fetch('db/crear_sucursal.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, ubicacion })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Sucursal creada: ' + nombre);
+            cerrarModalSucursal();
+            document.getElementById('formNuevaSucursal').reset();
+            // Recargar la tabla
+            cargarProduccionSucursal();
+            // Actualizar selector de sucursales
+            cargarSucursalesEnSelect();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al crear sucursal');
+    }
+});
+
+// Cargar productos en los selects del formulario con botón de eliminar
+async function cargarProductosEnSelects() {
+    try {
+        const response = await fetch('db/obtener_productos.php');
+        const data = await response.json();
+        if (data.success) {
+            const selectProducto = document.getElementById('tipoProductoSucursal');
+            if (selectProducto) {
+                selectProducto.innerHTML = '';
+                data.productos.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.nombre;
+                    const nombreFormateado = formatearNombre(p.nombre);
+                    option.textContent = nombreFormateado;
+                    option.setAttribute('data-es_leche', p.es_leche);
+                    option.setAttribute('data-id', p.id);
+                    selectProducto.appendChild(option);
+                });
+                selectProducto.dispatchEvent(new Event('change'));
+            }
+            
+            // Agregar botones de eliminar junto al select
+            const containerProducto = document.querySelector('#formProduccionSucursal .form-group:nth-child(3)');
+            if (containerProducto && !document.getElementById('productos-actions')) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.id = 'productos-actions';
+                actionsDiv.style.display = 'flex';
+                actionsDiv.style.gap = '8px';
+                actionsDiv.style.marginTop = '8px';
+                
+                // Select para elegir producto a eliminar
+                const selectEliminar = document.createElement('select');
+                selectEliminar.id = 'selectEliminarProducto';
+                selectEliminar.style.flex = '1';
+                selectEliminar.style.padding = '6px';
+                selectEliminar.style.border = '1px solid rgba(0,0,0,.4)';
+                selectEliminar.style.borderRadius = '4px';
+                
+                data.productos.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.nombre;
+                    option.textContent = formatearNombre(p.nombre);
+                    selectEliminar.appendChild(option);
+                });
+                
+                const btnEliminar = document.createElement('button');
+                btnEliminar.textContent = '× Eliminar Producto';
+                btnEliminar.style.cssText = 'background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;';
+                btnEliminar.onclick = () => {
+                    const productoSeleccionado = selectEliminar.value;
+                    const productoData = data.productos.find(p => p.nombre === productoSeleccionado);
+                    if (productoData) {
+                        eliminarProducto(productoData.nombre, productoData.id);
+                    }
+                };
+                
+                actionsDiv.appendChild(selectEliminar);
+                actionsDiv.appendChild(btnEliminar);
+                containerProducto.appendChild(actionsDiv);
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando productos:', error);
+    }
+}
+    
+// Llamar a estas funciones al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarProductosEnSelects();
+    cargarSucursalesEnSelect();
+});
+    
+    
+// Función para ver producción de un producto específico
+async function verProduccionProducto(productoNombre) {
+    try {
+        // Obtener fechas para el filtro (últimos 30 días por defecto)
+        const fechaFin = new Date().toISOString().split('T')[0];
+        const fechaInicio = new Date();
+        fechaInicio.setDate(fechaInicio.getDate() - 30);
+        const fechaInicioStr = fechaInicio.toISOString().split('T')[0];
+        
+        // Obtener sucursal actual
+        let sucursalId = 0;
+        if (sucursalActual !== 'total') {
+            sucursalId = sucursalActual === 'principal' ? 1 : 2;
+        }
+        
+        const response = await fetch(`db/produccion_sucursal.php?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar la producción del producto');
+            return;
+        }
+        
+        // Generar HTML para la ventana modal o ventana nueva
+        const nombreProducto = formatearNombre(productoNombre);
+        const unidad = data.es_leche ? 'litros' : 'kg';
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Producción - ${nombreProducto}</title>
+                <meta charset="UTF-8">
+                <style>
+                    * { font-family: 'Segoe UI', Arial, sans-serif; }
+                    body { padding: 20px; background: #f5f5f5; }
+                    .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                    h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                    .filtros { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; padding: 15px; border-radius: 8px; }
+                    .filtro-grupo { display: flex; flex-direction: column; gap: 5px; }
+                    .filtro-grupo label { font-size: 12px; font-weight: bold; color: #555; }
+                    .filtro-grupo input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
+                    .btn-filtrar { background: #278233; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+                    .btn-filtrar:hover { background: #1e6b28; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 0px solid #ddd; padding: 10px; text-align: left; }
+                    th { background: #278233; color: white; font-weight: bold; position: sticky; top: 0; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .total-row { background: #e8f5e9 !important; font-weight: bold; }
+                    .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; }
+                    .btn-cerrar:hover { background: #1e6b28; }
+                    .resumen { background: rgba(0,0,0,.2); padding: 8px; border-radius: 3px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; }
+                    .resumen-item { flex: 1; }
+                    .resumen-valor { font-size: 24px; font-weight: bold; color: #278233; }
+                    .resumen-label { font-size: 12px; color: #666; }
+                    .sucursal-badge { display: inline-block; background: #f4d71b; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 5px; }
+                    .export-btn { background: #f4d71b; color: rgba(0,0,0,.8); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
+                    .export-btn:hover { background: #0b7dda; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Producción de ${nombreProducto}</h2>
+                        <button class="export-btn" onclick="exportarProduccionCSV()">Exportar CSV</button>
+                    </div>
+                    
+                    <div class="filtros">
+                        <div class="filtro-grupo">
+                            <label>Fecha Inicio</label>
+                            <input type="date" id="filtroFechaInicio" value="${data.fecha_inicio}">
+                        </div>
+                        <div class="filtro-grupo">
+                            <label>Fecha Fin</label>
+                            <input type="date" id="filtroFechaFin" value="${data.fecha_fin}">
+                        </div>
+                        <div class="filtro-grupo">
+                            <button class="btn-filtrar" onclick="recargarProduccionProducto('${productoNombre}', ${sucursalId})">Filtrar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="resumen" id="resumenContainer">
+                        <div class="resumen-item">
+                            <div class="resumen-valor" id="totalCantidad">0</div>
+                            <div class="resumen-label">Total ${unidad}</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-valor" id="totalPiezas">0</div>
+                            <div class="resumen-label">Total Piezas</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-valor" id="diasProduccion">0</div>
+                            <div class="resumen-label">Días con Producción</div>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto; max-height: 500px;">
+                        <table id="tablaProduccionProducto">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Sucursal</th>
+                                    <th>Cantidad (${unidad})</th>
+                                    <th>Piezas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaBody">
+        `;
+        
+        let totalCantidad = 0;
+        let totalPiezasGeneral = 0;
+        let diasConProduccion = new Set();
+        
+        // Ordenar fechas de más reciente a más antigua
+        const fechasOrdenadas = [...data.fechas].sort((a, b) => new Date(b) - new Date(a));
+        
+        for (const fecha of fechasOrdenadas) {
+            let tieneDatos = false;
+            for (const trabajador of data.trabajadores) {
+                const dato = data.datos[fecha]?.[trabajador];
+                if (dato && (dato.peso > 0 || dato.piezas > 0)) {
+                    tieneDatos = true;
+                    const cantidad = data.es_leche ? dato.peso : dato.peso;
+                    totalCantidad += cantidad;
+                    totalPiezasGeneral += dato.piezas;
+                    
+                    html += `
+                        <tr>
+                            <td>${formatearFecha(fecha)}</td>
+                            <td>${dato.sucursal || '-'}</td>
+                            <td><strong>${cantidad.toFixed(2)}</strong> ${unidad}</td>
+                            <td>${dato.piezas > 0 ? dato.piezas + ' pz' : '-'}</td>
+                        </tr>
+                    `;
+                }
+            }
+            if (tieneDatos) {
+                diasConProduccion.add(fecha);
+            }
+        }
+        
+        if (totalCantidad === 0 && totalPiezasGeneral === 0) {
+            html += '<tr><td colspan="5" style="text-align:center;">No hay registros de producción para este producto en el período seleccionado</td></tr>';
+        }
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                </div>
+                
+                <script>
+                    // Actualizar resumen
+                    document.getElementById('totalCantidad').innerText = ${totalCantidad.toFixed(2)};
+                    document.getElementById('totalPiezas').innerText = ${totalPiezasGeneral};
+                    document.getElementById('diasProduccion').innerText = ${diasConProduccion.size};
+                    
+                    let datosOriginales = ${JSON.stringify(data)};
+                    let productoActual = '${productoNombre}';
+                    let sucursalActualId = ${sucursalId};
+                    
+                    function recargarProduccionProducto(producto, sucursalId) {
+                        const fechaInicio = document.getElementById('filtroFechaInicio').value;
+                        const fechaFin = document.getElementById('filtroFechaFin').value;
+                        
+                        if (!fechaInicio || !fechaFin) {
+                            alert('Seleccione ambas fechas');
+                            return;
+                        }
+                        
+                        fetch(\`db/produccion_sucursal.php?action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    actualizarTablaProduccion(data);
+                                } else {
+                                    alert('Error al cargar datos');
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Error:', err);
+                                alert('Error de conexión');
+                            });
+                    }
+                    
+                    function actualizarTablaProduccion(data) {
+                        const esLeche = data.es_leche;
+                        const unidad = esLeche ? 'litros' : 'kg';
+                        const tbody = document.getElementById('tablaBody');
+                        const fechasOrdenadas = [...data.fechas].sort((a, b) => new Date(b) - new Date(a));
+                        
+                        let totalCantidad = 0;
+                        let totalPiezas = 0;
+                        let diasConProd = new Set();
+                        let html = '';
+                        
+                        for (const fecha of fechasOrdenadas) {
+                            let tieneDatos = false;
+                            for (const trabajador of data.trabajadores) {
+                                const dato = data.datos[fecha]?.[trabajador];
+                                if (dato && (dato.peso > 0 || dato.piezas > 0)) {
+                                    tieneDatos = true;
+                                    const cantidad = esLeche ? dato.peso : dato.peso;
+                                    totalCantidad += cantidad;
+                                    totalPiezas += dato.piezas;
+                                    
+                                    html += \`
+                                        <tr>
+                                            <td>\${formatearFecha(fecha)}</td>
+                                            <td>\${dato.sucursal || '-'}</td>
+                                            <td><strong>\${cantidad.toFixed(2)}</strong> \${unidad}</td>
+                                            <td>\${dato.piezas > 0 ? dato.piezas + ' pz' : '-'}</td>
+                                        </tr>
+                                    \`;
+                                }
+                            }
+                            if (tieneDatos) diasConProd.add(fecha);
+                        }
+                        
+                        if (totalCantidad === 0 && totalPiezas === 0) {
+                            html = '<tr><td colspan="5" style="text-align:center;">No hay registros de producción</td></tr>';
+                        }
+                        
+                        tbody.innerHTML = html;
+                        document.getElementById('totalCantidad').innerText = totalCantidad.toFixed(2);
+                        document.getElementById('totalPiezas').innerText = totalPiezas;
+                        document.getElementById('diasProduccion').innerText = diasConProd.size;
+                    }
+                    
+                    function exportarProduccionCSV() {
+                        const tabla = document.getElementById('tablaProduccionProducto');
+                        const rows = tabla.querySelectorAll('tr');
+                        let csv = [];
+                        const BOM = "\\uFEFF";
+                        
+                        rows.forEach(row => {
+                            const rowData = [];
+                            const cols = row.querySelectorAll('th, td');
+                            cols.forEach(col => {
+                                let text = col.innerText || '';
+                                text = text.replace(/,/g, ';');
+                                rowData.push(text);
+                            });
+                            csv.push(rowData.join(','));
+                        });
+                        
+                        const csvContent = BOM + csv.join('\\n');
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        const fecha = new Date();
+                        const timestamp = \`\${fecha.getFullYear()}-\${(fecha.getMonth()+1).toString().padStart(2,'0')}-\${fecha.getDate().toString().padStart(2,'0')}\`;
+                        a.href = url;
+                        a.download = \`produccion_\${productoActual}_\${timestamp}.csv\`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }
+                    
+                    function formatearFecha(fechaStr) {
+                        const partes = fechaStr.split('-');
+                        return \`\${partes[2]}/\${partes[1]}/\${partes[0]}\`;
+                    }
+                    
+                    function escapeHtml(text) {
+                        if (!text) return '';
+                        const div = document.createElement('div');
+                        div.textContent = text;
+                        return div.innerHTML;
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+        
+        const ventana = window.open('', '_blank', 'width=800,height=700,scrollbars=yes');
+        ventana.document.write(html);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar la producción del producto: ' + error.message);
+    }
+}
+    
+// Variables para eliminar
+let elementoAEliminar = null;
+let tipoElementoAEliminar = null;
+
+function abrirModalConfirmacion(titulo, mensaje, elemento, tipo) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    document.getElementById('confirmacionTitulo').textContent = titulo;
+    document.getElementById('confirmacionMensaje').textContent = mensaje;
+    elementoAEliminar = elemento;
+    tipoElementoAEliminar = tipo;
+    document.getElementById('modalConfirmacion').style.display = 'block';
+}
+
+function cerrarModalConfirmacion() {
+    document.getElementById('modalConfirmacion').style.display = 'none';
+    elementoAEliminar = null;
+    tipoElementoAEliminar = null;
+}
+
+// Eliminar sucursal
+async function eliminarSucursal(nombre, id) {
+    // Primero verificar si tiene registros
+    try {
+        const checkResponse = await fetch(`db/verificar_registros.php?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`);
+        const checkData = await checkResponse.json();
+        
+        let mensaje = `¿Eliminar la sucursal "${formatearNombre(nombre)}"?`;
+        if (checkData.total > 0) {
+            mensaje = `La sucursal "${formatearNombre(nombre)}" tiene ${checkData.total} registros. ¿Deseas exportarlos antes de eliminar?`;
+        }
+        
+        abrirModalConfirmacion('Eliminar Sucursal', mensaje, { nombre: nombre, id: id }, 'sucursal');
+    } catch (error) {
+        console.error('Error:', error);
+        abrirModalConfirmacion('Eliminar Sucursal', `¿Eliminar la sucursal "${formatearNombre(nombre)}"?`, { nombre: nombre, id: id }, 'sucursal');
+    }
+}
+
+// Eliminar producto
+async function eliminarProducto(nombre, id) {
+    try {
+        const checkResponse = await fetch(`db/verificar_registros.php?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+        const checkData = await checkResponse.json();
+        
+        let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
+        if (checkData.total > 0) {
+            mensaje = `El producto "${formatearNombre(nombre)}" tiene ${checkData.total} registros. ¿Deseas exportarlos antes de eliminar?`;
+        }
+        
+        abrirModalConfirmacion('Eliminar Producto', mensaje, { nombre: nombre, id: id }, 'producto');
+    } catch (error) {
+        console.error('Error:', error);
+        abrirModalConfirmacion('Eliminar Producto', `¿Eliminar el producto "${formatearNombre(nombre)}"?`, { nombre: nombre, id: id }, 'producto');
+    }
+}
+
+// Ejecutar eliminación
+document.getElementById('btnConfirmarEliminar').onclick = async function() {
+    if (!elementoAEliminar) return;
+    
+    const action = tipoElementoAEliminar === 'sucursal' ? 'eliminar_sucursal' : 'eliminar_producto';
+    
+    try {
+        const response = await fetch('db/eliminar_elemento.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: action, 
+                nombre: elementoAEliminar.nombre,
+                id: elementoAEliminar.id 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`${tipoElementoAEliminar === 'sucursal' ? 'Sucursal' : 'Producto'} eliminado correctamente`);
+            cerrarModalConfirmacion();
+            // Recargar todo
+            cargarSucursalesEnSelect();
+            cargarProductosEnSelects();
+            cargarProduccionSucursal();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar');
+    }
+};
+
+// Exportar registros de sucursal
+async function exportarRegistrosSucursal(nombre) {
+    try {
+        window.open(`db/exportar_registros.php?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, '_blank');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al exportar');
+    }
+}
+    
+async function cargarTrabajadoresPorSucursal(sucursalId) {
+    const response = await fetch(`db/obtener_trabajadores_por_sucursal.php?sucursal_id=${sucursalId}`);
+    const data = await response.json();
+    const select = document.getElementById('trabajadorSelect');
+    if (data.success) {
+        select.innerHTML = '<option value="">Seleccionar trabajador</option>';
+        data.trabajadores.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.id;
+            option.textContent = `${t.nombre} ${t.cargo ? `- ${t.cargo}` : ''}`;
+            select.appendChild(option);
+        });
+    }
+}
+
+// Modificar cargarSucursalesEnSelect para incluir botón de eliminar
+// Agrega esta versión modificada:
+async function cargarSucursalesEnSelect() {
+    try {
+        const response = await fetch('db/obtener_sucursales.php');
+        const data = await response.json();
+        if (data.success) {
+            
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            if (tabsWrapper) {
+                tabsWrapper.innerHTML = '';
+                data.sucursales.forEach(s => {
+                    const btnContainer = document.createElement('div');
+                    btnContainer.style.display = 'inline-flex';
+                    btnContainer.style.alignItems = 'center';
+                    btnContainer.style.gap = '5px';
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-sucursal-btn';
+                    btn.setAttribute('data-sucursal', s.nombre);
+                    btn.onclick = () => cambiarSucursal(s.nombre);
+                    const nombreFormateado = formatearNombre(s.nombre);
+                    btn.textContent = nombreFormateado;
+                    btn.style.cssText = 'background: #ddd; color: #333; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;';
+                    if (sucursalActual === s.nombre) {
+                        btn.style.background = '#278233';
+                        btn.style.color = 'white';
+                    }
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×';
+                    deleteBtn.className = 'btn-delete-sucursal';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        eliminarSucursal(s.nombre, s.id);
+                    };
+                    deleteBtn.title = 'Eliminar sucursal';
+                    
+                    btnContainer.appendChild(btn);
+                    btnContainer.appendChild(deleteBtn);
+                    tabsWrapper.appendChild(btnContainer);
+                });
+                
+                const btnTotal = document.createElement('button');
+                btnTotal.className = 'tab-sucursal-btn';
+                btnTotal.setAttribute('data-sucursal', 'total');
+                btnTotal.onclick = () => cambiarSucursal('total');
+                btnTotal.textContent = 'Total';
+                btnTotal.style.cssText = 'background: #ddd; color: #333; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px 5px 0 0;';
+                if (sucursalActual === 'total') {
+                    btnTotal.style.background = '#278233';
+                    btnTotal.style.color = 'white';
+                }
+                tabsWrapper.appendChild(btnTotal);
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando sucursales:', error);
+    }
+}
+
+// Modificar cargarProductosEnSelects para incluir botón de eliminar
+async function cargarProductosEnSelects() {
+    try {
+        const response = await fetch('db/obtener_productos.php');
+        const data = await response.json();
+        if (data.success) {
+            const selectProducto = document.getElementById('tipoProductoSucursal');
+            if (selectProducto) {
+                selectProducto.innerHTML = '';
+                data.productos.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.nombre;
+                    const nombreFormateado = formatearNombre(p.nombre);
+                    option.textContent = nombreFormateado;
+                    option.setAttribute('data-es_leche', p.es_leche);
+                    option.setAttribute('data-id', p.id);
+                    selectProducto.appendChild(option);
+                });
+                selectProducto.dispatchEvent(new Event('change'));
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando productos:', error);
+    }
+}
+
+// Abrir panel de gestión de productos
+function abrirGestionProductos() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    mostrarListaProductos();
+}
+
+async function mostrarListaProductos() {
+    try {
+        const response = await fetch('db/obtener_productos.php');
+        const data = await response.json();
+        
+        let html = `
+            <div class="modal-confirmacion" id="modalGestionProductos" style="display: flex; z-index: 1003;">
+                <div class="modal-confirmacion-content" style="width: 500px;">
+                    <span class="close-cuenta" onclick="cerrarGestionProductos()" style="float: right;">&times;</span>
+                    <h3>Gestión de Productos</h3>
+                    <div style="margin-top: 20px; max-height: 400px; overflow-y: auto;">
+                        <table class="tabla-usuarios" style="width: 100%;">
+                            <thead>
+                                <tr><th>Producto</th><th>Tipo</th><th>Acción</th></tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        data.productos.forEach(p => {
+            const tipo = p.es_leche == 1 ? 'Líquido' : 'Sólido';
+            html += `
+                <tr>
+                    <td>${formatearNombre(p.nombre)}</td>
+                    <td>${tipo}</td>
+                    <td><button class="btn-eliminar" onclick="eliminarProducto('${p.nombre}', ${p.id})">Eliminar</button></td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                            </tbody>
+                         </table>
+                    </div>
+                    <button class="form-btn" onclick="cerrarGestionProductos()" style="width: 100%; margin-top: 15px;">Cerrar</button>
+                </div>
+            </div>
+        `;
+        
+        // Eliminar modal existente si hay
+        const existingModal = document.getElementById('modalGestionProductos');
+        if (existingModal) existingModal.remove();
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        document.body.appendChild(tempDiv.firstChild);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar productos');
+    }
+}
+
+function cerrarGestionProductos() {
+    const modal = document.getElementById('modalGestionProductos');
+    if (modal) modal.remove();
+}
+    
+    // Eliminar producto desde el encabezado de la tabla
+async function eliminarProductoTH(nombre, id) {
+    // Verificar si tiene registros
+    try {
+        const checkResponse = await fetch(`db/verificar_registros.php?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+        const checkData = await checkResponse.json();
+        
+        let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
+        if (checkData.total > 0) {
+            mensaje = `El producto "${formatearNombre(nombre)}" tiene ${checkData.total} registros de producción.\n\nSi lo eliminas, estos registros quedarán huérfanos.\n\n¿Estás seguro de eliminar este producto?`;
+        }
+        
+        if (confirm(mensaje)) {
+            const response = await fetch('db/eliminar_producto.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre: nombre, id: id })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Producto eliminado correctamente');
+                // Recargar la tabla y los selects
+                cargarProduccionSucursal();
+                cargarProductosEnSelects();
+            } else {
+                alert('❌ Error: ' + result.error);
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al verificar el producto');
+    }
+}
+</script>
+    
+    
+    
+    
+    
+    
+    
+<script>
+// ========== NUEVO MÓDULO DE CLIENTES PARA VENTAS ==========
+
+// --- Variables Globales ---
+let clienteEditandoId = null;
+
+// --- Funciones para el Panel Lateral y Select ---
+async function cargarClientes() {
+    try {
+        const response = await fetch('db/clientes.php?action=obtener_todos');
+        const data = await response.json();
+        if (data.success) {
+            mostrarListaClientes(data.clientes);
+            cargarSelectClientes(data.clientes);
+        } else {
+            document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">Error al cargar clientes</div>';
+            document.getElementById('ventaClienteId').innerHTML = '<option value="">Error al cargar clientes</option>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarListaClientes(clientes) {
+    if (!clientes || clientes.length === 0) {
+        document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">No hay clientes registrados</div>';
+        return;
+    }
+
+    let html = '';
+    clientes.forEach(c => {
+        html += `
+            <div class="menu-opcion" style="margin-bottom: 8px; padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1; cursor: pointer;" onclick="seleccionarClienteVenta(${c.id})" title="Seleccionar para la venta">
+                        <strong style="color:#222">${escapeHtml(c.nombre)}</strong>
+                        <p style="font-size: 11px; color: #666;">${c.rif || 'Sin RIF'} | ${c.telefono || 'Sin teléfono'}</p>
+                    </div>
+                    <div>
+                        <button class="btn-menu-cliente" 
+                                data-id="${c.id}"
+                                data-nombre="${escapeHtml(c.nombre)}"
+                                data-rif="${escapeHtml(c.rif || '')}"
+                                data-telefono="${escapeHtml(c.telefono || '')}"
+                                data-contacto="${escapeHtml(c.contacto || '')}"
+                                data-email="${escapeHtml(c.email || '')}"
+                                data-direccion="${escapeHtml(c.direccion || '')}"
+                                onclick="mostrarMenuCliente(event, ${c.id})"
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555; padding: 0 8px;">
+                            ⋮
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('listaClientesVenta').innerHTML = html;
+}
+
+function cargarSelectClientes(clientes) {
+    const select = document.getElementById('ventaClienteId');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
+    clientes.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${c.nombre} ${c.rif ? `- ${c.rif}` : ''}`;
+        select.appendChild(option);
+    });
+}
+
+// --- Funciones para el Menú de 3 Puntos ---
+function mostrarMenuCliente(event, clienteId) {
+    event.stopPropagation();
+    
+    const menuExistente = document.getElementById('menuContextualCliente');
+    if (menuExistente) menuExistente.remove();
+    
+    const btn = event.currentTarget;
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const rif = btn.getAttribute('data-rif') || '';
+    const telefono = btn.getAttribute('data-telefono') || '';
+    const contacto = btn.getAttribute('data-contacto') || '';
+    const email = btn.getAttribute('data-email') || '';
+    const direccion = btn.getAttribute('data-direccion') || '';
+    
+    const menu = document.createElement('div');
+    menu.id = 'menuContextualCliente';
+    menu.style.cssText = `
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        min-width: 220px;
+        overflow: hidden;
+    `;
+    
+    menu.innerHTML = `
+        <div class="menu-opcion-item" onclick="cerrarMenuCliente(); verDetallesCliente(${clienteId})" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver detalles</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuCliente(); editarCliente(${clienteId}, '${escapeHtml(nombre)}', '${escapeHtml(rif)}', '${escapeHtml(telefono)}', '${escapeHtml(contacto)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>✎ Editar cliente</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuCliente(); eliminarClienteConfirmar(${clienteId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="color: #f44336;">x Eliminar cliente</span>
+        </div>
+    `;
+    
+    const rect = btn.getBoundingClientRect();
+    menu.style.left = rect.left - 180 + 'px';
+    menu.style.top = rect.bottom + 5 + 'px';
+    
+    document.body.appendChild(menu);
+    
+    setTimeout(() => {
+        document.addEventListener('click', function cerrarMenu(e) {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', cerrarMenu);
+            }
+        });
+    }, 10);
+}
+    
+// --- Ver detalles completos del cliente (ventas y deudas) ---
+async function verDetallesCliente(clienteId) {
+    try {
+        // Obtener datos del cliente
+        const responseCliente = await fetch(`db/clientes.php?action=obtener_uno&id=${clienteId}`);
+        const dataCliente = await responseCliente.json();
+        
+        if (!dataCliente.success) {
+            alert('Error al cargar los datos del cliente');
+            return;
+        }
+        
+        const cliente = dataCliente.cliente;
+        
+        // Obtener historial de ventas del cliente
+        const responseVentas = await fetch(`db/ventas.php?action=obtener_por_cliente&cliente_id=${clienteId}`);
+        const dataVentas = await responseVentas.json();
+        
+        // Obtener deudas pendientes del cliente desde cuentas_cobrar
+        const responseDeudas = await fetch(`db/cuentas.php?action=obtener_deudas_cliente&cliente_id=${clienteId}`);
+        const dataDeudas = await responseDeudas.json();
+        
+        // Generar HTML para la ventana de detalles
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Detalles del Cliente - ${escapeHtml(cliente.nombre)}</title>
+                <meta charset="UTF-8">
+                <style>
+                    * { font-family: 'Segoe UI', Arial, sans-serif; }
+                    body { padding: 20px; background: #f5f5f5; }
+                    .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                    h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                    h3 { color: #333; margin: 20px 0 10px 0; border-left: 4px solid #278233; padding-left: 12px; }
+                    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 6px; border-radius: 8px; margin-bottom: 14px; }
+                    .info-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding: 4px 0; }
+                    .info-label { font-weight: bold; color: #555; }
+                    .info-value { color: #222; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 0px solid #ddd; padding: 10px; text-align: left; }
+                    th { background: #278233; color: white; font-weight: bold; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .deuda-total { background: rgba(0,0,0,.04); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+                    .deuda-total span { font-size: 24px; font-weight: bold; color: #rgba(0,0,0,.6); }
+                    .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 14px; }
+                    .btn-cerrar:hover { background: #1e6b28; }
+                    .estado-pendiente { color: #f44336; font-weight: bold; }
+                    .estado-pagado, .estado-cobrado { color: #4CAF50; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2>Detalles del Cliente</h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item"><span class="info-label">Nombre:</span><span class="info-value"><strong>${escapeHtml(cliente.nombre)}</strong></span></div>
+                        <div class="info-item"><span class="info-label">RIF/C.I.:</span><span class="info-value">${escapeHtml(cliente.rif || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(cliente.telefono || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Contacto:</span><span class="info-value">${escapeHtml(cliente.contacto || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Email:</span><span class="info-value">${escapeHtml(cliente.email || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(cliente.direccion || '-')}</span></div>
+                    </div>
+        `;
+        
+        // Mostrar deudas pendientes
+        if (dataDeudas.success && dataDeudas.deudas && dataDeudas.deudas.length > 0) {
+            let totalDeuda = 0;
+            dataDeudas.deudas.forEach(d => { totalDeuda += parseFloat(d.monto_pendiente || d.monto); });
+            
+            html += `
+                    <div class="deuda-total">
+                        <strong>Deuda Total Pendiente:</strong><br>
+                        <span>$${totalDeuda.toFixed(2)}</span>
+                    </div>
+                    
+                    <h3>Cuentas por Cobrar Pendientes</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Factura #</th>
+                                    <th>Fecha Venta</th>
+                                    <th>Monto Pendiente</th>
+                                    <th>Vencimiento</th>
+                                    <th>Estado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            dataDeudas.deudas.forEach(deuda => {
+                const fechaVenta = deuda.fecha_inicio ? formatearFecha(deuda.fecha_inicio) : '-';
+                const vencimiento = deuda.fecha_vencimiento ? formatearFecha(deuda.fecha_vencimiento) : '-';
+                const montoOriginal = parseFloat(deuda.monto_original || deuda.monto || 0).toFixed(2);
+                const montoPendiente = parseFloat(deuda.monto_pendiente || deuda.monto || 0).toFixed(2);
+                const estado = deuda.estado === 'pendiente' ? 'PENDIENTE' : 'COBRADO';
+                const estadoClass = deuda.estado === 'pendiente' ? 'estado-pendiente' : 'estado-pagado';
+                
+                html += `
+                    <tr>
+                        <td>${deuda.venta_id ? '#' + deuda.venta_id : '-'}</td>
+                        <td>${fechaVenta}</td>
+                        <td><strong>$${montoPendiente}</strong></td>
+                        <td>${vencimiento}</td>
+                        <td class="${estadoClass}">${estado}</td>
+                        <td>
+                            ${deuda.estado === 'pendiente' && deuda.venta_id ? 
+                                `<button onclick="window.opener.verFactura(${deuda.venta_id})" style="background:#278233;color:white;border:none;padding:4px 8px;border-radius:3px;cursor:pointer;">Ver</button>` : 
+                                ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+            `;
+        } else {
+            html += `
+                    <div class="deuda-total" style="background: #e8f5e9;">
+                        <strong>CLIENTE SIN DEUDAS PENDIENTES</strong>
+                    </div>
+            `;
+        }
+        
+        // Mostrar historial de ventas
+        if (dataVentas.success && dataVentas.ventas && dataVentas.ventas.length > 0) {
+            html += `
+                    <h3>Historial de Ventas</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Factura #</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Método Pago</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            dataVentas.ventas.forEach(venta => {
+                html += `
+                    <tr>
+                        <td>${String(venta.id).padStart(6, '0')}</td>
+                        <td>${formatearFecha(venta.fecha)}</td>
+                        <td><strong>$${parseFloat(venta.total).toFixed(2)}</strong></td>
+                        <td>${venta.metodo_pago}</td>
+                        <td>
+                            <button onclick="window.opener.verFactura(${venta.id})" style="background:#278233;color:white;border:none;padding:4px 12px;border-radius:3px;cursor:pointer;">Ver Factura</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+            `;
+        } else {
+            html += `<p style="text-align:center; color:#666;">No hay ventas registradas para este cliente</p>`;
+        }
+        
+        html += `
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        const ventana = window.open('', '_blank', 'width=1000,height=700,scrollbars=yes');
+        ventana.document.write(html);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar los detalles del cliente: ' + error.message);
+    }
+}
+
+function cerrarMenuCliente() {
+    const menu = document.getElementById('menuContextualCliente');
+    if (menu) menu.remove();
+}
+
+// --- Funciones CRUD de Clientes ---
+function abrirModalCliente(id = null) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    document.getElementById('formCliente').reset();
+    document.getElementById('clienteId').value = '';
+    
+    if (id) {
+        // Modo edición: cargar datos
+        document.getElementById('modalClienteTitle').innerHTML = 'Editar Cliente';
+        cargarClienteParaEditar(id);
+    } else {
+        document.getElementById('modalClienteTitle').innerHTML = 'Nuevo Cliente';
+        document.getElementById('modalCliente').style.display = 'block';
+    }
+}
+
+async function cargarClienteParaEditar(id) {
+    try {
+        const response = await fetch(`db/clientes.php?action=obtener_uno&id=${id}`);
+        const data = await response.json();
+        if (data.success) {
+            const c = data.cliente;
+            document.getElementById('clienteId').value = c.id;
+            document.getElementById('clienteNombre').value = c.nombre;
+            document.getElementById('clienteRif').value = c.rif || '';
+            document.getElementById('clienteTelefono').value = c.telefono || '';
+            document.getElementById('clienteContacto').value = c.contacto || '';
+            document.getElementById('clienteEmail').value = c.email || '';
+            document.getElementById('clienteDireccion').value = c.direccion || '';
+            document.getElementById('modalCliente').style.display = 'block';
+        } else {
+            alert('Error al cargar los datos del cliente');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    }
+}
+
+function cerrarModalCliente() {
+    document.getElementById('modalCliente').style.display = 'none';
+    document.getElementById('formCliente').reset();
+    document.getElementById('clienteId').value = '';
+}
+
+document.getElementById('formCliente')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('clienteId').value;
+    const nombre = document.getElementById('clienteNombre').value;
+    const rif = document.getElementById('clienteRif').value;
+    const telefono = document.getElementById('clienteTelefono').value;
+    const contacto = document.getElementById('clienteContacto').value;
+    const email = document.getElementById('clienteEmail').value;
+    const direccion = document.getElementById('clienteDireccion').value;
+    
+    if (!nombre) {
+        alert('El nombre del cliente es obligatorio');
+        return;
+    }
+    
+    const action = id ? 'actualizar' : 'guardar';
+    const data = { action, nombre, rif, telefono, contacto, email, direccion };
+    if (id) data.id = id;
+    
+    try {
+        const response = await fetch('db/clientes.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(id ? 'Cliente actualizado' : 'Cliente agregado');
+            cerrarModalCliente();
+            cargarClientes(); // Recargar lista y select
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar cliente');
+    }
+});
+
+function editarCliente(id, nombre, rif, telefono, contacto, email, direccion) {
+    abrirModalCliente(id);
+}
+
+function eliminarClienteConfirmar(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar al cliente "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        eliminarCliente(id);
+    }
+}
+
+async function eliminarCliente(id) {
+    try {
+        const response = await fetch('db/clientes.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'eliminar', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Cliente eliminado correctamente');
+            cargarClientes();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar cliente');
+    }
+}
+
+// --- Funciones para la Venta ---
+function seleccionarClienteVenta(clienteId) {
+    const select = document.getElementById('ventaClienteId');
+    if (select) {
+        select.value = clienteId;
+        select.dispatchEvent(new Event('change'));
+    }
+}
+
+async function cargarDatosClienteEnFormulario(clienteId) {
+    if (!clienteId) {
+        // Limpiar campos si no hay cliente seleccionado
+        document.getElementById('ventaClienteNombre').value = '';
+        document.getElementById('ventaClienteRif').value = '';
+        document.getElementById('ventaClienteTelefono').value = '';
+        document.getElementById('ventaClienteContacto').value = '';
+        document.getElementById('ventaClienteEmail').value = '';
+        document.getElementById('ventaClienteDireccion').value = '';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`db/clientes.php?action=obtener_uno&id=${clienteId}`);
+        const data = await response.json();
+        if (data.success) {
+            const c = data.cliente;
+            document.getElementById('ventaClienteNombre').value = c.nombre;
+            document.getElementById('ventaClienteRif').value = c.rif || '';
+            document.getElementById('ventaClienteTelefono').value = c.telefono || '';
+            document.getElementById('ventaClienteContacto').value = c.contacto || '';
+            document.getElementById('ventaClienteEmail').value = c.email || '';
+            document.getElementById('ventaClienteDireccion').value = c.direccion || '';
+        } else {
+            console.error('Error al cargar datos del cliente');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// --- Sobrescribir el evento 'submit' del formulario de venta ---
+// Busca el event listener original de 'formVenta' y reemplázalo, o simplemente añade este nuevo.
+// Para asegurar, podemos desactivar el anterior y poner este.
+const ventaForm = document.getElementById('formVenta');
+ventaForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const cliente_id = document.getElementById('ventaClienteId').value;
+    if (!cliente_id) {
+        alert('Debe seleccionar un cliente');
+        return;
+    }
+    
+    let fechaVenta = document.getElementById('ventaFecha').value;
+    
+    
+    
+    // Obtener productos
+    const productos = [];
+    const rows = document.querySelectorAll('#listaProductosVenta .producto-row');
+    let valido = true;
+    let totalGeneral = 0;
+    
+    rows.forEach(row => {
+        const productoId = row.querySelector('.producto-select').value;
+        const cantidad = parseFloat(row.querySelector('.producto-cantidad').value);
+        const piezas = parseInt(row.querySelector('.venta-piezas').value) || 0;  // <-- AGREGADO
+        const precioUnitario = parseFloat(row.querySelector('.producto-precio-unitario').value);
+        
+        if (!productoId) {
+            valido = false;
+        } else if (!cantidad || cantidad <= 0) {
+            alert('Ingrese una cantidad válida para todos los productos');
+            valido = false;
+        } else if (!precioUnitario || precioUnitario <= 0) {
+            alert('Ingrese un precio unitario válido para todos los productos');
+            valido = false;
+        } else {
+            const precioTotal = cantidad * precioUnitario;
+            totalGeneral += precioTotal;
+            productos.push({ 
+                id: productoId, 
+                cantidad: cantidad,
+                piezas: piezas,        // <-- AGREGADO
+                precio_unitario: precioUnitario,
+                precio_total: precioTotal
+            });
+        }
+    });
+    
+    if (!valido || productos.length === 0) {
+        alert('Complete correctamente todos los productos');
+        return;
+    }
+    
+    // Preparar datos para enviar
+    const data = {
+        action: 'guardar',
+        cliente_id: cliente_id,
+        fecha: document.getElementById('ventaFecha').value,
+        metodo_pago: document.getElementById('ventaMetodoPago').value,
+        es_credito: document.getElementById('ventaMetodoPago').value === 'credito',
+        sucursal_id: document.getElementById('ventaSucursalId').value || null,
+        observaciones: document.getElementById('ventaObservaciones').value,
+        subtotal: totalGeneral,
+        total: totalGeneral,
+        tiene_descuento: false,
+        descuento_porcentaje: 0,
+        descuento_monto: 0,
+        productos: productos
+    };
+    
+    console.log('Datos enviados:', JSON.stringify(data, null, 2)); // Para depuración
+    
+    try {
+        const response = await fetch('db/ventas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log('Respuesta:', result);
+        
+        if (result.success) {
+            alert('Venta registrada correctamente');
+            
+            // Asegurar que los detalles tengan el campo piezas
+            const detallesConPiezas = (result.detalles || []).map(d => ({
+                ...d,
+                piezas: d.piezas || 0
+            }));
+            
+            const facturaData = {
+                venta: result.venta,
+                detalles: detallesConPiezas,
+                empresa: {
+                    nombre: 'Agroindustria Láctea J.K.V. C.A.',
+                    rif: 'J-41022340-5',
+                    telefono: '(0412) 302-7063',
+                    direccion: 'Carretera Lara-Zulia (82Km) | Palmarito - Cerro Verde, Finca Las Vegas',
+                    email: ''
+                }
+            };
+            sessionStorage.setItem('facturaData', JSON.stringify(facturaData));
+            window.open('factura.php', '_blank', 'width=900,height=700,scrollbars=yes');
+            
+            // Resetear formulario
+            document.getElementById('ventaClienteId').value = '';
+            document.getElementById('ventaClienteNombre').value = '';
+            document.getElementById('ventaClienteRif').value = '';
+            document.getElementById('ventaClienteTelefono').value = '';
+            document.getElementById('ventaClienteContacto').value = '';
+            document.getElementById('ventaClienteEmail').value = '';
+            document.getElementById('ventaClienteDireccion').value = '';
+            document.getElementById('ventaFecha').value = getFechaActual();
+            document.getElementById('ventaMetodoPago').value = 'efectivo';
+            document.getElementById('ventaObservaciones').value = '';
+            document.getElementById('ventaTotal').innerText = '0.00';
+            
+            // Limpiar filas de productos
+            const container = document.getElementById('listaProductosVenta');
+            while (container.children.length > 1) {
+                container.removeChild(container.lastChild);
+            }
+            const firstRow = container.children[0];
+            if (firstRow) {
+                firstRow.querySelector('.producto-select').value = '';
+                firstRow.querySelector('.producto-cantidad').value = '';
+                firstRow.querySelector('.venta-piezas').value = '0';
+                firstRow.querySelector('.producto-precio-unitario').value = '';
+            }
+            
+        } else {
+            alert('❌ Error: ' + (result.error || 'Error desconocido'));
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar la venta: ' + error.message);
+    }
+});
+
+// --- Añadir event listener al select de clientes ---
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'ventaClienteId') {
+        cargarDatosClienteEnFormulario(e.target.value);
+    }
+});
+
+// --- Modificar la función abrirModalVentas para que cargue los clientes ---
+const abrirModalVentasOriginal = window.abrirModalVentas;
+window.abrirModalVentas = async function() {
+    if (abrirModalVentasOriginal) await abrirModalVentasOriginal();
+    await cargarClientes(); // Cargar clientes cuando se abre el modal
+    // Asegurar que el formulario de venta usa el nuevo event listener
+    // (El reemplazo ya se hizo al cargar la página)
+};    
+    
+    
+</script>
+    
+    
+    
+    
+    
+    
+<script>
+    // ========== MÓDULO DE CUENTAS ==========
+let cuentaPagoActual = null;
+
+function abrirModalCuentas() {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    document.getElementById('modalCuentas').style.display = 'block';
+    cargarCuentasPagar();
+    cargarCuentasCobrar();
+}
+
+document.getElementById('closeCuentas')?.addEventListener('click', () => {
+    cerrarModalCuentas();
+});
+
+function cerrarModalCuentas() {
+    const modal = document.getElementById('modalCuentas');
+    if (modal) modal.style.display = 'none';
+}
+
+function cambiarTabCuentas(tipo) {
+    const tabPagar = document.getElementById('tabPagar');
+    const tabCobrar = document.getElementById('tabCobrar');
+    const btns = document.querySelectorAll('.tab-cuentas-btn');
+    const btnNuevaPagar = document.getElementById('btnNuevaPagar');
+    const btnNuevaCobrar = document.getElementById('btnNuevaCobrar');
+    
+    if (tipo === 'pagar') {
+        tabPagar.style.display = 'block';
+        tabCobrar.style.display = 'none';
+        btns[0].style.background = '#278233';
+        btns[0].style.color = 'white';
+        btns[1].style.background = '#ddd';
+        btns[1].style.color = '#333';
+        if (btnNuevaPagar) btnNuevaPagar.style.display = 'inline-block';
+        if (btnNuevaCobrar) btnNuevaCobrar.style.display = 'none';
+    } else {
+        tabPagar.style.display = 'none';
+        tabCobrar.style.display = 'block';
+        btns[1].style.background = '#278233';
+        btns[1].style.color = 'white';
+        btns[0].style.background = '#ddd';
+        btns[0].style.color = '#333';
+        if (btnNuevaPagar) btnNuevaPagar.style.display = 'none';
+        if (btnNuevaCobrar) btnNuevaCobrar.style.display = 'inline-block';
+    }
+}
+
+async function cargarCuentasPagar() {
+    try {
+        const response = await fetch('db/cuentas.php?action=obtener_pagar');
+        const data = await response.json();
+        if (data.success) {
+            mostrarTablaCuentas(data.datos, 'pagar');
+        } else {
+            document.getElementById('tabPagar').innerHTML = '<div class="cargando">Error al cargar datos</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tabPagar').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+async function cargarCuentasCobrar() {
+    try {
+        const response = await fetch('db/cuentas.php?action=obtener_cobrar');
+        const data = await response.json();
+        if (data.success) {
+            mostrarTablaCuentas(data.datos, 'cobrar');
+        } else {
+            document.getElementById('tabCobrar').innerHTML = '<div class="cargando">Error al cargar datos</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tabCobrar').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+    
+// ========== FUNCIÓN PARA VER ESTADO DE CUENTA POR COBRAR ==========
+async function verEstadoCuentaCobrar(cuentaId) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    
+    try {
+        // Obtener datos de la cuenta por cobrar
+        const response = await fetch(`db/cuentas.php?action=obtener_detalle_cobrar&id=${cuentaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar los datos de la cuenta: ' + (data.error || ''));
+            return;
+        }
+        
+        // Obtener los pagos de esta cuenta
+        const responsePagos = await fetch(`db/cuentas.php?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`);
+        const dataPagos = await responsePagos.json();
+        
+        // Si la cuenta está asociada a una venta, obtener los productos
+        let detallesProductos = [];
+        if (data.cuenta.venta_id) {
+            try {
+                const responseVenta = await fetch(`db/ventas.php?action=obtener_detalle&id=${data.cuenta.venta_id}`);
+                const dataVenta = await responseVenta.json();
+                if (dataVenta.success && dataVenta.detalles) {
+                    detallesProductos = dataVenta.detalles;
+                }
+            } catch (e) {
+                console.warn('No se pudieron cargar los productos de la venta:', e);
+            }
+        }
+        
+        const datosComprobante = {
+            cuenta: data.cuenta,
+            detalles_productos: detallesProductos,
+            pagos: dataPagos.success ? dataPagos.pagos : [],
+            empresa: {
+                nombre: 'Agroindustria Láctea J.K.V. C.A.',
+                rif: 'J-41022340-5',
+                telefono: '(0412) 302-7063',
+                direccion: 'Carretera Lara-Zulia (Km 82) | Palmarito - Cerro Verde'
+            }
+        };
+        
+        sessionStorage.setItem('cuentaCobrarData', JSON.stringify(datosComprobante));
+        window.open('comprobante_cuenta_cobrar.php', '_blank', 'width=950,height=750,scrollbars=yes');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al generar el comprobante: ' + error.message);
+    }
+}
+
+function mostrarTablaCuentas(cuentas, tipo) {
+    const containerId = tipo === 'pagar' ? 'tabPagar' : 'tabCobrar';
+    const hoy = new Date();
+    const esPagar = tipo === 'pagar';
+    
+    // ========== SIEMPRE MOSTRAR FILTROS Y BOTÓN (incluso sin cuentas) ==========
+    agregarFiltrosCuentas(containerId);
+    
+    
+    let html = '<div><table class="tabla-produccion">';
+    html += '<thead><tr>';
+    html += '<th>Descripción</th><th>Monto</th><th>Pagado</th><th></th><th>Vencimiento</th><th>Estado</th><th></th>';
+    html += '</thead><tbody style="font-size:14px;">';
+    
+    cuentas.forEach(cuenta => {
+        const vencimiento = new Date(cuenta.fecha_vencimiento);
+        const estaVencido = (vencimiento < hoy && cuenta.estado === 'pendiente');
+        const montoOriginal = parseFloat(cuenta.monto);
+        const montoPagado = parseFloat(cuenta.monto_pagado || 0);
+        const montoPendiente = parseFloat(cuenta.monto_pendiente);
+        const porcentajePagado = montoOriginal > 0 ? (montoPagado / montoOriginal) * 100 : 0;
+        
+        let claseMonto = '';
+        if (estaVencido) claseMonto = 'monto-vencido';
+        else if (cuenta.estado === 'pendiente') claseMonto = 'monto-pendiente';
+        else claseMonto = 'monto-pagado';
+        
+        let claseEstado = '';
+        let textoEstado = '';
+        
+        if (estaVencido) {
+            claseEstado = 'estado-vencido';
+            textoEstado = 'VENCIDO';
+        } else if (cuenta.estado === 'pendiente') {
+            claseEstado = 'estado-pendiente';
+            textoEstado = 'PENDIENTE';
+        } else {
+            claseEstado = esPagar ? 'estado-pagado' : 'estado-cobrado';
+            textoEstado = esPagar ? 'PAGADO' : 'COBRADO';
+        }
+        
+        const puedePagar = (cuenta.estado === 'pendiente' || estaVencido) && montoPendiente > 0;
+        const textoBoton = esPagar ? '✓' : '✓';
+
+        if (tipo === 'cobrar') {
+            html += `<tr style="cursor:pointer;" onclick="verEstadoCuentaCobrar(${cuenta.id})">`;
+        } else {
+            html += `<tr>`;
+        }
+        html += `<td>
+                    <strong>${escapeHtml(cuenta.descripcion)}</strong>
+                    <!--br><small style="font-size:10px">ID: ${cuenta.id}</small!-->
+                    ${cuenta.venta_id ? '<br><small>Factura #' + cuenta.venta_id + '</small>' : ''}
+                 </div></td>`;
+        html += `<td>$${montoOriginal.toFixed(2)}</br><small>original</small></td>`;
+        if (montoPagado > 0) {
+            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
+        }else{
+        	html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
+        }
+        html += `<td class="${claseMonto}"><strong>$${montoPendiente.toFixed(2)}</strong></br><small>pendiente</small></td>`;
+        html += `<td>${formatearFechaCuenta(cuenta.fecha_vencimiento)}</br><small>${estaVencido ? 'VENCIDA' : ''}</small></td>`;
+        html += `<td><span class="${claseEstado}">${textoEstado}</span></td>`;
+        html += '<td><div style="display: flex; gap: 5px;">';
+        
+        if (puedePagar) {
+            html += `<button class="btn-editar" onclick="event.stopPropagation();abrirModalPagoParcial(${cuenta.id}, '${tipo}', '${escapeHtml(cuenta.descripcion)}', ${montoPendiente})" style="background: #278233; color: white;">${textoBoton}</button>`;
+        }
+        
+        /*if (montoPagado > 0) {
+            html += `<button class="btn-editar" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')" style="background: #f4d71b; color: rgba(0,0,0,.8);">↺</button>`;
+        }*/
+        
+        if (montoPagado === 0 || montoPagado === montoOriginal) {
+            html += `<button class="btn-eliminar" onclick="eliminarCuenta(${cuenta.id}, '${tipo}')">∅</button>`;
+        }
+        
+        html += '</div></td>';
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    
+    // Mostrar la tabla principal
+    document.getElementById(containerId).innerHTML = html;
+    agregarFiltrosCuentas(containerId);
+        
+    
+    // ========== AGREGAR RESÚMENES DEBAJO (SOLO PARA PAGAR) ==========
+    if (tipo === 'pagar') {
+        agregarResumenesDebajo(containerId);
+    }
+}
+function agregarFiltrosCuentas(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (document.getElementById(`filtrosCuentas_${containerId}`)) return;
+    
+    // Determinar el tipo de cuenta y el texto del botón
+    const esPagar = containerId === 'tabPagar';
+    const textoBoton = esPagar ? '+' : '+';
+    const funcionBoton = esPagar ? "abrirFormularioCuenta('pagar')" : "abrirFormularioCuenta('cobrar')";
+    
+    // 🔹 NUEVO: Determinar si mostrar botón de exportar (solo en cuentas por cobrar)
+    const mostrarExportar = containerId === 'tabCobrar';
+    
+    const filtrosHtml = `
+        <div id="filtrosCuentas_${containerId}" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="filtro-grupo" style="flex:2;">
+                    <label>Buscar</label>
+                    <input type="text" id="busquedaCuentas_${containerId}" placeholder="Descripción..." style="min-width: 200px;">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Desde</label>
+                    <input type="date" id="fechaInicioCuentas_${containerId}">
+                </div>
+                <div class="filtro-grupo">
+                    <label>Hasta</label>
+                    <input type="date" id="fechaFinCuentas_${containerId}">
+                </div>
+                <div class="filtro-grupo">
+                    <button class="btn-filtro" id="btnFiltrarCuentas_${containerId}" style="padding: 0px 4px">Filtrar</button>
+                    <button class="btn-limpiar-filtros" id="btnLimpiarCuentas_${containerId}" style="padding: 0px 4px">Limpiar</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                ${mostrarExportar ? `<button class="btn-agregar" onclick="exportarCuentasPendientesCobrar()" style="font-size: 14px; padding: 10px 12px;">Pendientes...</button>` : ''}
+                <button class="btn-agregar" onclick="${funcionBoton}" style="font-size:24px; padding: 8px 12px;">${textoBoton}</button>
+            </div>
+        </div>
+    `;
+    
+    const tabla = container.querySelector('table');
+    if (tabla) {
+        tabla.insertAdjacentHTML('beforebegin', filtrosHtml);
+    }
+    
+    // ... el resto de la función (aplicarFiltros, limpiarFiltros, event listeners) se mantiene IGUAL ...
+    const inputBusqueda = document.getElementById(`busquedaCuentas_${containerId}`);
+    const btnFiltrar = document.getElementById(`btnFiltrarCuentas_${containerId}`);
+    const btnLimpiar = document.getElementById(`btnLimpiarCuentas_${containerId}`);
+    const fechaInicio = document.getElementById(`fechaInicioCuentas_${containerId}`);
+    const fechaFin = document.getElementById(`fechaFinCuentas_${containerId}`);
+    
+    function aplicarFiltros() {
+        const tablaActual = container.querySelector('table');
+        if (!tablaActual) return;
+        
+        const filtroTexto = inputBusqueda.value.toLowerCase();
+        const fechaInicioVal = fechaInicio.value;
+        const fechaFinVal = fechaFin.value;
+        const filas = tablaActual.querySelectorAll('tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            let coincideTexto = true;
+            let coincideFecha = true;
+            
+            if (filtroTexto && celdas[0]) {
+                coincideTexto = celdas[0].innerText.toLowerCase().indexOf(filtroTexto) > -1;
+            }
+            
+            if (fechaInicioVal || fechaFinVal) {
+                let fechaCelda = celdas[4]?.innerText.trim() || '';
+                let partes = fechaCelda.split('/');
+                if (partes.length === 3) {
+                    fechaCelda = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+                if (fechaInicioVal && fechaCelda < fechaInicioVal) coincideFecha = false;
+                if (fechaFinVal && fechaCelda > fechaFinVal) coincideFecha = false;
+            }
+            
+            fila.style.display = (coincideTexto && coincideFecha) ? '' : 'none';
+        });
+    }
+    
+    function limpiarFiltros() {
+        inputBusqueda.value = '';
+        fechaInicio.value = '';
+        fechaFin.value = '';
+        aplicarFiltros();
+    }
+    
+    if (inputBusqueda) inputBusqueda.addEventListener('keyup', aplicarFiltros);
+    if (btnFiltrar) btnFiltrar.addEventListener('click', aplicarFiltros);
+    if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFiltros);
+}
+    
+// Función para agregar los resúmenes debajo de la tabla (manteniendo tu formato original)
+async function agregarResumenesDebajo(containerId) {
+    try {
+        // Obtener datos de proveedores
+        const responseMP = await fetch('db/materia_prima.php?action=obtener&modo=tabla');
+        const dataMP = await responseMP.json();
+        
+        // Obtener datos de producción
+        const responseProd = await fetch('db/produccion_sucursal.php?action=obtener_tabla');
+        const htmlProd = await responseProd.text();
+        
+        // Generar el HTML de los resúmenes (USANDO TUS FUNCIONES EXISTENTES)
+        let resumenProveedores = '';
+        let resumenProduccion = '';
+        
+        // Usar tus funciones existentes si están disponibles
+        if (typeof generarResumenProveedores === 'function') {
+            resumenProveedores = await generarResumenProveedores(dataMP);
+        } else if (typeof generarHTMLProveedores === 'function') {
+            resumenProveedores = await generarHTMLProveedores(dataMP);
+        } else {
+            // Fallback: resumen simple si tus funciones no existen
+            resumenProveedores = generarResumenProveedoresSimple(dataMP);
+        }
+        
+        if (typeof generarResumenProduccion === 'function') {
+            resumenProduccion = await generarResumenProduccion(htmlProd);
+        } else if (typeof generarHTMLProduccion === 'function') {
+            resumenProduccion = await generarHTMLProduccion(htmlProd);
+        } else {
+            resumenProduccion = generarResumenProduccionSimple(htmlProd);
+        }
+        
+        const resumenHtml = `
+            <div style="margin-top: 20px;display:flex;gap:12px">
+                <div style="background: white; border-radius: 5px; border: 1px solid rgba(0,0,0,0.2); margin-bottom: 15px;width:100%">
+                    <div onclick="togglePanel('panelProveedores', 'iconProveedores')" style="background: #278233; padding: 8px; border-radius: 3px 3px 0 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: white; font-size: 16px;">Deuda a Proveedores</strong>
+                        <span id="iconProveedores" style="color: white; font-size: 20px;">▼</span>
+                    </div>
+                    <div id="panelProveedores" style="display: block; padding: 15px; max-height:90px;overflow-y:auto;">
+                        ${resumenProveedores}
+                    </div>
+                </div>
+                <div style="background: white; border-radius: 5px; border: 1px solid rgba(0,0,0,0.2);width:100%">
+                    <div onclick="togglePanel('panelProduccion', 'iconProduccion')" style="background: #278233; padding: 8px; border-radius: 3px 3px 0 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: white; font-size: 16px;">Produccion de Trabajadores</strong>
+                        <span id="iconProduccion" style="color: white; font-size: 20px;">▼</span>
+                    </div>
+                    <div id="panelProduccion" style="display: block; padding: 15px; max-height: 90px;overflow-y:auto">
+                        ${resumenProduccion}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Agregar los resúmenes al final del contenedor (sin duplicar)
+        const container = document.getElementById(containerId);
+        if (container && !document.getElementById('resumenesContainer')) {
+            const resumenDiv = document.createElement('div');
+            resumenDiv.id = 'resumenesContainer';
+            resumenDiv.innerHTML = resumenHtml;
+            container.appendChild(resumenDiv);
+        }
+        
+    } catch (error) {
+        console.error('Error al cargar resúmenes:', error);
+    }
+}
+
+// FUNCIONES FALLBACK (solo se usan si NO encuentras tus funciones originales)
+function generarResumenProveedoresSimple(dataMP) {
+    if (!dataMP.success || !dataMP.datos || dataMP.datos.length === 0) {
+        return '<div style="text-align:center; padding:20px;">No hay datos de proveedores</div>';
+    }
+    
+    const recepcionesPendientes = dataMP.datos.filter(r => r.pagado == 0);
+    if (recepcionesPendientes.length === 0) {
+        return '<div style="text-align:center; padding:20px;">No hay deudas pendientes con proveedores</div>';
+    }
+    
+    const deudasPorProveedor = new Map();
+    
+    recepcionesPendientes.forEach(r => {
+        const proveedorId = r.proveedor_id;
+        const proveedorNombre = r.proveedor_nombre;
+        const totalCosto = parseFloat(r.total_costo || 0);
+        const litros = parseFloat(r.cantidad_litros || 0);
+        
+        if (totalCosto <= 0) return;
+        
+        if (!deudasPorProveedor.has(proveedorId)) {
+            deudasPorProveedor.set(proveedorId, { nombre: proveedorNombre, total: 0, litros: 0 });
+        }
+        const proveedor = deudasPorProveedor.get(proveedorId);
+        proveedor.total += totalCosto;
+        proveedor.litros += litros;
+    });
+    
+    if (deudasPorProveedor.size === 0) {
+        return '<div style="text-align:center; padding:20px;">No hay deudas pendientes</div>';
+    }
+    
+    let html = '<div style="overflow-x: auto;"><table style="width:100%; border-collapse:collapse;">';
+    html += '<thead><tr style="border-bottom:2px solid #278233;">';
+    html += '<th style="text-align:left; padding:8px;">Proveedor</th>';
+    html += '<th style="text-align:right; padding:8px;">Litros</th>';
+    html += '<th style="text-align:right; padding:8px;">Deuda</th>';
+    html += '<!--th style="text-align:center; padding:8px;"></th!-->';
+    html += '</tr></thead><tbody>';
+    
+    let totalLitros = 0;
+    let totalGeneral = 0;
+    
+    for (const [proveedorId, proveedor] of deudasPorProveedor) {
+        totalLitros += proveedor.litros;
+        totalGeneral += proveedor.total;
+        html += `
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;"><strong>${escapeHtml(proveedor.nombre)}</strong></td>
+                <td style="text-align:right; padding:8px;">${proveedor.litros.toFixed(2)} L</br><small>litros</small></td>
+                <td style="text-align:right; padding:8px;"><strong style="color:#a18f1b;">$${proveedor.total.toFixed(2)}</strong></br><small>por pagar</small></td>
+                <!--td style="text-align:center; padding:8px;">
+                    <button class="btn-editar" onclick="filtrarPorProveedor(${proveedorId}, '${escapeHtml(proveedor.nombre)}')">Ver recibos</button>
+                 </br><small>filtrar en MP</small></td!-->
+            </tr>
+        `;
+    }
+    
+    html += `
+            </tbody>
+            <tfoot>
+                <tr style="border-top:2px solid #ddd; background:#f9f9f9;">
+                    <td style="padding:10px;"><strong>TOTAL GENERAL</strong></td>
+                    <td style="text-align:right; padding:10px;">${totalLitros.toFixed(2)} L</br><small>litros</small></td>
+                    <td style="text-align:right; padding:10px;"><strong style="color:#a18f1b; font-size:16px;">$${totalGeneral.toFixed(2)}</strong></br><small>total adeudado</small></td>
+                    <td style="text-align:center; padding:10px;"></td>
+                </tr>
+            </tfoot>
+        </table></div>
+        <div style="margin-top: 10px; text-align: center;">
+            <button class="form-btn" onclick="abrirModalMateriaPrima()" style="padding: 6px 15px;">+ Registrar Recepción</button>
+        </div>
+    `;
+    
+    return html;
+}
+
+function generarResumenProduccionSimple(htmlTable) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlTable, 'text/html');
+    const rows = doc.querySelectorAll('#contenidoTabla table tbody tr');
+    
+    if (!rows || rows.length === 0) {
+        return '<div style="text-align:center; padding:20px;">No hay producción registrada esta semana</div>';
+    }
+    
+    const produccionPorTrabajador = new Map();
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 4) return;
+        
+        const trabajador = cells[0]?.innerText?.trim() || '';
+        const cantidadTexto = cells[2]?.innerText?.trim() || '';
+        const piezasTexto = cells[3]?.innerText?.trim() || '';
+        
+        let cantidad = 0;
+        let match = cantidadTexto.match(/([\d.]+)/);
+        if (match) cantidad = parseFloat(match[1]);
+        
+        let piezas = 0;
+        match = piezasTexto.match(/(\d+)/);
+        if (match) piezas = parseInt(match[1]);
+        
+        if (!trabajador) return;
+        
+        if (!produccionPorTrabajador.has(trabajador)) {
+            produccionPorTrabajador.set(trabajador, { nombre: trabajador, totalKilos: 0, totalPiezas: 0 });
+        }
+        const data = produccionPorTrabajador.get(trabajador);
+        data.totalKilos += cantidad;
+        data.totalPiezas += piezas;
+    });
+    
+    if (produccionPorTrabajador.size === 0) {
+        return '<div style="text-align:center; padding:20px;">📊 No hay producción registrada</div>';
+    }
+    
+    let html = '<div style="overflow-x: auto;"><table style="width:100%; border-collapse:collapse;">';
+    html += '<thead><tr style="border-bottom:2px solid #278233;">';
+    html += '<th style="text-align:left; padding:8px;">Trabajador</th>';
+    html += '<th style="text-align:right; padding:8px;">Total kg</th>';
+    html += '<th style="text-align:right; padding:8px;">Piezas</th>';
+    html += '<th style="text-align:center; padding:8px;"></th>';
+    html += '</tr></thead><tbody>';
+    
+    let totalKilos = 0;
+    let totalPiezas = 0;
+    
+    for (const [nombre, data] of produccionPorTrabajador) {
+        totalKilos += data.totalKilos;
+        totalPiezas += data.totalPiezas;
+        html += `
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;"><strong>${escapeHtml(data.nombre)}</strong></td>
+                <td style="text-align:right; padding:8px;">${data.totalKilos.toFixed(2)} kg</br><small>producción</small></td>
+                <td style="text-align:right; padding:8px;">${data.totalPiezas} pz</br><small>piezas</small></td>
+                <td style="text-align:center; padding:8px;">
+                    <button class="btn-editar" onclick="calcularPagoEstimado('${escapeHtml(data.nombre)}', ${data.totalKilos}, ${data.totalPiezas})" style="background:#f4d71b;">Calcular pago</button>
+                </br><small>valorar producción</small></td>
+            </tr>
+        `;
+    }
+    
+    html += `
+            </tbody>
+            <tfoot>
+                <tr style="border-top:2px solid #ddd; background:#f9f9f9;">
+                    <td style="padding:10px;"><strong>TOTAL SEMANA</strong></td>
+                    <td style="text-align:right; padding:10px;"><strong>${totalKilos.toFixed(2)} kg</strong></br><small>kilos</small></td>
+                    <td style="text-align:right; padding:10px;"><strong>${totalPiezas} pz</strong></br><small>piezas</small></td>
+                    <td style="text-align:center; padding:10px;"></td>
+                </tr>
+            </tfoot>
+        </table></div>
+        <div style="margin-top: 10px; text-align: center;">
+            <button class="form-btn" onclick="abrirModalProduccion()" style="padding: 6px 15px;">+ Registrar Producción</button>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Función toggle (mantén la que ya tienes o usa esta)
+function togglePanel(panelId, iconId) {
+    const panel = document.getElementById(panelId);
+    const icon = document.getElementById(iconId);
+    if (panel) {
+        if (panel.style.display === 'none' || getComputedStyle(panel).display === 'none') {
+            panel.style.display = 'block';
+            if (icon) icon.innerHTML = '▼';
+        } else {
+            panel.style.display = 'none';
+            if (icon) icon.innerHTML = '▶';
+        }
+    }
+}
+    
+
+// Función para calcular pago estimado (global)
+window.calcularPagoEstimado = function(trabajador, kilos, piezas) {
+    const precio = prompt(`Ingrese el precio por kilo para ${trabajador}:\n(Kilos: ${kilos.toFixed(2)} kg)\n(Piezas: ${piezas} pz)`);
+    if (precio && !isNaN(parseFloat(precio))) {
+        const total = kilos * parseFloat(precio);
+        alert(`💰 Total estimado para ${trabajador}: $${total.toFixed(2)}`);
+    }
+};
+
+// Resto de funciones de cuentas
+function abrirFormularioCuenta(tipo) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    document.getElementById('cuentaTipo').value = tipo;
+    const title = document.getElementById('formCuentaTitle');
+    title.innerHTML = tipo === 'pagar' ? 'Nueva Cuenta por Pagar' : 'Nueva Cuenta por Cobrar';
+    document.getElementById('formCuenta').reset();
+    document.getElementById('cuentaFechaInicio').value = getFechaActual();
+    document.getElementById('cuentaFechaVencimiento').value = getFechaActual();
+    document.getElementById('formCuentaModal').style.display = 'block';
+}
+
+function cerrarFormularioCuenta() {
+    document.getElementById('formCuentaModal').style.display = 'none';
+}
+
+async function guardarCuenta(event) {
+    event.preventDefault();
+    const tipo = document.getElementById('cuentaTipo').value;
+    const descripcion = document.getElementById('cuentaDescripcion').value;
+    const monto = document.getElementById('cuentaMonto').value;
+    const fecha_inicio = document.getElementById('cuentaFechaInicio').value;
+    const fecha_vencimiento = document.getElementById('cuentaFechaVencimiento').value;
+    const action = tipo === 'pagar' ? 'guardar_pagar' : 'guardar_cobrar';
+    
+    try {
+        const response = await fetch('db/cuentas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, descripcion, monto, fecha_inicio, fecha_vencimiento })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Cuenta guardada correctamente');
+            cerrarFormularioCuenta();
+            if (tipo === 'pagar') cargarCuentasPagar();
+            else cargarCuentasCobrar();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error al guardar la cuenta');
+    }
+}
+
+async function eliminarCuenta(id, tipo) {
+    if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
+    const action = tipo === 'pagar' ? 'eliminar_pagar' : 'eliminar_cobrar';
+    try {
+        const response = await fetch('db/cuentas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            if (tipo === 'pagar') cargarCuentasPagar();
+            else cargarCuentasCobrar();
+        } else {
+            alert('Error: ' + (result.error || 'No se pudo eliminar'));
+        }
+    } catch (error) {
+        alert('Error de conexión');
+    }
+}
+
+function abrirModalPagoParcial(id, tipo, descripcion, montoPendiente) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    cuentaPagoActual = { id, tipo, montoPendiente };
+    document.getElementById('cuentaPagoId').value = id;
+    document.getElementById('cuentaPagoTipo').value = tipo;
+    document.getElementById('cuentaPagoPendiente').value = `$${parseFloat(montoPendiente).toFixed(2)}`;
+    document.getElementById('cuentaPagoMonto').value = '';
+    document.getElementById('cuentaPagoMetodo').value = 'efectivo';
+    document.getElementById('cuentaPagoReferencia').value = '';
+    document.getElementById('cuentaPagoObservaciones').value = '';
+    document.getElementById('cuentaPagoErrorMsg').style.display = 'none';
+    document.getElementById('modalPagoParcial').style.display = 'block';
+}
+
+function cerrarModalPagoParcial() {
+    document.getElementById('modalPagoParcial').style.display = 'none';
+    cuentaPagoActual = null;
+}
+
+function validarMontoPagoCuenta() {
+    const monto = parseFloat(document.getElementById('cuentaPagoMonto').value) || 0;
+    const pendiente = cuentaPagoActual ? cuentaPagoActual.montoPendiente : 0;
+    const errorMsg = document.getElementById('cuentaPagoErrorMsg');
+    const btn = document.getElementById('btnRegistrarPagoCuenta');
+    
+    if (monto > pendiente) {
+        errorMsg.style.display = 'block';
+        btn.disabled = true;
+    } else if (monto <= 0) {
+        errorMsg.style.display = 'block';
+        btn.disabled = true;
+    } else {
+        errorMsg.style.display = 'none';
+        btn.disabled = false;
+    }
+}
+
+document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('cuentaPagoId').value;
+    const tipo = document.getElementById('cuentaPagoTipo').value;
+    const monto_pago = parseFloat(document.getElementById('cuentaPagoMonto').value);
+    const metodo_pago = document.getElementById('cuentaPagoMetodo').value;
+    const referencia = document.getElementById('cuentaPagoReferencia').value;
+    const observaciones = document.getElementById('cuentaPagoObservaciones').value;
+    
+    if (!monto_pago || monto_pago <= 0) {
+        alert('Ingrese un monto válido');
+        return;
+    }
+    
+    try {
+        const response = await fetch('db/cuentas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'registrar_pago_parcial',
+                id: id, tipo: tipo,
+                monto_pago: monto_pago,
+                metodo_pago: metodo_pago,
+                referencia: referencia,
+                observaciones: observaciones
+            })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            cerrarModalPagoParcial();
+            cargarCuentasPagar();
+            cargarCuentasCobrar();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error al registrar el pago');
+    }
+});
+
+function formatearFechaCuenta(fecha) {
+    if (!fecha) return '';
+    const partes = fecha.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta);
+
+async function verHistorialPagos(id, tipo) {
+    try {
+        const response = await fetch(`db/cuentas.php?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`);
+        const data = await response.json();
+        
+        if (data.success && data.pagos.length > 0) {
+            let historialHtml = `
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="tabla-produccion" style="width:100%;border-collapse:collapse;border:none">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Método</th>
+                                <th>Referencia</th>
+                                <th>Observaciones</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            data.pagos.forEach(pago => {
+                historialHtml += `
+                    <tr>
+                        <td>${pago.fecha}</td>
+                        <td><strong>$${parseFloat(pago.monto).toFixed(2)}</strong></td>
+                        <td>${pago.metodo_pago}</td>
+                        <td>${pago.referencia || '-'}</td>
+                        <td>${pago.observaciones || '-'}</td>
+                        <td>
+                            <button class="btn-eliminar-pago-local" data-id="${pago.id}" data-cuenta="${id}" data-tipo="${tipo}" data-monto="${parseFloat(pago.monto).toFixed(2)}">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            historialHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            const totalPagado = data.pagos.reduce((sum, p) => sum + parseFloat(p.monto), 0).toFixed(2);
+            
+            const ventana = window.open('', '_blank', 'width=750,height=550,scrollbars=yes');
+            ventana.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Historial de Pagos</title>
+                    <style>
+                        * { font-family: 'mainFont', Arial, sans-serif; }
+                        body { padding: 20px; background: #f5f5f5; }
+                        h2 { color: #278233; margin-top: 0; border-bottom: 2px solid #278233; padding-bottom: 10px; }
+                        table { width: 100%; border-collapse: collapse; border:0px solid #000}
+                        th, td { padding: 10px; text-align: left; }
+                        th { background: #278233; color: white; }
+                        tr:hover { background: #f5f5f5; }
+                        .btn-eliminar-pago-local { 
+                            background: #f44336; 
+                            color: white; 
+                            border: none; 
+                            padding: 5px 12px; 
+                            border-radius: 4px; 
+                            cursor: pointer; 
+                            font-size: 12px;
+                        }
+                        .btn-eliminar-pago-local:hover { background: #d32f2f; }
+                        .btn-cerrar {
+                            background: #278233;
+                            color: white;
+                            border: none;
+                            padding: 8px 20px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            margin-top: 20px;
+                        }
+                        .total-pagado {
+                            margin-top: 20px;
+                            padding: 12px 15px;
+                            background: #e8f5e9;
+                            border-radius: 5px;
+                            text-align: right;
+                            font-weight: bold;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>Historial de Pagos - Cuenta #${id}</h2>
+                    ${historialHtml}
+                    <div class="total-pagado">
+                        Total pagado: <span style="color:#278233">$${totalPagado}</span>
+                    </div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-cerrar" id="btnCerrar">Cerrar</button>
+                    </div>
+                    
+                    <script>
+                        // Variable para almacenar datos del pago a eliminar
+                        let pagoAEliminar = null;
+                        
+                        // Función para confirmar eliminación
+                        function confirmarEliminarPago(pagoId, cuentaId, tipo, monto) {
+                            pagoAEliminar = { pagoId, cuentaId, tipo };
+                            if (confirm('¿Eliminar este pago de $' + monto + '?\\n\\nEl monto se restará del total pagado de la cuenta.')) {
+                                ejecutarEliminarPago();
+                            }
+                        }
+                        
+                        // Función para ejecutar la eliminación
+                        async function ejecutarEliminarPago() {
+                            if (!pagoAEliminar) return;
+                            
+                            const { pagoId, cuentaId, tipo } = pagoAEliminar;
+                            
+                            try {
+                                const response = await fetch('db/cuentas.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ 
+                                        action: 'eliminar_pago_parcial', 
+                                        pago_id: pagoId, 
+                                        cuenta_id: cuentaId, 
+                                        tipo: tipo 
+                                    })
+                                });
+                                
+                                const result = await response.json();
+                                
+                                if (result.success) {
+                                    alert('✓ Pago eliminado correctamente');
+                                    if (window.opener && !window.opener.closed) {
+                                        if (window.opener.cargarCuentasPagar) window.opener.cargarCuentasPagar();
+                                        if (window.opener.cargarCuentasCobrar) window.opener.cargarCuentasCobrar();
+                                    }
+                                    window.close();
+                                } else {
+                                    alert('❌ Error: ' + result.error);
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert('❌ Error al eliminar el pago');
+                            }
+                            pagoAEliminar = null;
+                        }
+                        
+                        // Asignar eventos a los botones
+                        document.querySelectorAll('.btn-eliminar-pago-local').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const pagoId = parseInt(this.getAttribute('data-id'));
+                                const cuentaId = parseInt(this.getAttribute('data-cuenta'));
+                                const tipo = this.getAttribute('data-tipo');
+                                const monto = this.getAttribute('data-monto');
+                                confirmarEliminarPago(pagoId, cuentaId, tipo, monto);
+                            });
+                        });
+                        
+                        // Botón cerrar
+                        document.getElementById('btnCerrar').addEventListener('click', function() {
+                            window.close();
+                        });
+                    <\/script>
+                </body>
+                </html>
+            `);
+            ventana.document.close();
+        } else {
+            alert('No hay pagos registrados para esta cuenta');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar el historial');
+    }
+}
+</script>
+    
+    
+    
+    
+    
+    
+<script>
+// Fallback directo - Enviar comando de cierre al proceso principal
+// Esto funciona incluso si no hay un ipcMain.handle específico
+if (window.electronAPI) {
+    // Sobrescribir el método cerrarVentana para que también intente con ipcRenderer
+    const originalCerrar = window.electronAPI.cerrarVentana;
+    window.electronAPI.cerrarVentana = function() {
+        console.log('Cerrando ventana desde fallback...');
+        // Intentar con ipcRenderer directamente
+        if (window.ipcRenderer && window.ipcRenderer.send) {
+            window.ipcRenderer.send('ventana-cerrar');
+        } else if (originalCerrar) {
+            originalCerrar();
+        }
+        // Fallback final
+        setTimeout(() => window.close(), 100);
+    };
+}
+</script>
+<script>
+    // Función principal para cerrar la ventana - VERSIÓN CORREGIDA
+function cerrarVentanaElectron() {
+    console.log('Intentando cerrar ventana...');
+    
+    // Método 1: Usar API de Electron expuesta
+    if (window.electronAPI && typeof window.electronAPI.cerrarVentana === 'function') {
+        console.log('Llamando a electronAPI.cerrarVentana');
+        window.electronAPI.cerrarVentana();
+        console.log('Comando de cierre enviado');
+        return;
+    }
+    
+    // Método 2: Fallback - intentar cerrar con JavaScript normal
+    console.log('Usando fallback window.close()');
+    window.close();
+}
+
+// Asegurar que el botón tenga el evento correcto
+function configurarBotonCerrar() {
+    const closeBtn = document.querySelector('.bar span');
+    if (closeBtn) {
+        // Eliminar cualquier evento anterior
+        const nuevoBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(nuevoBtn, closeBtn);
+        
+        // Asignar el nuevo evento
+        nuevoBtn.onclick = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Botón de cerrar clickeado');
+            cerrarVentanaElectron();
+        };
+        nuevoBtn.style.cursor = 'pointer';
+        console.log('Botón de cerrar configurado correctamente');
+    } else {
+        console.error('No se encontró el botón de cerrar');
+    }
+}
+
+// Ejecutar configuración cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', configurarBotonCerrar);
+} else {
+    configurarBotonCerrar();
+}
+
+// También observar por si el botón se regenera dinámicamente
+const observerBoton = new MutationObserver(function(mutations) {
+    const closeBtn = document.querySelector('.bar span');
+    if (closeBtn && !closeBtn.hasAttribute('data-configured')) {
+        closeBtn.setAttribute('data-configured', 'true');
+        closeBtn.onclick = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Botón de cerrar clickeado (reconectado)');
+            cerrarVentanaElectron();
+        };
+        console.log('Botón de cerrar reconectado');
+    }
+});
+
+observerBoton.observe(document.body, { childList: true, subtree: true });
+</script>
+<script>
+// ========== FUNCIONALIDAD DE ARRASTRE PARA MODALES ==========
+function hacerModalArrastrable(modalElement, handleElement = null) {
+    const modalContent = modalElement.querySelector('.modal-content-produccion, .form-content');
+    if (!modalContent) return;
+    
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    const dragHandle = handleElement || modalContent.querySelector('.modal-header') || modalContent;
+    
+    dragHandle.style.cursor = 'default';
+    dragHandle.style.userSelect = 'none';
+    
+    dragHandle.onmousedown = dragMouseDown;
+    
+    function dragMouseDown(e) {
+        // Evitar que el evento se propague a elementos hijos que puedan tener su propio drag
+        if (e.target.closest('button, input, select, textarea, .close-produccion, .close-cuenta, .tab-sucursal-btn, .tab-cuentas-btn, .tab-ventas-btn, .btn-agregar, .form-btn, .producto-select, .producto-cantidad, .producto-precio')) {
+            return;
+        }
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+        modalContent.style.transition = 'none';
+    }
+    
+    function elementDrag(e) {
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        let newTop = modalContent.offsetTop - pos2;
+        let newLeft = modalContent.offsetLeft - pos1;
+        
+        // Limitar dentro de la ventana
+        const maxTop = window.innerHeight - modalContent.offsetHeight - 20;
+        const maxLeft = window.innerWidth - modalContent.offsetWidth - 20;
+        
+        newTop = Math.max(10, Math.min(newTop, maxTop));
+        newLeft = Math.max(10, Math.min(newLeft, maxLeft));
+        
+        modalContent.style.top = newTop + 'px';
+        modalContent.style.left = newLeft + 'px';
+        modalContent.style.margin = '0';
+        modalContent.style.position = 'fixed';
+    }
+    
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        modalContent.style.transition = '';
+    }
+}
+
+// Inicializar arrastre para todos los modales
+function inicializarArrastreModales() {
+    // Lista completa de todos los modales del sistema
+    const modales = [
+        // Modales de producción y sucursales
+        'modalProduccion',
+        'formModalSucursal',
+        'modalNuevoProducto',
+        'modalNuevaSucursal',
+        
+        // Modales de cuentas
+        'modalCuentas',
+        'formCuentaModal',
+        'modalPagoParcial',        // <-- Registrar pago parcial de cuentas
+        
+        // Modales de nómina y trabajadores
+        'modalNomina',
+        'modalRegistrarPago',      // <-- Registrar pago de nómina
+        'modalPrestamo',           // <-- Registrar préstamo a trabajador
+        'modalTrabajador',         // <-- Nuevo/Editar trabajador
+        
+        // Modales de egresos
+        'modalEgresos',
+        'formEgresoModal',
+        'modalCategoriaEgreso',
+        
+        // Modales de materia prima y proveedores
+        'modalMateriaPrima',
+        'formMateriaPrimaModal',
+        'modalProveedor',          // <-- Nuevo/Editar proveedor
+        'modalPagoProveedor',      // <-- Registrar pago a proveedor
+        'modalAdelantoProveedor',  // <-- Registrar adelanto a proveedor
+        'modalHistorialPagosProveedor',
+        
+        // Modales de ventas y clientes
+        'modalVentas',
+        'modalCliente',            // <-- Nuevo/Editar cliente
+        'modalVistaPreviaCobrar',  // <-- Vista previa de cuentas pendientes
+        
+        // Otros modales
+        'modalEditarUsuario',
+        'modalConfirmacion',
+        'modalExpandProd',
+        'modalExpandEgr',
+        'formModal'
+    ];
+    
+    // Aplicar arrastre a cada modal existente
+    modales.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            // Remover event listener previo si existe (para evitar duplicados)
+            modal.removeEventListener('click', modal._dragPreventHandler);
+            modal._dragPreventHandler = function(e) {
+                if (e.target.closest('button, input, select, textarea, .close-produccion, .close-cuenta, .tab-sucursal-btn, .tab-cuentas-btn, .tab-ventas-btn, .btn-agregar, .form-btn, .producto-select, .producto-cantidad, .producto-precio, .btn-ver, .btn-eliminar, .btn-editar, .btn-filtro, .btn-limpiar-filtros, .btn-add-sucursal, .btn-menu-trabajador, .btn-menu-proveedor, .btn-delete-sucursal, .tab-dia-btn, .tab-categoria-btn, .close-produccion-legal, .close-cuenta')) {
+                    return;
+                }
+            };
+            modal.addEventListener('click', modal._dragPreventHandler);
+            hacerModalArrastrable(modal);
+        }
+    });
+    
+    // Observar cambios en el DOM para capturar modales creados dinámicamente
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) {
+                        // Verificar si el nodo agregado es un modal
+                        if (node.classList && (node.classList.contains('modal-produccion') || node.classList.contains('form-modal'))) {
+                            hacerModalArrastrable(node);
+                        }
+                        // Buscar modales dentro del nodo agregado
+                        const modalesEncontrados = node.querySelectorAll('.modal-produccion, .form-modal');
+                        modalesEncontrados.forEach(modal => hacerModalArrastrable(modal));
+                    }
+                });
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Ejecutar cuando el DOM esté listo y también después de cargar contenido dinámico
+document.addEventListener('DOMContentLoaded', inicializarArrastreModales);
+
+// También ejecutar después de un pequeño retraso para capturar modales que se cargan asincrónicamente
+setTimeout(inicializarArrastreModales, 1000);
+</script>
+<script>
+// Función única para resetear focus
+window.forzarResetFocus = function() {
+    if (window.electronAPI && window.electronAPI.resetFocus) {
+        window.electronAPI.resetFocus();
+        console.log('Reset focus enviado a Electron');
+    } else {
+        console.log('Reset focus');
+        // Fallback si no está en Electron
+        document.activeElement?.blur();
+        setTimeout(() => {
+            document.body.click();
+            window.focus();
+        }, 10);
+    }
+};
+</script>
+</html>

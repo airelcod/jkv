@@ -1,0 +1,591 @@
+w<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura - Agroindustria Láctea J.K.V. C.A.</title>
+    <style>
+        @font-face {
+            font-family: 'mainFont';
+            src: url('source/font.ttf');
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'mainFont', 'Segoe UI', Arial, sans-serif;
+            background: #e0e0e0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* Tamaño Carta: 8.5 x 11 pulgadas = 792px x 1056px aprox */
+        .factura-doble {
+            width: 8.5in;
+            height: 11in;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin: 0 auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Cada mitad ocupa exactamente la mitad de la altura */
+        .factura-mitad {
+            flex: 1;
+            padding: 15px 20px;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .factura-mitad:first-child {
+            border-bottom: 2px dashed #ccc;
+        }
+        
+        /* Etiqueta de copia */
+        .copia-label {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 3px;
+            z-index: 1;
+        }
+        
+        .original-label {
+            background: #278233;
+            color: white;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .copia-label-cliente {
+            background: #f4d71b;
+            color: #333;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* Encabezado */
+        .header-factura {
+            background: #278233;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+            border-radius: 5px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-section img {
+            height: 40px;
+            filter: brightness(0) invert(1);
+        }
+        
+        .empresa-info h1 {
+            color: white;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        .empresa-info p {
+            color: rgba(255,255,255,0.8);
+            font-size: 8px;
+        }
+        
+        .factura-info {
+            text-align: right;
+            color: white;
+        }
+        
+        .factura-info .factura-num {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .factura-info .factura-fecha {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        
+        /* Datos del Cliente */
+        .cliente-section {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .cliente-section h3 {
+            color: #278233;
+            margin-bottom: 6px;
+            font-size: 16px;
+            border-left: 3px solid #278233;
+            padding-left: 8px;
+        }
+        
+        .cliente-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+        
+        .cliente-item {
+            display: flex;
+            font-size: 14px;
+        }
+        
+        .cliente-item .label {
+            font-weight: bold;
+            width: 70px;
+            color: #555;
+        }
+        
+        .cliente-item .value {
+            color: #333;
+        }
+        
+        /* Tabla de productos */
+        .productos-section {
+            flex: 1;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .productos-section h3 {
+            color: #278233;
+            margin-bottom: 6px;
+            font-size: 16px;
+            border-left: 3px solid #278233;
+            padding-left: 8px;
+        }
+        
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .tabla-productos th {
+            background: #278233;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .tabla-productos td {
+            padding: 4px 5px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* Totales */
+        .totales-section {
+            padding: 8px 12px;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: auto;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .totales {
+            width: 220px;
+        }
+        
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 16px;
+        }
+        
+        .total-line.grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 1px solid #278233;
+            margin-top: 3px;
+            padding-top: 5px;
+            color: #278233;
+        }
+        
+        /* Footer */
+        .footer-factura {
+            padding: 8px 12px;
+            background: #278233;
+            color: white;
+            text-align: center;
+            font-size: 8px;
+            margin-top: 8px;
+            border-radius: 4px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        .nota {
+            background: #fff3cd;
+            padding: 5px 10px;
+            margin-bottom: 8px;
+            border-radius: 3px;
+            font-size: 8px;
+            color: #856404;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* Botones de acción */
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #f0f0f0;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        
+        .btn {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'mainFont', sans-serif;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-imprimir {
+            background: #278233;
+            color: white;
+        }
+        
+        .btn-imprimir:hover {
+            background: #1e6b28;
+        }
+        
+        .btn-cerrar {
+            background: #666;
+            color: white;
+        }
+        
+        .btn-cerrar:hover {
+            background: #555;
+        }
+        
+        @media print {
+            @page {
+                margin: 0;
+                size: letter;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .acciones {
+                display: none;
+            }
+            
+            .factura-doble {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: auto;
+                min-height: 11in;
+            }
+            
+            .factura-mitad:first-child {
+                border-bottom: 1px dashed #000;
+            }
+            
+            .empresa-info h1 {
+                color: white;
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            .empresa-info p {
+                color: rgba(255,255,255,0.8);
+                font-size: 8px;
+            }
+            
+            .factura-info {
+                color: white;
+            }
+            
+            .tabla-productos th {
+                background: #278233 !important;
+                color: white !important;
+                padding: 5px;
+                text-align: center;
+                font-weight: bold;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            /* Ocultar URL y fecha de impresión */
+            header, footer {
+                display: none;
+            }
+        }
+        
+        /* Para pantalla, mantener el tamaño carta visible */
+        @media screen {
+            .factura-doble {
+                margin: 20px auto;
+            }
+        }
+        
+        /* Scroll suave dentro de cada mitad si el contenido excede */
+        .factura-mitad::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .factura-mitad::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+        
+        .factura-mitad::-webkit-scrollbar-thumb {
+            background: #278233;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="factura-doble" id="facturaContainer">
+        <!-- El contenido se llenará dinámicamente -->
+    </div>
+
+    <script>
+        // Función para cargar los datos de la factura desde sessionStorage
+        function cargarFactura() {
+            const facturaData = sessionStorage.getItem('facturaData');
+            if (!facturaData) {
+                document.getElementById('facturaContainer').innerHTML = '<div style="padding: 40px; text-align: center;">No hay datos de factura disponibles</div>';
+                return;
+            }
+            
+            const data = JSON.parse(facturaData);
+            generarHTMLFacturaDoble(data);
+        }
+        
+        function generarHTMLFacturaDoble(data) {
+            const { venta, detalles, empresa } = data;
+            
+            // Generar el contenido de una sola factura
+            const contenidoFactura = generarContenidoFactura(venta, detalles, 'original');
+            const contenidoCopia = generarContenidoFactura(venta, detalles, 'copia');
+            
+            const html = `
+                <div class="factura-mitad">
+                    ${contenidoFactura}
+                </div>
+                <div class="factura-mitad">
+                    ${contenidoCopia}
+                </div>
+                <div class="acciones">
+                    <button class="btn btn-imprimir" onclick="imprimirFactura()">Imprimir / Guardar PDF</button>
+                    <button class="btn btn-cerrar" onclick="window.close()">✖ Cerrar</button>
+                </div>
+            `;
+            
+            document.getElementById('facturaContainer').innerHTML = html;
+        }
+        
+        function generarContenidoFactura(venta, detalles, tipo) {
+            // Formatear fecha
+            const fechaFactura = new Date(venta.fecha);
+            const fechaFormateada = fechaFactura.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            // Determinar método de pago texto
+            const metodoPagoTexto = {
+                'efectivo': 'Efectivo',
+                'transferencia': 'Transferencia',
+                'cheque': 'Cheque',
+                'credito': 'Crédito'
+            }[venta.metodo_pago] || venta.metodo_pago;
+            
+            const esCopia = tipo === 'copia';
+            const labelTexto = esCopia ? 'COPIA DEL CLIENTE' : 'ORIGINAL';
+            const labelClass = esCopia ? 'copia-label-cliente' : 'original-label';
+            
+            let html = `
+                <div class="copia-label ${labelClass}">${labelTexto}</div>
+                
+                <div class="header-factura">
+                    <div class="logo-section">
+                        <img src="source/logo.png" alt="Logo" onerror="this.style.display='none'">
+                        <div class="empresa-info">
+                            <h1>AGROINDUSTRIA LÁCTEA J.K.V. C.A.</h1>
+                            <p>RIF: J-41022340-5 | Telf: (0412) 302-7063</p>
+                            <p>Carretera Lara-Zulia (Km 82) | Palmarito - Cerro Verde</p>
+                        </div>
+                    </div>
+                    <div class="factura-info">
+                        <div class="factura-num">FACTURA #${String(venta.id).padStart(6, '0')}</div>
+                        <div class="factura-fecha">Fecha: ${fechaFormateada}</div>
+                    </div>
+                </div>
+                
+                <div class="cliente-section">
+                    <h3>DATOS DEL CLIENTE</h3>
+                    <div class="cliente-grid">
+                        <div class="cliente-item"><span class="label">Cliente:</span><span class="value">${escapeHtml(venta.cliente)}</span></div>
+                        <div class="cliente-item"><span class="label">RIF/C.I.:</span><span class="value">${escapeHtml(venta.rif || '-')}</span></div>
+                        <div class="cliente-item"><span class="label">Teléfono:</span><span class="value">${escapeHtml(venta.telefono || '-')}</span></div>
+                        <div class="cliente-item"><span class="label">Contacto:</span><span class="value">${escapeHtml(venta.contacto || '-')}</span></div>
+                        <div class="cliente-item"><span class="label">Email:</span><span class="value">${escapeHtml(venta.email || '-')}</span></div>
+                        <div class="cliente-item"><span class="label">Dirección:</span><span class="value">${escapeHtml(venta.direccion || '-')}</span></div>
+                    </div>
+                </div>
+                
+                <div class="productos-section">
+                    <h3>DETALLE DE PRODUCTOS</h3>
+                    <table class="tabla-productos">
+                        <thead>
+                            <tr><th>Cant.</th><th>Piezas</th><th>Producto</th><th>Precio Unit.</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            detalles.forEach(detalle => {
+                const productoNombre = formatearNombre(detalle.producto_nombre || 'Producto');
+                const cantidad = parseFloat(detalle.cantidad).toFixed(2);
+                const piezas = parseInt(detalle.piezas) || 0;
+                const precio = parseFloat(detalle.precio_unitario).toFixed(2);
+                const total = (cantidad * precio).toFixed(2);
+
+                // Determinar la unidad según el producto
+                let unidad = 'kg';
+                const productoNombreLower = (detalle.producto_nombre || '').toLowerCase();
+
+                if (productoNombreLower === 'leche' || 
+                    productoNombreLower === 'suero' || 
+                    productoNombreLower === 'crema' ||
+                    productoNombreLower === 'nata' ||
+                    detalle.es_leche == 1) {
+                    unidad = 'L';
+                }
+
+                html += `
+                    <tr>
+                        <td>${cantidad} ${unidad}</td>
+                        <td>${piezas > 0 ? piezas + ' pz' : '-'}</td>
+                        <td>${productoNombre}</td>
+                        <td>$${precio}</td>
+                        <td>$${total}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="totales-section">
+                    <div class="totales">
+            `;
+            
+            if (venta.tiene_descuento && venta.descuento_monto > 0) {
+                html += `
+                        <div class="total-line"><span>Subtotal:</span><span>$${parseFloat(venta.subtotal).toFixed(2)}</span></div>
+                        <div class="total-line"><span>Descuento ${venta.descuento_porcentaje > 0 ? `(${venta.descuento_porcentaje}%)` : ''}:</span><span>-$${parseFloat(venta.descuento_monto).toFixed(2)}</span></div>
+                `;
+            }
+            
+            html += `
+                        <div class="total-line grand-total">
+                            <span>TOTAL A PAGAR:</span>
+                            <span>$${parseFloat(venta.total).toFixed(2)}</span>
+                        </div>
+                        <div class="total-line">
+                            <span>Método de Pago:</span>
+                            <span>${metodoPagoTexto}</span>
+                        </div>
+                        ${venta.es_credito ? '<div class="total-line"><span>Plazo:</span><span>7 días</span></div>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            if (venta.observaciones) {
+                html += `<div class="nota"><strong>Observaciones:</strong> ${escapeHtml(venta.observaciones)}</div>`;
+            }
+            
+            if (venta.es_credito == 1 || venta.es_credito === true) {
+                html += `<div class="nota"><strong>⚠ Esta venta fue realizada a CRÉDITO.</strong> Vence en 7 días.</div>`;
+            }
+            
+            html += `
+                <div class="footer-factura">
+                    <p>¡Gracias por su compra! | Agroindustria Láctea J.K.V. C.A.</p>
+                </div>
+            `;
+            
+            return html;
+        }
+        
+        function imprimirFactura() {
+            window.print();
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatearNombre(texto) {
+            if (!texto) return '';
+            return texto.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+        }
+        
+        // Cargar la factura al iniciar
+        cargarFactura();
+    </script>
+</body>
+</html>

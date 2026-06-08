@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesion - Agroindustria Lactea J.K.V. C.A.</title>
+    <link rel="icon" href="source/main.ico" type="image/png">
+    <style>
+        @font-face {
+            font-family: 'mainFont';
+            src: url('source/font.ttf');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'mainFont', calibri;
+            transition: 0.3s;
+        }
+
+        body {
+            background: #f4d71b;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            display: flex;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Header que se reduce */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-width: 300px;
+            height: 85vh;
+            padding: 16px 0px;
+            background: #fff;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(0,0,0,.7);
+            border-right: 1px solid rgba(0,0,0,.7);
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            z-index: 2;
+        }
+		
+
+        main {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            gap: 24px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form {
+            display: flex;
+            width: max-content;
+            gap: 48px;
+            justify-content: center;
+        }
+
+        .form-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 320px;
+            padding: 12px 18px;
+            border-radius: 4px;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: default;
+        }
+
+        .title-bar {
+            border: 1px solid rgba(0,0,0,.4);
+            border-radius: 2px;
+            padding: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            color: rgba(255,255,255,.8);
+            width: 100%;
+            background: #278233;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            font-size: 16px;
+            border: 1px solid rgba(0,0,0,.2);
+            background: #f4d71b;
+            color: rgba(0,0,0,.7);
+            padding: 8px 24px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            opacity: 1;
+            box-shadow: 0px 4px 12px rgba(0,0,0,.2);
+            border: 1px solid rgba(0,0,0,.7);
+        }
+
+		.form-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            box-sizing: border-box;
+            background: #f4d71b;
+            border-radius: 4px;
+			border: 1px solid rgba(0,0,0,0);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            box-shadow: 0px 4px 12px rgba(0,0,0,.3);
+        }
+
+        .form-btn:hover {
+            opacity: 1;
+            border: 1px solid rgba(0,0,0,.4);
+            box-shadow: 0px 8px 12px rgba(0,0,0,.2);
+        }
+
+		.form-btn-limpiar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            box-sizing: border-box;
+            background: rgba(0,0,0,.4);
+            border-radius: 4px;
+			border: 1px solid rgba(0,0,0,0);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: .9;
+            cursor: pointer;
+            box-shadow: 0px 4px 12px rgba(0,0,0,.3);
+        }
+
+        .form-btn-limpiar:hover {
+            opacity: 1;
+            border: 1px solid rgba(0,0,0,.4);
+            box-shadow: 0px 8px 12px rgba(0,0,0,.2);
+        }
+
+        .icon {
+            mix-blend-mode: multiply;
+            opacity: .8;
+        }
+
+        /* Estilos para inputs */
+        .input-field {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            border: 1px solid rgba(0,0,0,.4);
+            padding: 10px 12px;
+            border-radius: 3px;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border:2px solid #f4d71b;
+        }
+
+        .error-mensaje {
+            color: #f44336;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #f44336;
+        }
+
+        .logo {
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-limpiar {
+            background: #666;
+            color: white;
+        }
+
+        .btn-limpiar:hover {
+            background: #555;
+        }
+
+        .btn-entrar {
+            background: #278233;
+            color: white;
+        }
+
+        .btn-entrar:hover {
+            background: #1e6b28;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .form-box {
+                width: 280px;
+                padding: 12px 16px;
+            }
+            
+            .btn {
+                padding: 6px 18px;
+                font-size: 14px;
+            }
+            
+            .header {
+                height: 85vh;
+            }
+        }
+
+        /* Animación sutil para el formulario */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-box {
+            animation: fadeInUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+	<div class="bar" style="width:100%;height:32px;background:#f4d71b;border-bottom:1px solid rgba(0,0,0,.7); display:flex;align-items:center;justify-content:flex-end;-webkit-app-region:drag"><span style="font-size:32px;cursor:pointer;box-sizing:border-box;margin-left:auto;transform:translateX(-6px);-webkit-app-region:no-drag" onclick="cerrarVentanaElectron();">&times;</span></div>
+    <div class="main-container">
+        <div class="header">
+            <img height="180" class="logo" src="source/logo.png" alt="Logo">
+
+            <main>
+                <div class="form-box">
+                    <div class="title-bar">
+                        <span>Ingrese sus credenciales</span>
+                    </div>
+                    
+                    <div style="width: 100%; margin-top: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: rgba(0,0,0,.7);">Correo Electrónico</label>
+                            <input type="email" id="loginEmail" class="input-field" placeholder="abc@email.com" autocomplete="off">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: rgba(0,0,0,.7);">Contraseña</label>
+                            <input type="password" id="loginPassword" class="input-field" placeholder="••••••••">
+                        </div>
+                        
+                        <div class="button-group">
+                            <div class="form-btn-limpiar" onclick="limpiarFormulario()"><span>Limpiar</span></div>
+                            <div class="form-btn" onclick="iniciarSesion()"><span>Entrar</span></div>
+                        </div>
+                        
+                        <div id="errorMensaje" class="error-mensaje" style="display: none;"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <center><span style="color:rgba(0,0,0,.7); cursor: default;">© 2026 PST10. Todos los derechos reservados. <span style="color:rgba(35,130,51);">pst10carora@gmail.com</span></span></center>
+    
+    <script>
+        function limpiarFormulario() {
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            const errorDiv = document.getElementById('errorMensaje');
+            errorDiv.style.display = 'none';
+            errorDiv.innerHTML = '';
+            
+            // Resetear estilos de inputs
+            document.getElementById('loginEmail').style.borderColor = 'rgba(0,0,0,.4)';
+            document.getElementById('loginPassword').style.borderColor = 'rgba(0,0,0,.4)';
+        }
+        
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('errorMensaje');
+            errorDiv.innerHTML = mensaje;
+            errorDiv.style.display = 'block';
+            
+            // Animación de error
+            setTimeout(() => {
+                errorDiv.style.opacity = '0';
+                setTimeout(() => {
+                    if (errorDiv.innerHTML === mensaje) {
+                        errorDiv.style.display = 'none';
+                        errorDiv.style.opacity = '1';
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        async function iniciarSesion() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            // Validar campos
+            if (!email) {
+                document.getElementById('loginEmail').style.borderColor = '#f44336';
+                mostrarError('Por favor ingrese su correo electrónico');
+                return;
+            }
+            
+            if (!password) {
+                document.getElementById('loginPassword').style.borderColor = '#f44336';
+                mostrarError('Por favor ingrese su contraseña');
+                return;
+            }
+            
+            // Resetear bordes
+            document.getElementById('loginEmail').style.borderColor = 'rgba(0,0,0,.4)';
+            document.getElementById('loginPassword').style.borderColor = 'rgba(0,0,0,.4)';
+            
+            // Mostrar estado de carga
+            const btnEntrar = document.querySelector('.form-btn');
+            const textoOriginal = "Entrar";
+            btnEntrar.innerHTML = '<span>Ingresando...</span>';
+            btnEntrar.disabled = true;
+            
+            try {
+                const response = await fetch('db/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Animación de éxito antes de redirigir
+                    btnEntrar.innerHTML = '<span>Éxito!</span>';
+                    setTimeout(() => {
+                        window.location.href = 'main.php';
+                    }, 500);
+                } else {
+                    btnEntrar.value = textoOriginal;
+                    btnEntrar.disabled = false;
+                    mostrarError(result.error || 'Credenciales incorrectas');
+                    
+                    // Animación de shake en el formulario
+                    const formBox = document.querySelector('.form-box');
+                    formBox.style.transform = 'translateX(10px)';
+                    setTimeout(() => {
+                        formBox.style.transform = 'translateX(-10px)';
+                        setTimeout(() => {
+                            formBox.style.transform = 'translateX(5px)';
+                            setTimeout(() => {
+                                formBox.style.transform = 'translateX(0)';
+                            }, 50);
+                        }, 50);
+                    }, 50);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                btnEntrar.value = textoOriginal;
+                btnEntrar.disabled = false;
+                mostrarError('Error de conexión con el servidor');
+            }
+        }
+        
+        // Permitir enviar con Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                if (email && password) {
+                    iniciarSesion();
+                } else if (email && !password) {
+                    document.getElementById('loginPassword').focus();
+                } else if (!email) {
+                    document.getElementById('loginEmail').focus();
+                }
+            }
+        });
+        
+        // Remover borde rojo al escribir
+        document.getElementById('loginEmail').addEventListener('input', function() {
+            this.style.borderColor = 'rgba(0,0,0,.4)';
+            document.getElementById('errorMensaje').style.display = 'none';
+        });
+        
+        document.getElementById('loginPassword').addEventListener('input', function() {
+            this.style.borderColor = 'rgba(0,0,0,.4)';
+            document.getElementById('errorMensaje').style.display = 'none';
+        });
+        
+        // Auto-focus en el primer campo
+        document.getElementById('loginEmail').focus();
+    </script>
+	<script>
+        
+        
+        function cerrarVentanaElectron() {
+            if (window.electronAPI && window.electronAPI.cerrarVentana) {
+                window.electronAPI.cerrarVentana();
+            } else {
+                window.close();
+            }
+        }
+        
+	    // Detección de entorno y control de barra de título
+	    (function() {
+	        // Detectar si está en Electron (múltiples métodos)
+	        const isElectron = () => {
+	            // Método 1: Detectar por userAgent
+	            const userAgent = navigator.userAgent.toLowerCase();
+	            const hasElectron = userAgent.includes('electron');
+	            
+	            // Método 2: Detectar por la API expuesta en preload
+	            const hasElectronAPI = typeof window.electronAPI !== 'undefined' && window.electronAPI.isElectron;
+	            
+	            // Método 3: Detectar por la presencia de procesos de Node
+	            const hasNodeProcess = typeof process !== 'undefined' && process.versions && process.versions.electron;
+	            
+	            return hasElectron || hasElectronAPI || hasNodeProcess;
+	        };
+	        
+	        // Variable global para saber si estamos en Electron
+	        window.entornoElectron = isElectron();
+	        
+	        // Función para controlar la visibilidad de la barra
+	        function controlarBarraTitulo() {
+	            const barraTitulo = document.querySelector('.bar');
+				const header = document.querySelector('.header');
+				
+	            if (!barraTitulo) return;
+	            
+	            if (window.entornoElectron) {
+	                // En Electron: MOSTRAR barra y configurar para arrastre
+	                barraTitulo.style.display = 'flex';
+	                barraTitulo.style.setProperty('-webkit-app-region', 'drag');
+
+					header.style.height = "85vh";
+	                // Configurar botones de ventana
+	                configurarBotonesVentana();
+	            } else {
+	                // En navegador web: OCULTAR barra
+	                barraTitulo.style.display = 'none';
+
+					header.style.height = "90vh";
+	                
+	                // Ajustar márgenes para compensar la falta de barra
+	                document.body.style.marginTop = '0';
+	                document.querySelector('.main-container').style.height = 'calc(100vh - 30px)';
+	            }
+	        }
+	        
+	        // Configurar botones de control de ventana (solo en Electron)
+	        function configurarBotonesVentana() {
+	            // Buscar el botón de cerrar (el span con &times;)
+	            const closeBtn = document.querySelector('.bar span');
+	            if (closeBtn && window.electronAPI) {
+	                // Remover el onclick nativo para evitar conflictos
+	                closeBtn.removeAttribute('onclick');
+	                closeBtn.onclick = (e) => {
+	                    e.stopPropagation();
+	                    window.electronAPI.cerrarVentana();
+	                };
+	                closeBtn.style.setProperty('-webkit-app-region', 'no-drag');
+	            }
+	            
+	            // OPCIONAL: Agregar botones de minimizar y maximizar
+	            const bar = document.querySelector('.bar');
+	            if (bar && window.electronAPI && !document.querySelector('.window-controls')) {
+	                const controls = document.createElement('div');
+	                controls.className = 'window-controls';
+	                controls.style.cssText = 'display:flex; gap:8px; margin-right:10px; -webkit-app-region:no-drag';
+	                
+	                const minBtn = document.createElement('span');
+	                minBtn.textContent = '─';
+	                minBtn.style.cssText = 'cursor:pointer; font-size:24px; line-height:1; padding:0 8px;';
+	                minBtn.onclick = () => window.electronAPI.minimizarVentana();
+	                
+	                const maxBtn = document.createElement('span');
+	                maxBtn.textContent = '□';
+	                maxBtn.style.cssText = 'cursor:pointer; font-size:24px; line-height:1; padding:0 8px;';
+	                maxBtn.onclick = () => window.electronAPI.maximizarVentana();
+	                
+	                controls.appendChild(minBtn);
+	                controls.appendChild(maxBtn);
+	                
+	                // Insertar antes del botón de cerrar
+	                const closeBtnElement = document.querySelector('.bar span');
+	                if (closeBtnElement) {
+	                    bar.insertBefore(controls, closeBtnElement);
+	                }
+	            }
+	        }
+	        
+	        // Escuchar confirmación desde el proceso principal (si está en Electron)
+	        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.onEntornoDetectado) {
+	            window.electronAPI.onEntornoDetectado((data) => {
+	                console.log('Entorno detectado por Electron:', data);
+	                window.entornoElectron = true;
+	                controlarBarraTitulo();
+	            });
+	        }
+	        
+	        // Ejecutar control cuando el DOM esté listo
+	        if (document.readyState === 'loading') {
+	            document.addEventListener('DOMContentLoaded', controlarBarraTitulo);
+	        } else {
+	            controlarBarraTitulo();
+	        }
+	    })();
+	</script>
+</body>
+</html>
