@@ -3835,7 +3835,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         
         // 5. Guardar en sessionStorage y abrir ventana
         sessionStorage.setItem('pagoProveedorData', JSON.stringify(datosComprobante));
-        window.open('comprobante_pago_proveedor.php', '_blank', 'width=450,height=750,scrollbars=yes');
+        window.open('comprobante_pago_proveedor.html', '_blank', 'width=450,height=750,scrollbars=yes');
         
     } catch (error) {
         console.error('Error:', error);
@@ -6693,7 +6693,7 @@ function getFechaActual() {
             const response = await fetch('db/obtener_usuario.php');
             const data = await response.json();
             if (!data.success) {
-                window.location.href = 'index.php';
+                window.location.href = 'index.html';
             } else {
                 usuarioActual = data.user;
             }
@@ -7070,7 +7070,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
         sessionStorage.setItem('comprobanteData', JSON.stringify(datosComprobante));
         
         // ABRIR EL COMPROBANTE CORRECTO SEGÚN EL TIPO DE PAGO
-        const comprobanteUrl = trabajador.tipo_pago === 'fijo' ? 'comprobante_pago_fijo.php' : 'comprobante_pago.php';
+        const comprobanteUrl = trabajador.tipo_pago === 'fijo' ? 'comprobante_pago_fijo.html' : 'comprobante_pago.html';
         window.open(comprobanteUrl, '_blank', 'width=950,height=750,scrollbars=yes');
         
     } catch (error) {
@@ -8620,7 +8620,7 @@ async function verFactura(id) {
             };
             
             sessionStorage.setItem('facturaData', JSON.stringify(facturaData));
-            window.open('factura.php', '_blank', 'width=900,height=700,scrollbars=yes');
+            window.open('factura.html', '_blank', 'width=900,height=700,scrollbars=yes');
         } else {
             alert('Error al cargar los datos de la factura');
         }
@@ -10709,7 +10709,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         };
         
         sessionStorage.setItem('cuentaCobrarData', JSON.stringify(datosComprobante));
-        window.open('comprobante_cuenta_cobrar.php', '_blank', 'width=950,height=750,scrollbars=yes');
+        window.open('comprobante_cuenta_cobrar.html', '_blank', 'width=950,height=750,scrollbars=yes');
         
     } catch (error) {
         console.error('Error:', error);
