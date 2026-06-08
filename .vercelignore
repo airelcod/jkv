@@ -1,2 +1,5 @@
+# Ignorar TODOS los archivos PHP en cualquier carpeta
 *.php
-api/db/*.php
+**/*.php
+api/**/*.php
+db/**/*.php
