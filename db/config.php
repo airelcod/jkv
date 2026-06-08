@@ -1,9 +1,9 @@
 <?php
 // config.php
-$host = 'sql100.infinityfree.com';
-$user = 'if0_41672003';
-$password = '0tFI5TSKBFq2LoB';
-$database = 'if0_41672003_jkv';
+$host = 'sql3.freesqldatabase.com';
+$user = 'sql3829733';
+$password = '7lYY4HAu23';
+$database = 'sql3829733';
 
 $conn = new mysqli($host, $user, $password, $database);
 
