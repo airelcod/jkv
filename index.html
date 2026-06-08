@@ -6,6 +6,7 @@
     <title>Iniciar sesion - Agroindustria Lactea J.K.V. C.A.</title>
     <link rel="icon" href="source/main.ico" type="image/png">
     <style>
+        /* Tu CSS igual, sin cambios */
         @font-face {
             font-family: 'mainFont';
             src: url('source/font.ttf');
@@ -23,7 +24,6 @@
             overflow: hidden;
         }
 
-        /* Contenedor principal */
         .main-container {
             display: flex;
             position: relative;
@@ -31,7 +31,6 @@
             overflow: hidden;
         }
         
-        /* Header que se reduce */
         .header {
             display: flex;
             flex-direction: column;
@@ -49,7 +48,6 @@
             z-index: 2;
         }
 		
-
         main {
             display: flex;
             flex-direction: column;
@@ -163,7 +161,6 @@
             opacity: .8;
         }
 
-        /* Estilos para inputs */
         .input-field {
             width: 100%;
             box-sizing: border-box;
@@ -241,7 +238,6 @@
             }
         }
 
-        /* Animación sutil para el formulario */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -302,7 +298,6 @@
             errorDiv.style.display = 'none';
             errorDiv.innerHTML = '';
             
-            // Resetear estilos de inputs
             document.getElementById('loginEmail').style.borderColor = 'rgba(0,0,0,.4)';
             document.getElementById('loginPassword').style.borderColor = 'rgba(0,0,0,.4)';
         }
@@ -312,7 +307,6 @@
             errorDiv.innerHTML = mensaje;
             errorDiv.style.display = 'block';
             
-            // Animación de error
             setTimeout(() => {
                 errorDiv.style.opacity = '0';
                 setTimeout(() => {
@@ -328,7 +322,6 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            // Validar campos
             if (!email) {
                 document.getElementById('loginEmail').style.borderColor = '#f44336';
                 mostrarError('Por favor ingrese su correo electrónico');
@@ -341,18 +334,17 @@
                 return;
             }
             
-            // Resetear bordes
             document.getElementById('loginEmail').style.borderColor = 'rgba(0,0,0,.4)';
             document.getElementById('loginPassword').style.borderColor = 'rgba(0,0,0,.4)';
             
-            // Mostrar estado de carga
             const btnEntrar = document.querySelector('.form-btn');
             const textoOriginal = "Entrar";
             btnEntrar.innerHTML = '<span>Ingresando...</span>';
             btnEntrar.disabled = true;
             
             try {
-                const response = await fetch('db/login.php', {
+                // 🔥 MODIFICACIÓN 1: Cambiar la URL y extensión
+                const response = await fetch('/api/db/login.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -360,18 +352,20 @@
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    // Animación de éxito antes de redirigir
+                if (result.success && result.token) {
+                    // 🔥 MODIFICACIÓN 2: Guardar el token y datos del usuario
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
                     btnEntrar.innerHTML = '<span>Éxito!</span>';
                     setTimeout(() => {
                         window.location.href = 'main.html';
                     }, 500);
                 } else {
-                    btnEntrar.value = textoOriginal;
+                    btnEntrar.innerHTML = textoOriginal;
                     btnEntrar.disabled = false;
                     mostrarError(result.error || 'Credenciales incorrectas');
                     
-                    // Animación de shake en el formulario
                     const formBox = document.querySelector('.form-box');
                     formBox.style.transform = 'translateX(10px)';
                     setTimeout(() => {
@@ -386,13 +380,12 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                btnEntrar.value = textoOriginal;
+                btnEntrar.innerHTML = textoOriginal;
                 btnEntrar.disabled = false;
                 mostrarError('Error de conexión con el servidor');
             }
         }
         
-        // Permitir enviar con Enter
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const email = document.getElementById('loginEmail').value;
@@ -407,7 +400,6 @@
             }
         });
         
-        // Remover borde rojo al escribir
         document.getElementById('loginEmail').addEventListener('input', function() {
             this.style.borderColor = 'rgba(0,0,0,.4)';
             document.getElementById('errorMensaje').style.display = 'none';
@@ -418,12 +410,9 @@
             document.getElementById('errorMensaje').style.display = 'none';
         });
         
-        // Auto-focus en el primer campo
         document.getElementById('loginEmail').focus();
     </script>
 	<script>
-        
-        
         function cerrarVentanaElectron() {
             if (window.electronAPI && window.electronAPI.cerrarVentana) {
                 window.electronAPI.cerrarVentana();
@@ -432,27 +421,17 @@
             }
         }
         
-	    // Detección de entorno y control de barra de título
 	    (function() {
-	        // Detectar si está en Electron (múltiples métodos)
 	        const isElectron = () => {
-	            // Método 1: Detectar por userAgent
 	            const userAgent = navigator.userAgent.toLowerCase();
 	            const hasElectron = userAgent.includes('electron');
-	            
-	            // Método 2: Detectar por la API expuesta en preload
 	            const hasElectronAPI = typeof window.electronAPI !== 'undefined' && window.electronAPI.isElectron;
-	            
-	            // Método 3: Detectar por la presencia de procesos de Node
 	            const hasNodeProcess = typeof process !== 'undefined' && process.versions && process.versions.electron;
-	            
 	            return hasElectron || hasElectronAPI || hasNodeProcess;
 	        };
 	        
-	        // Variable global para saber si estamos en Electron
 	        window.entornoElectron = isElectron();
 	        
-	        // Función para controlar la visibilidad de la barra
 	        function controlarBarraTitulo() {
 	            const barraTitulo = document.querySelector('.bar');
 				const header = document.querySelector('.header');
@@ -460,31 +439,21 @@
 	            if (!barraTitulo) return;
 	            
 	            if (window.entornoElectron) {
-	                // En Electron: MOSTRAR barra y configurar para arrastre
 	                barraTitulo.style.display = 'flex';
 	                barraTitulo.style.setProperty('-webkit-app-region', 'drag');
-
 					header.style.height = "85vh";
-	                // Configurar botones de ventana
 	                configurarBotonesVentana();
 	            } else {
-	                // En navegador web: OCULTAR barra
 	                barraTitulo.style.display = 'none';
-
 					header.style.height = "90vh";
-	                
-	                // Ajustar márgenes para compensar la falta de barra
 	                document.body.style.marginTop = '0';
 	                document.querySelector('.main-container').style.height = 'calc(100vh - 30px)';
 	            }
 	        }
 	        
-	        // Configurar botones de control de ventana (solo en Electron)
 	        function configurarBotonesVentana() {
-	            // Buscar el botón de cerrar (el span con &times;)
 	            const closeBtn = document.querySelector('.bar span');
 	            if (closeBtn && window.electronAPI) {
-	                // Remover el onclick nativo para evitar conflictos
 	                closeBtn.removeAttribute('onclick');
 	                closeBtn.onclick = (e) => {
 	                    e.stopPropagation();
@@ -493,7 +462,6 @@
 	                closeBtn.style.setProperty('-webkit-app-region', 'no-drag');
 	            }
 	            
-	            // OPCIONAL: Agregar botones de minimizar y maximizar
 	            const bar = document.querySelector('.bar');
 	            if (bar && window.electronAPI && !document.querySelector('.window-controls')) {
 	                const controls = document.createElement('div');
@@ -513,7 +481,6 @@
 	                controls.appendChild(minBtn);
 	                controls.appendChild(maxBtn);
 	                
-	                // Insertar antes del botón de cerrar
 	                const closeBtnElement = document.querySelector('.bar span');
 	                if (closeBtnElement) {
 	                    bar.insertBefore(controls, closeBtnElement);
@@ -521,7 +488,6 @@
 	            }
 	        }
 	        
-	        // Escuchar confirmación desde el proceso principal (si está en Electron)
 	        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.onEntornoDetectado) {
 	            window.electronAPI.onEntornoDetectado((data) => {
 	                console.log('Entorno detectado por Electron:', data);
@@ -530,7 +496,6 @@
 	            });
 	        }
 	        
-	        // Ejecutar control cuando el DOM esté listo
 	        if (document.readyState === 'loading') {
 	            document.addEventListener('DOMContentLoaded', controlarBarraTitulo);
 	        } else {
