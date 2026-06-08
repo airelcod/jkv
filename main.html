@@ -2454,7 +2454,13 @@
 // ========== FUNCIONES PARA EXPORTAR CUENTAS POR COBRAR PENDIENTES ==========
 async function exportarCuentasPendientesCobrar() {
     try {
-        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar_pendientes');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar_pendientes', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (!data.success || !data.datos || data.datos.length === 0) {
@@ -2736,7 +2742,13 @@ let egresosDataCache = null;
 
 async function cargarEstadisticasResumen() {
     try {
-        const response = await fetch('/api/db/estadisticas.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/estadisticas.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (!data.success) {
@@ -3050,7 +3062,13 @@ function cargarResumenManual() {
     }    
         // Ver detalle de recepción
 async function verDetalleRecepcion(id) {
-    const response = await fetch(`/api/db/materia_prima.js?action=obtener_detalle_recepcion&id=${id}`);
+	const token = localStorage.getItem('token');
+    const response = await fetch(`/api/db/materia_prima.js?action=obtener_detalle_recepcion&id=${id}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const data = await response.json();
     
     if (!data.success) {
@@ -3201,7 +3219,13 @@ function editarProveedorDesdeLista(id, nombre, contacto, telefono, email, direcc
 // Cargar productos dinámicamente desde la tabla productos (mismo método que producción)
 async function cargarProductosEnSelect() {
     try {
-        const response = await fetch('/api/db/obtener_productos_mp.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_productos_mp.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         console.log('Productos recibidos:', data); // Para depuración
@@ -3297,7 +3321,13 @@ document.getElementById('mpProductoEntregadoText')?.addEventListener('input', fu
 // Cargar proveedores para el sidebar
 async function cargarProveedores() {
     try {
-        const response = await fetch('/api/db/materia_prima.js?action=obtener_proveedores');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js?action=obtener_proveedores', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarListaProveedores(data.proveedores);
@@ -3441,9 +3471,13 @@ async function eliminarProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
         });
         const result = await response.json();
@@ -3478,9 +3512,13 @@ async function eliminarProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
         });
         const result = await response.json();
@@ -3593,7 +3631,13 @@ async function cargarRecepciones(proveedorId = null) {
         if (proveedorId) {
             url += `&proveedor_id=${proveedorId}`;
         }
-        const response = await fetch(url);
+		const token = localStorage.getItem('token');
+        const response = await fetch(url, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (data.success) {
@@ -3773,7 +3817,13 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
     
     try {
         // 1. Obtener datos del proveedor
-        const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
+		const token = localStorage.getItem('token');
+        const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataProv = await responseProv.json();
         
         if (!dataProv.success) {
@@ -3782,7 +3832,13 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         }
         
         // 2. Obtener las recepciones de leche en ese período
-        const responseRecepciones = await fetch(`/api/db/materia_prima.js?action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`);
+		const token = localStorage.getItem('token');
+        const responseRecepciones = await fetch(`/api/db/materia_prima.js?action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataRecepciones = await responseRecepciones.json();
         
         if (!dataRecepciones.success || dataRecepciones.recepciones.length === 0) {
@@ -3798,7 +3854,13 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         let fechaPago = '';
         
         if (pagoId) {
-            const responsePago = await fetch(`/api/db/proveedores_pagos.js?action=obtener_pago&id=${pagoId}`);
+			const token = localStorage.getItem('token');
+            const responsePago = await fetch(`/api/db/proveedores_pagos.js?action=obtener_pago&id=${pagoId}`, {
+				headers: {
+			        'Authorization': `Bearer ${token}`,
+			        'Content-Type': 'application/json'
+			    }
+			});
             const dataPago = await responsePago.json();
             if (dataPago.success && dataPago.pago) {
                 totalPagado = parseFloat(dataPago.pago.monto_pagado);
@@ -4010,9 +4072,13 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
     console.log('Enviando datos:', data);
 
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4033,9 +4099,13 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
 async function eliminarRecepcion(id) {
     if (!confirm('¿Eliminar esta recepción?')) return;
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar', id })
         });
         const result = await response.json();
@@ -4083,9 +4153,13 @@ document.getElementById('formProveedor')?.addEventListener('submit', async (e) =
     if (id) data.id = id;
 
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4133,7 +4207,13 @@ async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
     document.getElementById('pagoFecha').value = getFechaActual();
     
     // Obtener día de corte del proveedor
-    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`);
+	const token = localStorage.getItem('token');
+    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const dataProv = await responseProv.json();
     const diaCorte = dataProv.proveedor?.dia_corte || 2;
     
@@ -7781,7 +7861,13 @@ function mostrarPagosDeDia(fecha, pagos) {
 */
     
 async function verDetallePago(pagoId) {
-    const response = await fetch(`/api/db/obtener_detalle_pago.js?id=${pagoId}`);
+	const token = localStorage.getItem('token');
+    const response = await fetch(`/api/db/obtener_detalle_pago.js?id=${pagoId}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const data = await response.json();
     
     if (!data.success) {
@@ -8187,9 +8273,13 @@ document.getElementById('formTrabajador')?.addEventListener('submit', async (e) 
     if (id) data.id = id;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/trabajadores.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         
@@ -8218,9 +8308,13 @@ async function eliminarPago(id) {
     }
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/nomina.js?action=eliminar_pago', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ id: id })
         });
         
@@ -8308,7 +8402,13 @@ function cambiarTabVentas(tab) {
 
 async function cargarProductosVenta() {
     try {
-        const response = await fetch('/api/db/obtener_productos_venta.js');
+	const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_productos_venta.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             productosVentaGlobal = data.productos;
@@ -8536,7 +8636,13 @@ function agregarFiltrosVentas() {
 // Historial de ventas - asegurar que la sucursal se muestre correctamente
 async function cargarHistorialVentas() {
     try {
-        const response = await fetch('/api/db/ventas.js?action=obtener');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/ventas.js?action=obtener', {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarHistorialVentas(data.ventas);
@@ -8597,7 +8703,13 @@ function mostrarHistorialVentas(ventas) {
 
 async function verFactura(id) {
     try {
-        const response = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${id}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${id}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (data.success && data.detalles && data.detalles.length > 0) {
@@ -8652,9 +8764,13 @@ async function eliminarVenta(id) {
     if (!confirm('¿Estás seguro de eliminar esta venta? Esta acción no se puede deshacer.')) return;
     
     try {
+		const token = localStorage('token');
         const response = await fetch('/api/db/ventas.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar', id: id })
         });
         const result = await response.json();
@@ -8835,7 +8951,13 @@ function cambiarCategoriaEgreso(categoriaNombre) {
 
 async function cargarCategoriasEgresos() {
     try {
-        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarCategoriasEgresos(data.categorias);
@@ -8967,7 +9089,13 @@ async function cargarEgresos() {
         if (categoriaActual && categoriaActual !== '0' && categoriaActual !== 'Todos') {
             url += `&categoria=${encodeURIComponent(categoriaActual)}`;
         }
-        const response = await fetch(url);
+		const token = localStorage.getItem('token');
+        const response = await fetch(url, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarTablaEgresos(data.datos);
@@ -9027,7 +9155,13 @@ function abrirFormularioEgreso() {
 
 async function cargarSelectCategorias() {
     try {
-        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/egresos.js?action=obtener_categorias&tipo=${tipoEgresoActual}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+		});
         const data = await response.json();
         const select = document.getElementById('egresoCategoria');
         if (data.success && select) {
@@ -9066,9 +9200,13 @@ document.getElementById('formEgreso')?.addEventListener('submit', async (e) => {
     };
 
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -9090,9 +9228,13 @@ async function eliminarEgreso(id) {
     if (!confirm('¿Estás seguro de eliminar este egreso?')) return;
 
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar', id: id })
         });
         const result = await response.json();
@@ -9138,9 +9280,13 @@ async function eliminarCategoriaEgreso(id, nombre) {
     if (!confirm(`¿Estás seguro de eliminar la categoría "${nombre}"?`)) return;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar_categoria', id: id })
         });
         const result = await response.json();
@@ -9177,9 +9323,13 @@ document.getElementById('formCategoriaEgreso')?.addEventListener('submit', async
     if (id) data.id = id;
     
     try {
+	const token = localStorage.getItem('token');
         const response = await fetch('/api/db/egresos.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -9225,9 +9375,13 @@ document.getElementById('formNuevoProducto')?.addEventListener('submit', async (
     const es_leche = document.getElementById('esLeche').checked;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/crear_producto.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ nombre, es_leche })
         });
         const result = await response.json();
@@ -9264,9 +9418,13 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
     const ubicacion = document.getElementById('ubicacionSucursal').value;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/crear_sucursal.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ nombre, ubicacion })
         });
         const result = await response.json();
@@ -9289,7 +9447,13 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
 // Cargar productos en los selects del formulario con botón de eliminar
 async function cargarProductosEnSelects() {
     try {
-        const response = await fetch('/api/db/obtener_productos.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_productos.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             const selectProducto = document.getElementById('tipoProductoSucursal');
@@ -9373,8 +9537,14 @@ async function verProduccionProducto(productoNombre) {
         if (sucursalActual !== 'total') {
             sucursalId = sucursalActual === 'principal' ? 1 : 2;
         }
-        
-        const response = await fetch(`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`);
+
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (!data.success) {
@@ -9672,7 +9842,13 @@ function cerrarModalConfirmacion() {
 async function eliminarSucursal(nombre, id) {
     // Primero verificar si tiene registros
     try {
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`);
+		const token = localStorage.getItem('token');
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar la sucursal "${formatearNombre(nombre)}"?`;
@@ -9690,7 +9866,13 @@ async function eliminarSucursal(nombre, id) {
 // Eliminar producto
 async function eliminarProducto(nombre, id) {
     try {
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+		const token = localStorage.getItem('token');
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
@@ -9712,9 +9894,13 @@ document.getElementById('btnConfirmarEliminar').onclick = async function() {
     const action = tipoElementoAEliminar === 'sucursal' ? 'eliminar_sucursal' : 'eliminar_producto';
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/eliminar_elemento.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ 
                 action: action, 
                 nombre: elementoAEliminar.nombre,
@@ -9751,7 +9937,13 @@ async function exportarRegistrosSucursal(nombre) {
 }
     
 async function cargarTrabajadoresPorSucursal(sucursalId) {
-    const response = await fetch(`/api/db/obtener_trabajadores_por_sucursal.js?sucursal_id=${sucursalId}`);
+	const token = localStorage.getItem('token');
+    const response = await fetch(`/api/db/obtener_trabajadores_por_sucursal.js?sucursal_id=${sucursalId}`, {
+		headers: {
+	        'Authorization': `Bearer ${token}`,
+	        'Content-Type': 'application/json'
+	    }
+	});
     const data = await response.json();
     const select = document.getElementById('trabajadorSelect');
     if (data.success) {
@@ -9769,7 +9961,13 @@ async function cargarTrabajadoresPorSucursal(sucursalId) {
 // Agrega esta versión modificada:
 async function cargarSucursalesEnSelect() {
     try {
-        const response = await fetch('/api/db/obtener_sucursales.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_sucursales.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             
@@ -9829,7 +10027,13 @@ async function cargarSucursalesEnSelect() {
 // Modificar cargarProductosEnSelects para incluir botón de eliminar
 async function cargarProductosEnSelects() {
     try {
-        const response = await fetch('/api/db/obtener_productos.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_productos.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             const selectProducto = document.getElementById('tipoProductoSucursal');
@@ -9861,7 +10065,13 @@ function abrirGestionProductos() {
 
 async function mostrarListaProductos() {
     try {
-        const response = await fetch('/api/db/obtener_productos.js');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/obtener_productos.js', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         let html = `
@@ -9920,7 +10130,13 @@ function cerrarGestionProductos() {
 async function eliminarProductoTH(nombre, id) {
     // Verificar si tiene registros
     try {
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`);
+		const token = localStorage.getItem('token');
+        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const checkData = await checkResponse.json();
         
         let mensaje = `¿Eliminar el producto "${formatearNombre(nombre)}"?`;
@@ -9931,7 +10147,10 @@ async function eliminarProductoTH(nombre, id) {
         if (confirm(mensaje)) {
             const response = await fetch('/api/db/eliminar_producto.js', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+			        'Authorization': `Bearer ${token}`,
+			        'Content-Type': 'application/json'
+			    },
                 body: JSON.stringify({ nombre: nombre, id: id })
             });
             
@@ -9968,7 +10187,13 @@ let clienteEditandoId = null;
 // --- Funciones para el Panel Lateral y Select ---
 async function cargarClientes() {
     try {
-        const response = await fetch('/api/db/clientes.js?action=obtener_todos');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/clientes.js?action=obtener_todos', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarListaClientes(data.clientes);
@@ -10092,7 +10317,13 @@ function mostrarMenuCliente(event, clienteId) {
 async function verDetallesCliente(clienteId) {
     try {
         // Obtener datos del cliente
-        const responseCliente = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`);
+		const token = localStorage.getItem('token');
+        const responseCliente = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataCliente = await responseCliente.json();
         
         if (!dataCliente.success) {
@@ -10103,11 +10334,23 @@ async function verDetallesCliente(clienteId) {
         const cliente = dataCliente.cliente;
         
         // Obtener historial de ventas del cliente
-        const responseVentas = await fetch(`/api/db/ventas.js?action=obtener_por_cliente&cliente_id=${clienteId}`);
+		const token = localStorage.getItem('token');
+        const responseVentas = await fetch(`/api/db/ventas.js?action=obtener_por_cliente&cliente_id=${clienteId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataVentas = await responseVentas.json();
         
         // Obtener deudas pendientes del cliente desde cuentas_cobrar
-        const responseDeudas = await fetch(`/api/db/cuentas.js?action=obtener_deudas_cliente&cliente_id=${clienteId}`);
+		const token = localStorage.getItem('token');
+        const responseDeudas = await fetch(`/api/db/cuentas.js?action=obtener_deudas_cliente&cliente_id=${clienteId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataDeudas = await responseDeudas.json();
         
         // Generar HTML para la ventana de detalles
@@ -10299,7 +10542,13 @@ function abrirModalCliente(id = null) {
 
 async function cargarClienteParaEditar(id) {
     try {
-        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${id}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${id}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             const c = data.cliente;
@@ -10347,9 +10596,13 @@ document.getElementById('formCliente')?.addEventListener('submit', async (e) => 
     if (id) data.id = id;
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/clientes.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -10379,9 +10632,13 @@ function eliminarClienteConfirmar(id, nombre) {
 
 async function eliminarCliente(id) {
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/clientes.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action: 'eliminar', id: id })
         });
         const result = await response.json();
@@ -10419,7 +10676,13 @@ async function cargarDatosClienteEnFormulario(clienteId) {
     }
     
     try {
-        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             const c = data.cliente;
@@ -10512,9 +10775,13 @@ ventaForm.addEventListener('submit', async (e) => {
     console.log('Datos enviados:', JSON.stringify(data, null, 2)); // Para depuración
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/ventas.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify(data)
         });
         
@@ -10654,7 +10921,13 @@ function cambiarTabCuentas(tipo) {
 
 async function cargarCuentasPagar() {
     try {
-        const response = await fetch('/api/db/cuentas.js?action=obtener_pagar');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_pagar', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'pagar');
@@ -10669,7 +10942,13 @@ async function cargarCuentasPagar() {
 
 async function cargarCuentasCobrar() {
     try {
-        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar');
+		const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'cobrar');
@@ -10688,7 +10967,13 @@ async function verEstadoCuentaCobrar(cuentaId) {
     
     try {
         // Obtener datos de la cuenta por cobrar
-        const response = await fetch(`/api/db/cuentas.js?action=obtener_detalle_cobrar&id=${cuentaId}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_detalle_cobrar&id=${cuentaId}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (!data.success) {
@@ -10697,14 +10982,26 @@ async function verEstadoCuentaCobrar(cuentaId) {
         }
         
         // Obtener los pagos de esta cuenta
-        const responsePagos = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`);
+		const token = localStorage.getItem('token');
+        const responsePagos = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataPagos = await responsePagos.json();
         
         // Si la cuenta está asociada a una venta, obtener los productos
         let detallesProductos = [];
         if (data.cuenta.venta_id) {
             try {
-                const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`);
+				const token = localStorage.getItem('token');
+                const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`, {
+					headers: {
+				        'Authorization': `Bearer ${token}`,
+				        'Content-Type': 'application/json'
+				    }
+				});
                 const dataVenta = await responseVenta.json();
                 if (dataVenta.success && dataVenta.detalles) {
                     detallesProductos = dataVenta.detalles;
@@ -10929,11 +11226,23 @@ function agregarFiltrosCuentas(containerId) {
 async function agregarResumenesDebajo(containerId) {
     try {
         // Obtener datos de proveedores
-        const responseMP = await fetch('/api/db/materia_prima.js?action=obtener&modo=tabla');
+		const token = localStorage.getItem('token');
+        const responseMP = await fetch('/api/db/materia_prima.js?action=obtener&modo=tabla', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const dataMP = await responseMP.json();
         
         // Obtener datos de producción
-        const responseProd = await fetch('/api/db/produccion_sucursal.js?action=obtener_tabla');
+		const token = localStorage.getItem('token');
+        const responseProd = await fetch('/api/db/produccion_sucursal.js?action=obtener_tabla', {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const htmlProd = await responseProd.text();
         
         // Generar el HTML de los resúmenes (USANDO TUS FUNCIONES EXISTENTES)
@@ -11210,9 +11519,13 @@ async function guardarCuenta(event) {
     const action = tipo === 'pagar' ? 'guardar_pagar' : 'guardar_cobrar';
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action, descripcion, monto, fecha_inicio, fecha_vencimiento })
         });
         const result = await response.json();
@@ -11233,9 +11546,13 @@ async function eliminarCuenta(id, tipo) {
     if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
     const action = tipo === 'pagar' ? 'eliminar_pagar' : 'eliminar_cobrar';
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({ action, id })
         });
         const result = await response.json();
@@ -11302,9 +11619,13 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
     }
     
     try {
+		const token = localStorage.getItem('token');
         const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    },
             body: JSON.stringify({
                 action: 'registrar_pago_parcial',
                 id: id, tipo: tipo,
@@ -11338,7 +11659,13 @@ document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta)
 
 async function verHistorialPagos(id, tipo) {
     try {
-        const response = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`);
+		const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
+			headers: {
+		        'Authorization': `Bearer ${token}`,
+		        'Content-Type': 'application/json'
+		    }
+		});
         const data = await response.json();
         
         if (data.success && data.pagos.length > 0) {
