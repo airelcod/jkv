@@ -1,3 +1,5 @@
+// api/db/produccion_sucursal.js - Versión corregida
+
 import { query, sendJSON, parseBody } from './config.js';
 
 export default async function handler(req, res) {
@@ -9,12 +11,18 @@ export default async function handler(req, res) {
     const { action } = req.query;
     
     if (action === 'obtener_tabla') {
-        await obtenerTabla(req, res);
+        // Esta acción devuelve HTML (para la tabla visual)
+        await obtenerTablaHTML(req, res);
         return;
     }
     
     if (action === 'obtener_produccion_producto') {
         await obtenerProduccionProducto(req, res);
+        return;
+    }
+    
+    if (action === 'obtener_resumen_produccion') {
+        await obtenerResumenProduccion(req, res);
         return;
     }
     
@@ -39,30 +47,8 @@ export default async function handler(req, res) {
     sendJSON(res, { success: false, error: 'Acción no válida: ' + action });
 }
 
-function obtenerSemanaActual() {
-    const hoy = new Date();
-    const diaSemana = hoy.getDay();
-    let inicio = new Date(hoy);
-    
-    if (diaSemana === 3) {
-        inicio = hoy;
-    } else if (diaSemana === 4) {
-        inicio.setDate(hoy.getDate() - 1);
-    } else if (diaSemana === 5) {
-        inicio.setDate(hoy.getDate() - 2);
-    } else if (diaSemana === 6) {
-        inicio.setDate(hoy.getDate() - 3);
-    } else if (diaSemana === 0) {
-        inicio.setDate(hoy.getDate() - 4);
-    } else if (diaSemana === 1) {
-        inicio.setDate(hoy.getDate() - 5);
-    } else if (diaSemana === 2) {
-        inicio.setDate(hoy.getDate() - 6);
-    }
-    return inicio;
-}
-
-async function obtenerTabla(req, res) {
+// Renombrar la función original a obtenerTablaHTML
+async function obtenerTablaHTML(req, res) {
     try {
         const trabajador_id = parseInt(req.query.trabajador_id || '0');
         const sucursal_id = parseInt(req.query.sucursal_id || '0');
@@ -207,6 +193,57 @@ async function obtenerTabla(req, res) {
     }
 }
 
+// NUEVA FUNCIÓN: Devuelve JSON con el resumen de producción
+async function obtenerResumenProduccion(req, res) {
+    try {
+        const inicioSemana = obtenerSemanaActual();
+        const fechaInicio = inicioSemana.toISOString().split('T')[0];
+        const fechaFin = new Date(inicioSemana);
+        fechaFin.setDate(inicioSemana.getDate() + 6);
+        const fechaFinStr = fechaFin.toISOString().split('T')[0];
+        
+        const querySQL = `
+            SELECT t.nombre as trabajador, 
+                   COALESCE(SUM(p.peso_kg), 0) as total_kilos,
+                   COALESCE(SUM(p.piezas), 0) as total_piezas
+            FROM produccion_diaria p
+            JOIN trabajadores t ON p.trabajador_id = t.id
+            WHERE p.fecha BETWEEN ? AND ?
+            GROUP BY t.id
+            ORDER BY t.nombre
+        `;
+        
+        const datos = await query(querySQL, [fechaInicio, fechaFinStr]);
+        
+        sendJSON(res, { success: true, produccion: datos, semana: { inicio: fechaInicio, fin: fechaFinStr } });
+    } catch (error) {
+        sendJSON(res, { success: false, error: error.message }, 500);
+    }
+}
+
+function obtenerSemanaActual() {
+    const hoy = new Date();
+    const diaSemana = hoy.getDay();
+    let inicio = new Date(hoy);
+    
+    if (diaSemana === 3) {
+        inicio = hoy;
+    } else if (diaSemana === 4) {
+        inicio.setDate(hoy.getDate() - 1);
+    } else if (diaSemana === 5) {
+        inicio.setDate(hoy.getDate() - 2);
+    } else if (diaSemana === 6) {
+        inicio.setDate(hoy.getDate() - 3);
+    } else if (diaSemana === 0) {
+        inicio.setDate(hoy.getDate() - 4);
+    } else if (diaSemana === 1) {
+        inicio.setDate(hoy.getDate() - 5);
+    } else if (diaSemana === 2) {
+        inicio.setDate(hoy.getDate() - 6);
+    }
+    return inicio;
+}
+
 async function obtenerProduccionProducto(req, res) {
     try {
         const { producto, fecha_inicio, fecha_fin, sucursal_id } = req.query;
@@ -269,7 +306,6 @@ async function obtenerProduccionProducto(req, res) {
             };
         }
         
-        // Obtener información del producto
         const prodInfo = await query("SELECT nombre, es_leche FROM productos WHERE nombre = ?", [producto]);
         const esLeche = prodInfo.length > 0 ? prodInfo[0].es_leche === 1 : false;
         
