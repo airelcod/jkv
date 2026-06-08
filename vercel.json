@@ -4,10 +4,10 @@
       "runtime": "nodejs20.x"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/db/(.*)",
-      "dest": "/api/db/$1"
+      "source": "/api/db/:path*",
+      "destination": "/api/db/:path*"
     }
   ]
 }
