@@ -2450,209 +2450,6 @@
         </div>
     </div>
 </div>
-
-	<script>
-	// Función para interceptar fetch y redirigir a /api/index.js
-function interceptFetchForVercel() {
-    // Guardar referencia al fetch original
-    const originalFetch = window.fetch;
-
-    // Mapeo de endpoints a redirigir
-    const endpointMap = {
-        // Base de datos
-        'db/obtener_usuario.js': '/api/index.js?endpoint=obtener_usuario',
-        'db/actualizar_usuario.js': '/api/index.js?endpoint=actualizar_usuario',
-        'db/lista_usuarios.js': '/api/index.js?endpoint=lista_usuarios',
-        'db/crear_usuario.js': '/api/index.js?endpoint=crear_usuario',
-        'db/actualizar_usuario_admin.js': '/api/index.js?endpoint=actualizar_usuario_admin',
-        'db/eliminar_usuario.js': '/api/index.js?endpoint=eliminar_usuario',
-        
-        // Cuentas
-        'db/cuentas.js': '/api/index.js?endpoint=cuentas',
-        
-        // Egresos
-        'db/egresos.js': '/api/index.js?endpoint=egresos',
-        
-        // Materia prima
-        'db/materia_prima.js': '/api/index.js?endpoint=materia_prima',
-        'db/proveedores_pagos.js': '/api/index.js?endpoint=proveedores_pagos',
-        
-        // Nómina
-        'db/nomina.js': '/api/index.js?endpoint=nomina',
-        'db/trabajadores.js': '/api/index.js?endpoint=trabajadores',
-        
-        // Producción
-        'db/produccion_sucursal.js': '/api/index.js?endpoint=produccion_sucursal',
-        'db/guardar_produccion.js': '/api/index.js?endpoint=guardar_produccion',
-        'db/obtener_detalle_produccion.js': '/api/index.js?endpoint=obtener_detalle_produccion',
-        'db/obtener_produccion_por_periodo.js': '/api/index.js?endpoint=obtener_produccion_por_periodo',
-        
-        // Ventas
-        'db/ventas.js': '/api/index.js?endpoint=ventas',
-        
-        // Productos
-        'db/obtener_productos.js': '/api/index.js?endpoint=obtener_productos',
-        'db/obtener_productos_mp.js': '/api/index.js?endpoint=obtener_productos_mp',
-        'db/obtener_productos_venta.js': '/api/index.js?endpoint=obtener_productos_venta',
-        'db/crear_producto.js': '/api/index.js?endpoint=crear_producto',
-        'db/eliminar_producto.js': '/api/index.js?endpoint=eliminar_producto',
-        
-        // Sucursales
-        'db/obtener_sucursales.js': '/api/index.js?endpoint=obtener_sucursales',
-        'db/crear_sucursal.js': '/api/index.js?endpoint=crear_sucursal',
-        'db/eliminar_elemento.js': '/api/index.js?endpoint=eliminar_elemento',
-        
-        // Trabajadores select
-        'db/obtener_trabajadores_select.js': '/api/index.js?endpoint=obtener_trabajadores_select',
-        'db/obtener_trabajadores_por_sucursal.js': '/api/index.js?endpoint=obtener_trabajadores_por_sucursal',
-        
-        // Cálculos
-        'db/calcular_periodo_por_corte.js': '/api/index.js?endpoint=calcular_periodo_por_corte',
-        'db/calcular_periodo_pago.js': '/api/index.js?endpoint=calcular_periodo_pago',
-        
-        // Estadísticas
-        'db/estadisticas.js': '/api/index.js?endpoint=estadisticas',
-        
-        // Otros
-        'db/obtener_detalle_pago.js': '/api/index.js?endpoint=obtener_detalle_pago',
-        'db/verificar_registros.js': '/api/index.js?endpoint=verificar_registros',
-        'db/exportar_registros.js': '/api/index.js?endpoint=exportar_registros',
-        'db/obtener_tasa_dolar.js': '/api/index.js?endpoint=obtener_tasa_dolar',
-        'db/obtener_resumen_semanal_proveedor.js': '/api/index.js?endpoint=obtener_resumen_semanal_proveedor',
-        
-        // Clientes
-        'db/clientes.js': '/api/index.js?endpoint=clientes',
-    };
-
-    // Función para extraer parámetros de una URL
-    function extractParams(urlString) {
-        const params = {};
-        const url = new URL(urlString, window.location.origin);
-        for (const [key, value] of url.searchParams) {
-            params[key] = value;
-        }
-        return params;
-    }
-
-    // Función para combinar parámetros
-    function mergeParams(urlParams, action, optionsParams) {
-        const merged = { ...urlParams, ...optionsParams };
-        if (action && !merged.action) merged.action = action;
-        return merged;
-    }
-
-    // Reemplazar fetch global
-    window.fetch = async function(input, init = {}) {
-        let url = typeof input === 'string' ? input : input.url;
-        
-        // Verificar si la URL contiene algún endpoint mapeado
-        let mappedUrl = null;
-        let endpointKey = null;
-        
-        for (const [originalPath, newPath] of Object.entries(endpointMap)) {
-            if (url.includes(originalPath)) {
-                endpointKey = originalPath;
-                mappedUrl = newPath;
-                break;
-            }
-        }
-        
-        // Si no está mapeado, pasar al fetch original
-        if (!mappedUrl) {
-            return originalFetch(input, init);
-        }
-        
-        // Extraer parámetros de la URL original
-        const urlParams = extractParams(url);
-        
-        // Extraer body si existe
-        let bodyData = {};
-        if (init.body && typeof init.body === 'string') {
-            try {
-                bodyData = JSON.parse(init.body);
-            } catch (e) {}
-        }
-        
-        // Extraer parámetros de la URL del fetch
-        let fetchUrlParams = {};
-        if (url.includes('?')) {
-            const searchParams = url.split('?')[1];
-            const params = new URLSearchParams(searchParams);
-            for (const [key, value] of params) {
-                fetchUrlParams[key] = value;
-            }
-        }
-        
-        // Combinar todos los parámetros
-        const allParams = {
-            ...urlParams,
-            ...fetchUrlParams,
-            ...bodyData
-        };
-        
-        // Construir nueva URL con parámetros
-        let newUrl = mappedUrl;
-        
-        // Crear objeto de parámetros para la nueva URL
-        const newParams = new URLSearchParams();
-        
-        // Añadir todos los parámetros
-        for (const [key, value] of Object.entries(allParams)) {
-            if (value !== undefined && value !== null && value !== '') {
-                newParams.append(key, value);
-            }
-        }
-        
-        // Si hay parámetros, añadirlos a la URL
-        const paramString = newParams.toString();
-        if (paramString) {
-            newUrl += '&' + paramString;
-        }
-        
-        console.log(`🔄 Redirigiendo: ${url} → ${newUrl}`);
-        
-        // Preparar nuevo init
-        const newInit = { ...init };
-        
-        // Si había body, eliminarlo porque ahora los parámetros van en la URL
-        if (newInit.body) {
-            delete newInit.body;
-        }
-        
-        // Si el método es GET o no tiene body, mantener
-        if (init.method === 'POST' || init.method === 'PUT') {
-            // Para POST, mantener el content-type si es necesario
-            newInit.method = init.method;
-        } else {
-            newInit.method = 'GET';
-        }
-        
-        // Realizar la petición redirigida
-        try {
-            const response = await originalFetch(newUrl, newInit);
-            
-            // Intentar parsear como JSON para logging
-            const clonedResponse = response.clone();
-            try {
-                const data = await clonedResponse.json();
-                console.log(`✅ Respuesta de ${endpointKey}:`, data.success ? 'OK' : 'Error');
-            } catch (e) {}
-            
-            return response;
-        } catch (error) {
-            console.error(`❌ Error en fetch redirigido a ${endpointKey}:`, error);
-            throw error;
-        }
-    };
-    
-    console.log('✅ Fetch interceptor activado para redirigir a /api/index.js');
-}
-
-// Ejecutar la función de interceptación inmediatamente
-interceptFetchForVercel();
-</script>
-
-
     
 <script>
 // ========== FUNCIONES PARA EXPORTAR CUENTAS POR COBRAR PENDIENTES ==========
@@ -6592,7 +6389,7 @@ function getFechaActual() {
     
     async function cargarPerfilUsuario() {
         try {
-            const response = await fetch('/api/db/obtener_usuario.js');
+            const response = await fetch('/api/index.js?endpoint=obtener_usuario');
             const data = await response.json();
             
             if (data.success) {
@@ -7021,7 +6818,7 @@ function getFechaActual() {
 	    }
 	    
 	    try {
-	        const response = await fetch('/api/db/obtener_usuario.js', {
+	        const response = await fetch('/api/index.js?endpoint=obtener_usuario', {
 	            headers: { 'Authorization': `Bearer ${token}` }
 	        });
 	        const data = await response.json();
