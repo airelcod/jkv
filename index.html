@@ -344,7 +344,7 @@
             
             try {
                 // 🔥 MODIFICACIÓN 1: Cambiar la URL y extensión
-                const response = await fetch('/api/db/login.js', {
+                const response = await fetch('/api/index.js?endpoint=login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
