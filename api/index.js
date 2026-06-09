@@ -135,13 +135,35 @@ export default async function handler(req, res) {
     }
     
     const url = new URL(req.url, `http://${req.headers.host}`);
-    let endpoint = url.pathname.replace('/api/', '').replace('.js', '').split('/')[0];
+    let endpoint = '';
     
+    // 1. Primero buscar en query string (?endpoint=xxx)
+    if (url.searchParams.has('endpoint')) {
+        endpoint = url.searchParams.get('endpoint');
+    }
+    // 2. Si no hay endpoint en query string, extraer del pathname
+    else {
+        // Para rutas como /api/db/login.js → "login"
+        const pathname = url.pathname;
+        if (pathname.startsWith('/api/db/')) {
+            endpoint = pathname.replace('/api/db/', '').replace('.js', '');
+        } 
+        // Para rutas como /api/index.js → mantener como está
+        else if (pathname === '/api/index.js') {
+            endpoint = 'index';
+        }
+        // Para otros casos
+        else {
+            endpoint = pathname.replace('/api/', '').replace('.js', '').split('/')[0];
+        }
+    }
+    
+    // Si endpoint está vacío o es 'db', buscar en query string como fallback
     if (!endpoint || endpoint === 'db') {
         endpoint = url.searchParams.get('endpoint') || '';
     }
     
-    console.log(`📡 Endpoint: ${endpoint}, Method: ${req.method}`);
+    console.log(`📡 Endpoint: ${endpoint}, Method: ${req.method}, URL: ${req.url}`);
     
     const handlers = {
         'login': () => handleLogin(req, res),
