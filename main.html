@@ -3221,7 +3221,7 @@ function editarProveedorDesdeLista(id, nombre, contacto, telefono, email, direcc
 async function cargarProductosEnSelect() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_productos_mp.js', {
+        const response = await fetch('/api/db//api/index.js?endpoint=obtener_productos_mp', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -3856,7 +3856,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         
         if (pagoId) {
 			const token = localStorage.getItem('token');
-            const responsePago = await fetch(`/api/db/proveedores_pagos.js?action=obtener_pago&id=${pagoId}`, {
+            const responsePago = await fetch(`/api/index.js?endpoint=proveedores_pagos&&action=obtener_pago&id=${pagoId}`, {
 				headers: {
 			        'Authorization': `Bearer ${token}`,
 			        'Content-Type': 'application/json'
@@ -4245,7 +4245,7 @@ async function recalcularPeriodoProveedor() {
 
 async function recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte) {
 	const token = localStorage.getItem('token');
-    const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${getFechaActual()}&dia_corte=${diaCorte}`, {
+    const responsePeriodo = await fetch(`/api/index.js?endpoint=calcular_periodo_por_corte&&fecha=${getFechaActual()}&dia_corte=${diaCorte}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -4370,7 +4370,7 @@ document.getElementById('formPagoProveedor')?.addEventListener('submit', async (
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/proveedores_pagos.js', {
+        const response = await fetch('/api/index.js?endpoint=proveedores_pagos', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -4403,7 +4403,7 @@ function cerrarModalPagoProveedor() {
 async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/proveedores_pagos.js?action=obtener_historial&proveedor_id=${proveedorId}`, {
+        const response = await fetch(`/api/index.js?endpoint=proveedores_pagos&&action=obtener_historial&proveedor_id=${proveedorId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -4804,7 +4804,7 @@ function limpiarFiltroProveedor() {
 <script>
     
 async function cargarTrabajadoresEnSelect() {
-    const response = await fetch('/api/db/obtener_trabajadores_select.js');
+    const response = await fetch('/api/index.js?endpoint=obtener_trabajadores_select');
     const data = await response.json();
     const select = document.getElementById('trabajadorSelect');
     if (data.success) {
@@ -4844,7 +4844,7 @@ async function eliminarRegistroProduccion(elemento) {
     
     try {
         // Enviar solicitud para eliminar
-        const response = await fetch('/api/db/produccion_sucursal.js', {
+        const response = await fetch('/api/index.js?endpoint=produccion_sucursal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4878,7 +4878,7 @@ async function verDetalleProduccion(elemento) {
     let sucursalId = elemento.getAttribute('data-sucursal-id');
     
     // Construir URL
-    let url = `/api/db/obtener_detalle_produccion.js?fecha=${fecha}&producto=${producto}`;
+    let url = `/api/db//api/index.js?endpoint=obtener_detalle_produccion&&fecha=${fecha}&producto=${producto}`;
     if (sucursalId && sucursalId !== '0') {
         url += `&sucursal_id=${sucursalId}`;
     }
@@ -4998,7 +4998,7 @@ async function verDetalleProduccion(elemento) {
     
 async function cargarSucursalesEnSelectTrabajador() {
     try {
-        const res = await fetch('/api/db/obtener_sucursales.js');
+        const res = await fetch('/api/index.js?endpoint=obtener_sucursales');
         const data = await res.json();
         const select = document.getElementById('trabajadorSucursal');
         
@@ -5036,7 +5036,7 @@ async function cargarSucursalesEnSelectTrabajador() {
 }
     
 async function calcularPeriodoPersonalizado(trabajador_id) {
-    const response = await fetch(`/api/db/calcular_periodo_pago.js?trabajador_id=${trabajador_id}`);
+    const response = await fetch(`/api/index.js?endpoint=calcular_periodo_pago&&trabajador_id=${trabajador_id}`);
     const data = await response.json();
     if (data.success) {
         document.getElementById('periodoInicio').value = data.inicio;
@@ -6156,7 +6156,7 @@ function exportarProduccionImprimir() {
 
 async function cargarProduccionSucursal() {
     try {
-        let url = `/api/db/produccion_sucursal.js?action=obtener_tabla`;
+        let url = `/api/index.js?endpoint=produccion_sucursal&&action=obtener_tabla`;
         
         // Si no es "total", pasar el ID de sucursal para filtrar
         if (sucursalActual !== 'total') {
@@ -6264,7 +6264,7 @@ if (formSucursal) {
         };
         
         try {
-            const response = await fetch('/api/db/produccion_sucursal.js?action=guardar', {
+            const response = await fetch('/api/index.js?endpoint=produccion_sucursal&&action=guardar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -6337,8 +6337,8 @@ function getFechaActual() {
 }
     </script>
 <script>
-    const obtenerproduccion = '/api/db/produccion_sucursal.js';
-    const guardarproduccion = '/api/db/guardar_produccion.js';
+    const obtenerproduccion = '/api/index.js?endpoint=produccion_sucursal';
+    const guardarproduccion = '/api/index.js?endpoint=guardar_produccion';
     
     let menuActual = null;
     let animando = false;
@@ -6876,7 +6876,7 @@ function toggleSueldoFijo() {
 // Cargar trabajadores para el sidebar
 async function cargarTrabajadores() {
     try {
-        const response = await fetch('/api/db/trabajadores.js?action=obtener');
+        const response = await fetch('/api/index.js?endpoint=trabajadores&&action=obtener');
         const data = await response.json();
         if (data.success) {
             mostrarListaTrabajadores(data.trabajadores);
@@ -6936,7 +6936,7 @@ function mostrarListaTrabajadores(trabajadores) {
 // Ver detalle de préstamos de un trabajador
 async function verDetallePrestamos(trabajadorId, nombre) {
     try {
-        const response = await fetch(`/api/db/trabajadores.js?action=obtener_prestamos&trabajador_id=${trabajadorId}`);
+        const response = await fetch(`/api/index.js?endpoint=trabajadores&&action=obtener_prestamos&trabajador_id=${trabajadorId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -7124,7 +7124,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     try {
-        const responseTrabajador = await fetch(`/api/db/trabajadores.js?action=obtener_uno&id=${trabajadorId}`);
+        const responseTrabajador = await fetch(`/api/index.js?endpoint=trabajadores&&action=obtener_uno&id=${trabajadorId}`);
         const dataTrabajador = await responseTrabajador.json();
         
         if (!dataTrabajador.success) {
@@ -7133,7 +7133,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
         }
         
         const trabajador = dataTrabajador.trabajador;
-        const responseDeuda = await fetch(`/api/db/trabajadores.js?action=obtener_deuda&trabajador_id=${trabajadorId}`);
+        const responseDeuda = await fetch(`/api/index.js?endpoint=trabajadores&&action=obtener_deuda&trabajador_id=${trabajadorId}`);
         const dataDeuda = await responseDeuda.json();
         const deudaPendiente = dataDeuda.success ? dataDeuda.deuda : 0;
         
@@ -7141,7 +7141,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
         const fechaActual = hoy.toISOString().split('T')[0];
         const diaCorte = trabajador.dia_corte || 2;
         
-        const responsePeriodo = await fetch(`/api/db/calcular_periodo_por_corte.js?fecha=${fechaActual}&dia_corte=${diaCorte}`);
+        const responsePeriodo = await fetch(`/api/index.js?endpoint=calcular_periodo_por_corte&&fecha=${fechaActual}&dia_corte=${diaCorte}`);
         const dataPeriodo = await responsePeriodo.json();
         
         if (!dataPeriodo.success) {
@@ -7166,7 +7166,7 @@ async function calcularPagoTrabajador(trabajadorId, nombre) {
                 cantidad: parseFloat(trabajador.sueldo_fijo) || 0
             }];
         } else {
-            const responseProd = await fetch(`/api/db/obtener_produccion_por_periodo.js?trabajador_id=${trabajadorId}&inicio=${periodoInicio}&fin=${periodoFin}`);
+            const responseProd = await fetch(`/api/index.js?endpoint=obtener_produccion_por_periodo&&trabajador_id=${trabajadorId}&inicio=${periodoInicio}&fin=${periodoFin}`);
             const dataProd = await responseProd.json();
             if (!dataProd.success) {
                 alert('Error al cargar la producción');
@@ -7222,7 +7222,7 @@ function eliminarTrabajadorConfirmar(id, nombre) {
 // Eliminar trabajador
 async function eliminarTrabajador(id) {
     try {
-        const response = await fetch('/api/db/trabajadores.js', {
+        const response = await fetch('/api/index.js?endpoint=trabajadores', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'eliminar', id: id })
@@ -7311,7 +7311,7 @@ document.getElementById('formPrestamo')?.addEventListener('submit', async (e) =>
     const descripcion = document.getElementById('prestamoDescripcion').value;
     
     try {
-        const response = await fetch('/api/db/trabajadores.js?action=guardar_prestamo', {
+        const response = await fetch('/api/index.js?endpoint=trabajadores&&action=guardar_prestamo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ trabajador_id, monto, fecha, descripcion })
@@ -7359,7 +7359,7 @@ function calcularSemanaActual() {
 // Cargar SOLO días que tienen pagos
 async function cargarDiasConPagos() {
     try {
-        const response = await fetch('/api/db/nomina.js?action=obtener_dias_con_pagos');
+        const response = await fetch('/api/index.js?endpoint=nomina&&action=obtener_dias_con_pagos');
         const data = await response.json();
         
         // Ocultar o mostrar el enlace de historial completo según si hay pagos
@@ -7460,7 +7460,7 @@ function cambiarDiaPago(fecha) {
 }
 
 async function cargarPagosPorDia(fecha) {
-    const response = await fetch(`/api/db/nomina.js?action=obtener_pagos_por_dia&fecha=${fecha}`);
+    const response = await fetch(`/api/index.js?endpoint=nomina&&action=obtener_pagos_por_dia&fecha=${fecha}`);
     const data = await response.json();
     if (data.success) {
         mostrarPagosDeDia(fecha, data.pagos);
@@ -7520,7 +7520,7 @@ async function actualizarPestañasPagos() {
 
 // Ver historial completo
 async function verHistorialCompleto() {
-    const response = await fetch('/api/db/nomina.js?action=obtener_historial_completo');
+    const response = await fetch('/api/index.js?endpoint=nomina&&action=obtener_historial_completo');
     const data = await response.json();
     
     if (!data.success) {
@@ -7597,7 +7597,7 @@ async function abrirModalRegistrarPago() {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     try {
-        const response = await fetch('/api/db/trabajadores.js?action=obtener');
+        const response = await fetch('/api/index.js?endpoint=trabajadores&&action=obtener');
         const data = await response.json();
         if (data.success) {
             const select = document.getElementById('nominaSelectTrabajador');
@@ -7631,7 +7631,7 @@ document.getElementById('nominaSelectTrabajador').addEventListener('change', asy
     const trabajadorId = this.value;
     if (!trabajadorId) return;
     
-    const response = await fetch(`/api/db/calcular_periodo_pago.js?trabajador_id=${trabajadorId}`);
+    const response = await fetch(`/api/index.js?endpoint=calcular_periodo_pago&&trabajador_id=${trabajadorId}`);
     const data = await response.json();
     
     if (data.success) {
@@ -7710,7 +7710,7 @@ document.getElementById('formRegistrarPagoNomina')?.addEventListener('submit', a
     };
     
     try {
-        const response = await fetch('/api/db/nomina.js?action=guardar_pago', {
+        const response = await fetch('/api/index.js?endpoint=nomina&&action=guardar_pago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dataToSend)
@@ -7897,7 +7897,7 @@ function mostrarPagosDeDia(fecha, pagos) {
     
 async function verDetallePago(pagoId) {
 	const token = localStorage.getItem('token');
-    const response = await fetch(`/api/db/obtener_detalle_pago.js?id=${pagoId}`, {
+    const response = await fetch(`/api/index.js?endpoint=obtener_detalle_pago&&id=${pagoId}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -8309,7 +8309,7 @@ document.getElementById('formTrabajador')?.addEventListener('submit', async (e) 
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/trabajadores.js', {
+        const response = await fetch('/api/index.js?endpoint=trabajadores', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -8344,7 +8344,7 @@ async function eliminarPago(id) {
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/nomina.js?action=eliminar_pago', {
+        const response = await fetch('/api/index.js?endpoint=nomina&&action=eliminar_pago', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -8438,7 +8438,7 @@ function cambiarTabVentas(tab) {
 async function cargarProductosVenta() {
     try {
 	const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_productos_venta.js', {
+        const response = await fetch('/api/db//api/index.js?endpoint=obtener_productos_venta', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -8672,7 +8672,7 @@ function agregarFiltrosVentas() {
 async function cargarHistorialVentas() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js?action=obtener', {
+        const response = await fetch('/api/index.js?endpoint=ventas&&action=obtener', {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -8739,7 +8739,7 @@ function mostrarHistorialVentas(ventas) {
 async function verFactura(id) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${id}`, {
+        const response = await fetch(`/api/index.js?endpoint=ventas&&action=obtener_detalle&id=${id}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -8800,7 +8800,7 @@ async function eliminarVenta(id) {
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js', {
+        const response = await fetch('/api/index.js?endpoint=ventas', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -9411,7 +9411,7 @@ document.getElementById('formNuevoProducto')?.addEventListener('submit', async (
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/crear_producto.js', {
+        const response = await fetch('/api/index.js?endpoint=crear_producto', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -9454,7 +9454,7 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/crear_sucursal.js', {
+        const response = await fetch('/api/index.js?endpoint=crear_sucursal', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -9483,7 +9483,7 @@ document.getElementById('formNuevaSucursal')?.addEventListener('submit', async (
 async function cargarProductosEnSelects() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_productos.js', {
+        const response = await fetch('/api/index.js?endpoint=obtener_productos', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -9574,7 +9574,7 @@ async function verProduccionProducto(productoNombre) {
         }
 
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`, {
+        const response = await fetch(`/api/index.js?endpoint=produccion_sucursal&&action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -9738,7 +9738,7 @@ async function verProduccionProducto(productoNombre) {
                             return;
                         }
                         
-                        fetch(\`/api/db/produccion_sucursal.js?action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
+                        fetch(\`/api/index.js?endpoint=produccion_sucursal&&action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
                             .then(res => res.json())
                             .then(data => {
                                 if (data.success) {
@@ -9878,7 +9878,7 @@ async function eliminarSucursal(nombre, id) {
     // Primero verificar si tiene registros
     try {
 		const token = localStorage.getItem('token');
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, {
+        const checkResponse = await fetch(`/api/index.js?endpoint=verificar_registros&&tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -9902,7 +9902,7 @@ async function eliminarSucursal(nombre, id) {
 async function eliminarProducto(nombre, id) {
     try {
 		const token = localStorage.getItem('token');
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
+        const checkResponse = await fetch(`/api/index.js?endpoint=verificar_registros&&tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -9930,7 +9930,7 @@ document.getElementById('btnConfirmarEliminar').onclick = async function() {
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/eliminar_elemento.js', {
+        const response = await fetch('/api/index.js?endpoint=eliminar_elemento', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -9964,7 +9964,7 @@ document.getElementById('btnConfirmarEliminar').onclick = async function() {
 // Exportar registros de sucursal
 async function exportarRegistrosSucursal(nombre) {
     try {
-        window.open(`/api/db/exportar_registros.js?tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, '_blank');
+        window.open(`/api/db//api/index.js?endpoint=exportar_registros&&tipo=sucursal&nombre=${encodeURIComponent(nombre)}`, '_blank');
     } catch (error) {
         console.error('Error:', error);
         alert('Error al exportar');
@@ -9973,7 +9973,7 @@ async function exportarRegistrosSucursal(nombre) {
     
 async function cargarTrabajadoresPorSucursal(sucursalId) {
 	const token = localStorage.getItem('token');
-    const response = await fetch(`/api/db/obtener_trabajadores_por_sucursal.js?sucursal_id=${sucursalId}`, {
+    const response = await fetch(`/api/index.js?endpoint=obtener_trabajadores_por_sucursal&&sucursal_id=${sucursalId}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -9997,7 +9997,7 @@ async function cargarTrabajadoresPorSucursal(sucursalId) {
 async function cargarSucursalesEnSelect() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_sucursales.js', {
+        const response = await fetch('/api/index.js?endpoint=obtener_sucursales', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10063,7 +10063,7 @@ async function cargarSucursalesEnSelect() {
 async function cargarProductosEnSelects() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_productos.js', {
+        const response = await fetch('/api/index.js?endpoint=obtener_productos', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10101,7 +10101,7 @@ function abrirGestionProductos() {
 async function mostrarListaProductos() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/obtener_productos.js', {
+        const response = await fetch('/api/index.js?endpoint=obtener_productos', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10166,7 +10166,7 @@ async function eliminarProductoTH(nombre, id) {
     // Verificar si tiene registros
     try {
 		const token = localStorage.getItem('token');
-        const checkResponse = await fetch(`/api/db/verificar_registros.js?tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
+        const checkResponse = await fetch(`/api/index.js?endpoint=verificar_registros&&tipo=producto&nombre=${encodeURIComponent(nombre)}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10180,7 +10180,7 @@ async function eliminarProductoTH(nombre, id) {
         }
         
         if (confirm(mensaje)) {
-            const response = await fetch('/api/db/eliminar_producto.js', {
+            const response = await fetch('/api/index.js?endpoint=eliminar_producto', {
                 method: 'POST',
                 headers: {
 			        'Authorization': `Bearer ${token}`,
@@ -10223,7 +10223,7 @@ let clienteEditandoId = null;
 async function cargarClientes() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/clientes.js?action=obtener_todos', {
+        const response = await fetch('/api/index.js?endpoint=clientes&&action=obtener_todos', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10353,7 +10353,7 @@ async function verDetallesCliente(clienteId) {
     try {
         // Obtener datos del cliente
 		const token = localStorage.getItem('token');
-        const responseCliente = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
+        const responseCliente = await fetch(`/api/index.js?endpoint=clientes&&action=obtener_uno&id=${clienteId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10370,7 +10370,7 @@ async function verDetallesCliente(clienteId) {
         
         // Obtener historial de ventas del cliente
 		const token = localStorage.getItem('token');
-        const responseVentas = await fetch(`/api/db/ventas.js?action=obtener_por_cliente&cliente_id=${clienteId}`, {
+        const responseVentas = await fetch(`/api/index.js?endpoint=ventas&&action=obtener_por_cliente&cliente_id=${clienteId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10578,7 +10578,7 @@ function abrirModalCliente(id = null) {
 async function cargarClienteParaEditar(id) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${id}`, {
+        const response = await fetch(`/api/index.js?endpoint=clientes&&action=obtener_uno&id=${id}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10632,7 +10632,7 @@ document.getElementById('formCliente')?.addEventListener('submit', async (e) => 
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/clientes.js', {
+        const response = await fetch('/api/index.js?endpoint=clientes', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -10668,7 +10668,7 @@ function eliminarClienteConfirmar(id, nombre) {
 async function eliminarCliente(id) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/clientes.js', {
+        const response = await fetch('/api/index.js?endpoint=clientes', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -10712,7 +10712,7 @@ async function cargarDatosClienteEnFormulario(clienteId) {
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
+        const response = await fetch(`/api/index.js?endpoint=clientes&&action=obtener_uno&id=${clienteId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10811,7 +10811,7 @@ ventaForm.addEventListener('submit', async (e) => {
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js', {
+        const response = await fetch('/api/index.js?endpoint=ventas', {
             method: 'POST',
             headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -11031,7 +11031,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         if (data.cuenta.venta_id) {
             try {
 				const token = localStorage.getItem('token');
-                const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`, {
+                const responseVenta = await fetch(`/api/index.js?endpoint=ventas&&action=obtener_detalle&id=${data.cuenta.venta_id}`, {
 					headers: {
 				        'Authorization': `Bearer ${token}`,
 				        'Content-Type': 'application/json'
@@ -11272,7 +11272,7 @@ async function agregarResumenesDebajo(containerId) {
         
         // Obtener datos de producción
 		const token = localStorage.getItem('token');
-        const responseProd = await fetch('/api/db/produccion_sucursal.js?action=obtener_tabla', {
+        const responseProd = await fetch('/api/index.js?endpoint=produccion_sucursal&&action=obtener_tabla', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
