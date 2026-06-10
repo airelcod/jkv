@@ -10931,25 +10931,38 @@ function cambiarTabCuentas(tipo) {
     const btns = document.querySelectorAll('.tab-cuentas-btn');
     
     if (tipo === 'pagar') {
-        tabPagar.style.display = 'block';
-        tabCobrar.style.display = 'none';
-        btns[0].style.background = '#278233';
-        btns[0].style.color = 'white';
-        btns[1].style.background = '#ddd';
-        btns[1].style.color = '#333';
+        if (tabPagar) tabPagar.style.display = 'block';
+        if (tabCobrar) tabCobrar.style.display = 'none';
+        if (btns[0]) {
+            btns[0].style.background = '#278233';
+            btns[0].style.color = 'white';
+        }
+        if (btns[1]) {
+            btns[1].style.background = '#ddd';
+            btns[1].style.color = '#333';
+        }
     } else {
-        tabPagar.style.display = 'none';
-        tabCobrar.style.display = 'block';
-        btns[1].style.background = '#278233';
-        btns[1].style.color = 'white';
-        btns[0].style.background = '#ddd';
-        btns[0].style.color = '#333';
+        if (tabPagar) tabPagar.style.display = 'none';
+        if (tabCobrar) tabCobrar.style.display = 'block';
+        if (btns[1]) {
+            btns[1].style.background = '#278233';
+            btns[1].style.color = 'white';
+        }
+        if (btns[0]) {
+            btns[0].style.background = '#ddd';
+            btns[0].style.color = '#333';
+        }
     }
 }
 
 async function cargarCuentasPagar() {
     try {
         const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No hay token de autenticación');
+            document.getElementById('tabPagar').innerHTML = '<div class="cargando">No autenticado</div>';
+            return;
+        }
         const response = await fetch('/api/db/cuentas.js?action=obtener_pagar', {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -10963,7 +10976,7 @@ async function cargarCuentasPagar() {
             document.getElementById('tabPagar').innerHTML = '<div class="cargando">Error al cargar datos</div>';
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error en cargarCuentasPagar:', error);
         document.getElementById('tabPagar').innerHTML = '<div class="cargando">Error de conexión</div>';
     }
 }
@@ -10971,6 +10984,11 @@ async function cargarCuentasPagar() {
 async function cargarCuentasCobrar() {
     try {
         const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No hay token de autenticación');
+            document.getElementById('tabCobrar').innerHTML = '<div class="cargando">No autenticado</div>';
+            return;
+        }
         const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar', {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -10984,7 +11002,7 @@ async function cargarCuentasCobrar() {
             document.getElementById('tabCobrar').innerHTML = '<div class="cargando">Error al cargar datos</div>';
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error en cargarCuentasCobrar:', error);
         document.getElementById('tabCobrar').innerHTML = '<div class="cargando">Error de conexión</div>';
     }
 }
@@ -11064,17 +11082,22 @@ function mostrarTablaCuentas(cuentas, tipo) {
     
     agregarFiltrosCuentas(containerId);
     
+    if (!cuentas || cuentas.length === 0) {
+        document.getElementById(containerId).innerHTML = '<div class="cargando">No hay cuentas registradas</div>';
+        return;
+    }
+    
     let html = '<div><table class="tabla-produccion">';
     html += '<thead><tr>';
-    html += '<th>Descripción</th><th>Monto</th><th>Pagado</th><th></th><th>Vencimiento</th><th>Estado</th><th></th>';
+    html += '<th>Descripción</th><th>Monto Original</th><th>Pagado</th><th>Pendiente</th><th>Vencimiento</th><th>Estado</th><th></th>';
     html += '</thead><tbody style="font-size:14px;">';
     
     cuentas.forEach(cuenta => {
         const vencimiento = new Date(cuenta.fecha_vencimiento);
         const estaVencido = (vencimiento < hoy && cuenta.estado === 'pendiente');
-        const montoOriginal = parseFloat(cuenta.monto);
+        const montoOriginal = parseFloat(cuenta.monto_original || cuenta.monto || 0);
         const montoPagado = parseFloat(cuenta.monto_pagado || 0);
-        const montoPendiente = parseFloat(cuenta.monto_pendiente);
+        const montoPendiente = parseFloat(cuenta.monto_pendiente || (montoOriginal - montoPagado));
         const porcentajePagado = montoOriginal > 0 ? (montoPagado / montoOriginal) * 100 : 0;
         
         let claseMonto = '';
@@ -11096,7 +11119,7 @@ function mostrarTablaCuentas(cuentas, tipo) {
             textoEstado = esPagar ? 'PAGADO' : 'COBRADO';
         }
         
-        const puedePagar = (cuenta.estado === 'pendiente' || estaVencido) && montoPendiente > 0;
+        const puedePagar = (cuenta.estado === 'pendiente' || estaVencido) && montoPendiente > 0.01;
         const textoBoton = esPagar ? '✓' : '✓';
 
         if (tipo === 'cobrar') {
@@ -11104,18 +11127,18 @@ function mostrarTablaCuentas(cuentas, tipo) {
         } else {
             html += `<tr>`;
         }
-        html += `<td>
-                    <strong>${escapeHtml(cuenta.descripcion)}</strong>
-                    ${cuenta.venta_id ? '<br><small>Factura #' + cuenta.venta_id + '</small>' : ''}
-                 </div></td>`;
-        html += `<td>$${montoOriginal.toFixed(2)}</br><small>original</small></td>`;
+        
+        html += `<td><strong>${escapeHtml(cuenta.descripcion)}</strong>${cuenta.venta_id ? '<br><small>Factura #' + cuenta.venta_id + '</small>' : ''}</td>`;
+        html += `<td>$${montoOriginal.toFixed(2)}</td>`;
+        
         if (montoPagado > 0) {
-            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
-        }else{
-            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
+            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}<div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
+        } else {
+            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}<div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:0%; height:6px; border-radius:4px;"></div></div></div></td>`;
         }
-        html += `<td class="${claseMonto}"><strong>$${montoPendiente.toFixed(2)}</strong></br><small>pendiente</small></td>`;
-        html += `<td>${formatearFechaCuenta(cuenta.fecha_vencimiento)}</br><small>${estaVencido ? 'VENCIDA' : ''}</small></td>`;
+        
+        html += `<td class="${claseMonto}"><strong>$${montoPendiente.toFixed(2)}</strong></td>`;
+        html += `<td>${formatearFechaCuenta(cuenta.fecha_vencimiento)}<br><small>${estaVencido ? 'VENCIDA' : ''}</small></td>`;
         html += `<td><span class="${claseEstado}">${textoEstado}</span></td>`;
         html += '<td><div style="display: flex; gap: 5px;">';
         
@@ -11123,7 +11146,7 @@ function mostrarTablaCuentas(cuentas, tipo) {
             html += `<button class="btn-editar" onclick="event.stopPropagation();abrirModalPagoParcial(${cuenta.id}, '${tipo}', '${escapeHtml(cuenta.descripcion)}', ${montoPendiente})" style="background: #278233; color: white;">${textoBoton}</button>`;
         }
         
-        if (montoPagado === 0 || montoPagado === montoOriginal) {
+        if (montoPagado === 0 || Math.abs(montoPagado - montoOriginal) < 0.01) {
             html += `<button class="btn-eliminar" onclick="eliminarCuenta(${cuenta.id}, '${tipo}')">∅</button>`;
         }
         
@@ -11193,9 +11216,9 @@ function agregarFiltrosCuentas(containerId) {
         const tablaActual = container.querySelector('table');
         if (!tablaActual) return;
         
-        const filtroTexto = inputBusqueda.value.toLowerCase();
-        const fechaInicioVal = fechaInicio.value;
-        const fechaFinVal = fechaFin.value;
+        const filtroTexto = inputBusqueda ? inputBusqueda.value.toLowerCase() : '';
+        const fechaInicioVal = fechaInicio ? fechaInicio.value : '';
+        const fechaFinVal = fechaFin ? fechaFin.value : '';
         const filas = tablaActual.querySelectorAll('tbody tr');
         
         filas.forEach(fila => {
@@ -11222,9 +11245,9 @@ function agregarFiltrosCuentas(containerId) {
     }
     
     function limpiarFiltros() {
-        inputBusqueda.value = '';
-        fechaInicio.value = '';
-        fechaFin.value = '';
+        if (inputBusqueda) inputBusqueda.value = '';
+        if (fechaInicio) fechaInicio.value = '';
+        if (fechaFin) fechaFin.value = '';
         aplicarFiltros();
     }
     
