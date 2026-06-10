@@ -10523,7 +10523,6 @@ async function verDetallesCliente(clienteId) {
         const dataVentas = await responseVentas.json();
         
         // Obtener deudas pendientes del cliente desde cuentas_cobrar
-		const token = localStorage.getItem('token');
         const responseDeudas = await fetch(`/api/index.js?endpoint=cuentas&&action=obtener_deudas_cliente&cliente_id=${clienteId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
