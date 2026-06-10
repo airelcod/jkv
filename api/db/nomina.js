@@ -316,22 +316,37 @@ async function guardarPago(data, res) {
     }
 }
 
-async function eliminarPago(data, res) {
+async function eliminarPago(id) {
+    if (!confirm('¿Estás seguro de eliminar este pago? Esta acción también restaurará los préstamos pagados en esta transacción.')) {
+        return;
+    }
+    
     try {
-        await transaction(async (conn) => {
-            const [pago] = await conn.execute("SELECT * FROM nomina_pagos WHERE id = ?", [data.id]);
-            
-            if (pago.length === 0) {
-                throw new Error('Pago no encontrado');
-            }
-            
-            // Eliminar detalle de valores si existe
-            await conn.execute("DELETE FROM pago_detalle_valores WHERE pago_id = ?", [data.id]);
-            await conn.execute("DELETE FROM nomina_pagos WHERE id = ?", [data.id]);
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/nomina.js', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                action: 'eliminar_pago',  // 🔑 IMPORTANTE: Agregar el action
+                id: id 
+            })
         });
         
-        sendJSON(res, { success: true, message: 'Pago eliminado correctamente' });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Pago eliminado correctamente');
+            // Recargar todo
+            if (typeof cargarTrabajadores === 'function') cargarTrabajadores();
+            if (typeof cargarDiasConPagos === 'function') cargarDiasConPagos();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
     } catch (error) {
-        sendJSON(res, { success: false, error: error.message }, 500);
+        console.error('Error:', error);
+        alert('❌ Error al eliminar el pago');
     }
 }
