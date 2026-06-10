@@ -7985,13 +7985,16 @@ async function eliminarPago(id) {
     
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/nomina.js?action=eliminar_pago', {
+        const response = await fetch('/api/db/nomina.js', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id: id })
+            body: JSON.stringify({ 
+                action: 'eliminar_pago',  // 🔑 IMPORTANTE: Agregar el action
+                id: id 
+            })
         });
         
         const result = await response.json();
