@@ -10957,12 +10957,13 @@ function cambiarTabCuentas(tipo) {
 
 async function cargarCuentasPagar() {
     try {
-        const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_pagar', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_pagar', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'pagar');
@@ -10977,12 +10978,13 @@ async function cargarCuentasPagar() {
 
 async function cargarCuentasCobrar() {
     try {
-        const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_cobrar', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js?action=obtener_cobrar', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         if (data.success) {
             mostrarTablaCuentas(data.datos, 'cobrar');
@@ -11002,7 +11004,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
     try {
         // Obtener datos de la cuenta por cobrar
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_detalle_cobrar&id=${cuentaId}`, {
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_detalle_cobrar&id=${cuentaId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11017,7 +11019,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         
         // Obtener los pagos de esta cuenta
 		const token = localStorage.getItem('token');
-        const responsePagos = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
+        const responsePagos = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11030,7 +11032,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         if (data.cuenta.venta_id) {
             try {
 				const token = localStorage.getItem('token');
-                const responseVenta = await fetch(`/api/index.js?endpoint=ventas&action=obtener_detalle&id=${data.cuenta.venta_id}`, {
+                const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`, {
 					headers: {
 				        'Authorization': `Bearer ${token}`,
 				        'Content-Type': 'application/json'
@@ -11553,13 +11555,13 @@ async function guardarCuenta(event) {
     const action = tipo === 'pagar' ? 'guardar_pagar' : 'guardar_cobrar';
     
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=cuentas', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action, descripcion, monto, fecha_inicio, fecha_vencimiento })
         });
         const result = await response.json();
@@ -11580,13 +11582,13 @@ async function eliminarCuenta(id, tipo) {
     if (!confirm('¿Estás seguro de eliminar esta cuenta?')) return;
     const action = tipo === 'pagar' ? 'eliminar_pagar' : 'eliminar_cobrar';
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=cuentas', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action, id })
         });
         const result = await response.json();
@@ -11654,12 +11656,12 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
     
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=cuentas', {
+        const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 action: 'registrar_pago_parcial',
                 id: id, tipo: tipo,
@@ -11694,7 +11696,7 @@ document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta)
 async function verHistorialPagos(id, tipo) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
+        const response = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
