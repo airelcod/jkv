@@ -20,6 +20,18 @@ export default async function handler(req, res) {
             case 'obtener_detalle':
                 await obtenerDetalleVenta(req, res);
                 break;
+            case 'obtener_clientes':
+                await obtenerClientes(res);
+                break;
+            case 'obtener_cliente':
+                await obtenerCliente(req, res);
+                break;
+            case 'obtener_cliente_detalle':
+                await obtenerClienteDetalle(req, res);
+                break;
+            case 'obtener_productos':
+                await obtenerProductosVenta(res);
+                break;
             default:
                 sendJSON(res, { success: false, error: 'Acción no válida: ' + action });
         }
@@ -36,6 +48,18 @@ export default async function handler(req, res) {
                 break;
             case 'eliminar':
                 await eliminarVenta(data, res);
+                break;
+            case 'guardar_cliente':
+                await guardarCliente(data, res);
+                break;
+            case 'actualizar_cliente':
+                await actualizarCliente(data, res);
+                break;
+            case 'eliminar_cliente':
+                await eliminarCliente(data, res);
+                break;
+            case 'guardar_venta':
+                await guardarVenta(data, res);
                 break;
             default:
                 sendJSON(res, { success: false, error: 'Acción no válida: ' + postAction });
