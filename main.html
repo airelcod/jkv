@@ -8390,7 +8390,6 @@ function getFechaActual() {
     
     
 <script>
-    
 // ========== MÓDULO DE VENTAS ==========
 let productosVentaGlobal = [];
 
@@ -8399,10 +8398,11 @@ function abrirModalVentas() {
     
     document.getElementById('modalVentas').style.display = 'block';
     document.getElementById('ventaFecha').value = getFechaActual();
+    cargarClientesParaVenta();
     cargarProductosVenta();
     cargarHistorialVentas();
 }
-    
+
 document.querySelector('.close-ventas')?.addEventListener('click', () => {
     cerrarModalVentas();
 });
@@ -8423,6 +8423,8 @@ function cambiarTabVentas(tab) {
         btns[0].style.color = 'white';
         btns[1].style.background = '#ddd';
         btns[1].style.color = '#333';
+        // Cargar productos y clientes al entrar a la pestaña nueva
+        cargarClientesParaVenta();
     } else {
         tabNueva.style.display = 'none';
         tabHistorial.style.display = 'block';
@@ -8434,15 +8436,439 @@ function cambiarTabVentas(tab) {
     }
 }
 
+// ========== CLIENTES PARA VENTAS (usa ventas.js) ==========
+async function cargarClientesParaVenta() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/ventas.js?action=obtener_clientes', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            mostrarListaClientesVenta(data.clientes);
+            cargarSelectClientesVenta(data.clientes);
+        } else {
+            document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">Error al cargar clientes</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">Error de conexión</div>';
+    }
+}
+
+function mostrarListaClientesVenta(clientes) {
+    if (!clientes || clientes.length === 0) {
+        document.getElementById('listaClientesVenta').innerHTML = '<div class="cargando">No hay clientes registrados</div>';
+        return;
+    }
+
+    let html = '';
+    clientes.forEach(c => {
+        html += `
+            <div class="menu-opcion" style="margin-bottom: 8px; padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1; cursor: pointer;" onclick="seleccionarClienteVenta(${c.id})" title="Seleccionar para la venta">
+                        <strong style="color:#222">${escapeHtml(c.nombre)}</strong>
+                        <p style="font-size: 11px; color: #666;">${c.rif || 'Sin RIF'} | ${c.telefono || 'Sin teléfono'}</p>
+                    </div>
+                    <div>
+                        <button class="btn-menu-cliente" 
+                                data-id="${c.id}"
+                                data-nombre="${escapeHtml(c.nombre)}"
+                                data-rif="${escapeHtml(c.rif || '')}"
+                                data-telefono="${escapeHtml(c.telefono || '')}"
+                                data-contacto="${escapeHtml(c.contacto || '')}"
+                                data-email="${escapeHtml(c.email || '')}"
+                                data-direccion="${escapeHtml(c.direccion || '')}"
+                                onclick="mostrarMenuClienteVenta(event, ${c.id})"
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555; padding: 0 8px;">
+                            ⋮
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('listaClientesVenta').innerHTML = html;
+}
+
+function cargarSelectClientesVenta(clientes) {
+    const select = document.getElementById('ventaClienteId');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
+    clientes.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${c.nombre} ${c.rif ? `- ${c.rif}` : ''}`;
+        select.appendChild(option);
+    });
+}
+
+// Menú contextual para clientes (usa ventas.js)
+function mostrarMenuClienteVenta(event, clienteId) {
+    event.stopPropagation();
+    
+    const menuExistente = document.getElementById('menuContextualClienteVenta');
+    if (menuExistente) menuExistente.remove();
+    
+    const btn = event.currentTarget;
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const rif = btn.getAttribute('data-rif') || '';
+    const telefono = btn.getAttribute('data-telefono') || '';
+    const contacto = btn.getAttribute('data-contacto') || '';
+    const email = btn.getAttribute('data-email') || '';
+    const direccion = btn.getAttribute('data-direccion') || '';
+    
+    const menu = document.createElement('div');
+    menu.id = 'menuContextualClienteVenta';
+    menu.style.cssText = `
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        min-width: 220px;
+        overflow: hidden;
+    `;
+    
+    menu.innerHTML = `
+        <div class="menu-opcion-item" onclick="cerrarMenuClienteVenta(); verDetallesClienteVenta(${clienteId})" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver detalles</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuClienteVenta(); editarClienteVenta(${clienteId}, '${escapeHtml(nombre)}', '${escapeHtml(rif)}', '${escapeHtml(telefono)}', '${escapeHtml(contacto)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>✎ Editar cliente</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuClienteVenta(); eliminarClienteConfirmarVenta(${clienteId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <span style="color: #f44336;">x Eliminar cliente</span>
+        </div>
+    `;
+    
+    const rect = btn.getBoundingClientRect();
+    menu.style.left = rect.left - 180 + 'px';
+    menu.style.top = rect.bottom + 5 + 'px';
+    
+    document.body.appendChild(menu);
+    
+    setTimeout(() => {
+        document.addEventListener('click', function cerrarMenu(e) {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', cerrarMenu);
+            }
+        });
+    }, 10);
+}
+
+function cerrarMenuClienteVenta() {
+    const menu = document.getElementById('menuContextualClienteVenta');
+    if (menu) menu.remove();
+}
+
+// Ver detalles del cliente (usa ventas.js)
+async function verDetallesClienteVenta(clienteId) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente_detalle&id=${clienteId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar los datos del cliente');
+            return;
+        }
+        
+        const cliente = data.cliente;
+        const ventas = data.ventas || [];
+        const deudas = data.deudas || [];
+        
+        let totalDeuda = 0;
+        deudas.forEach(d => { totalDeuda += parseFloat(d.monto_pendiente || d.monto || 0); });
+        
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Detalles del Cliente - ${escapeHtml(cliente.nombre)}</title>
+                <meta charset="UTF-8">
+                <style>
+                    * { font-family: 'Segoe UI', Arial, sans-serif; }
+                    body { padding: 20px; background: #f5f5f5; }
+                    .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                    h2 { color: #278233; margin-top: 0; border-bottom: 3px solid #278233; padding-bottom: 10px; }
+                    h3 { color: #333; margin: 20px 0 10px 0; border-left: 4px solid #278233; padding-left: 12px; }
+                    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                    .info-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding: 8px 0; }
+                    .info-label { font-weight: bold; color: #555; }
+                    .info-value { color: #222; }
+                    .deuda-total { background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+                    .deuda-total span { font-size: 24px; font-weight: bold; color: #ff9800; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                    th { background: #278233; color: white; font-weight: bold; }
+                    tr:nth-child(even) { background: #f9f9f9; }
+                    .btn-cerrar { background: #278233; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2>Detalles del Cliente</h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item"><span class="info-label">Nombre:</span><span class="info-value"><strong>${escapeHtml(cliente.nombre)}</strong></span></div>
+                        <div class="info-item"><span class="info-label">RIF/C.I.:</span><span class="info-value">${escapeHtml(cliente.rif || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(cliente.telefono || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Contacto:</span><span class="info-value">${escapeHtml(cliente.contacto || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Email:</span><span class="info-value">${escapeHtml(cliente.email || '-')}</span></div>
+                        <div class="info-item"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(cliente.direccion || '-')}</span></div>
+                    </div>
+                    
+                    <div class="deuda-total">
+                        <strong>Deuda Total Pendiente:</strong><br>
+                        <span>$${totalDeuda.toFixed(2)}</span>
+                    </div>
+                    
+                    <h3>Cuentas por Cobrar Pendientes</h3>
+                    ${deudas.length > 0 ? `
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Fecha</th><th>Monto Pendiente</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+                            <tbody>
+                                ${deudas.map(d => `
+                                    <tr>
+                                        <td>${formatearFecha(d.fecha_inicio)}</td>
+                                        <td><strong>$${(parseFloat(d.monto_pendiente || d.monto || 0)).toFixed(2)}</strong></td>
+                                        <td>${formatearFecha(d.fecha_vencimiento)}</td>
+                                        <td><span class="estado-pendiente">PENDIENTE</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ` : '<p style="text-align:center; color:#666;">No hay deudas pendientes</p>'}
+                    
+                    <h3>Historial de Ventas</h3>
+                    ${ventas.length > 0 ? `
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Factura #</th><th>Fecha</th><th>Total</th><th>Método Pago</th><th></th></tr></thead>
+                            <tbody>
+                                ${ventas.map(v => `
+                                    <tr>
+                                        <td>${String(v.id).padStart(6, '0')}</td>
+                                        <td>${formatearFecha(v.fecha)}</td>
+                                        <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></td>
+                                        <td>${v.metodo_pago}</td>
+                                        <td><button onclick="window.opener.verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:4px 12px;border-radius:3px;cursor:pointer;">Ver</button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ` : '<p style="text-align:center; color:#666;">No hay ventas registradas</p>'}
+                    
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-cerrar" onclick="window.close()">Cerrar</button>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        const ventana = window.open('', '_blank', 'width=1000,height=700,scrollbars=yes');
+        ventana.document.write(html);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar los detalles del cliente: ' + error.message);
+    }
+}
+
+// CRUD de clientes (usa ventas.js)
+function abrirModalClienteVenta(id = null) {
+    setTimeout(() => window.forzarResetFocus(), 50);
+    document.getElementById('formCliente').reset();
+    document.getElementById('clienteId').value = '';
+    
+    if (id) {
+        document.getElementById('modalClienteTitle').innerHTML = 'Editar Cliente';
+        cargarClienteParaEditarVenta(id);
+    } else {
+        document.getElementById('modalClienteTitle').innerHTML = 'Nuevo Cliente';
+        document.getElementById('modalCliente').style.display = 'block';
+    }
+}
+
+async function cargarClienteParaEditarVenta(id) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente&id=${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            const c = data.cliente;
+            document.getElementById('clienteId').value = c.id;
+            document.getElementById('clienteNombre').value = c.nombre;
+            document.getElementById('clienteRif').value = c.rif || '';
+            document.getElementById('clienteTelefono').value = c.telefono || '';
+            document.getElementById('clienteContacto').value = c.contacto || '';
+            document.getElementById('clienteEmail').value = c.email || '';
+            document.getElementById('clienteDireccion').value = c.direccion || '';
+            document.getElementById('modalCliente').style.display = 'block';
+        } else {
+            alert('Error al cargar los datos del cliente');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    }
+}
+
+document.getElementById('formCliente')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('clienteId').value;
+    const nombre = document.getElementById('clienteNombre').value;
+    const rif = document.getElementById('clienteRif').value;
+    const telefono = document.getElementById('clienteTelefono').value;
+    const contacto = document.getElementById('clienteContacto').value;
+    const email = document.getElementById('clienteEmail').value;
+    const direccion = document.getElementById('clienteDireccion').value;
+    
+    if (!nombre) {
+        alert('El nombre del cliente es obligatorio');
+        return;
+    }
+    
+    const action = id ? 'actualizar_cliente' : 'guardar_cliente';
+    const data = { action, nombre, rif, telefono, contacto, email, direccion };
+    if (id) data.id = id;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/ventas.js', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(id ? 'Cliente actualizado' : 'Cliente agregado');
+            cerrarModalCliente();
+            cargarClientesParaVenta();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar cliente');
+    }
+});
+
+function editarClienteVenta(id, nombre, rif, telefono, contacto, email, direccion) {
+    abrirModalClienteVenta(id);
+}
+
+function eliminarClienteConfirmarVenta(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar al cliente "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        eliminarClienteVenta(id);
+    }
+}
+
+async function eliminarClienteVenta(id) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/ventas.js', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'eliminar_cliente', id: id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Cliente eliminado correctamente');
+            cargarClientesParaVenta();
+        } else {
+            alert('❌ Error: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar cliente');
+    }
+}
+
+// Funciones para la venta
+function seleccionarClienteVenta(clienteId) {
+    const select = document.getElementById('ventaClienteId');
+    if (select) {
+        select.value = clienteId;
+        select.dispatchEvent(new Event('change'));
+    }
+    cargarDatosClienteEnFormularioVenta(clienteId);
+}
+
+async function cargarDatosClienteEnFormularioVenta(clienteId) {
+    if (!clienteId) {
+        document.getElementById('ventaClienteNombre').value = '';
+        document.getElementById('ventaClienteRif').value = '';
+        document.getElementById('ventaClienteTelefono').value = '';
+        document.getElementById('ventaClienteContacto').value = '';
+        document.getElementById('ventaClienteEmail').value = '';
+        document.getElementById('ventaClienteDireccion').value = '';
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente&id=${clienteId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            const c = data.cliente;
+            document.getElementById('ventaClienteNombre').value = c.nombre;
+            document.getElementById('ventaClienteRif').value = c.rif || '';
+            document.getElementById('ventaClienteTelefono').value = c.telefono || '';
+            document.getElementById('ventaClienteContacto').value = c.contacto || '';
+            document.getElementById('ventaClienteEmail').value = c.email || '';
+            document.getElementById('ventaClienteDireccion').value = c.direccion || '';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// ========== PRODUCTOS PARA VENTAS ==========
 async function cargarProductosVenta() {
     try {
-	const token = localStorage.getItem('token');
-        const response = await fetch('/api/db//api/index.js?endpoint=obtener_productos_venta', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/ventas.js?action=obtener_productos', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         if (data.success) {
             productosVentaGlobal = data.productos;
@@ -8488,7 +8914,6 @@ function agregarProductoRow() {
     `;
     container.appendChild(newRow);
     
-    // Llenar el nuevo select con productos
     const select = newRow.querySelector('.producto-select');
     productosVentaGlobal.forEach(p => {
         const option = document.createElement('option');
@@ -8500,7 +8925,6 @@ function agregarProductoRow() {
         select.appendChild(option);
     });
     
-    // Agregar event listeners
     const cantidadInput = newRow.querySelector('.producto-cantidad');
     const precioInput = newRow.querySelector('.producto-precio-unitario');
     cantidadInput.addEventListener('input', calcularTotalVenta);
@@ -8513,16 +8937,14 @@ function eliminarProductoRow(btn) {
         row.remove();
         calcularTotalVenta();
     } else {
-        // Limpiar en lugar de eliminar
         row.querySelector('.producto-select').value = '';
         row.querySelector('.producto-cantidad').value = '';
-        row.querySelector('.venta-piezas').value = '0';  // <-- CAMBIADO
+        row.querySelector('.venta-piezas').value = '0';
         row.querySelector('.producto-precio-unitario').value = '';
         calcularTotalVenta();
     }
 }
 
-// Calcular total de venta (suma de cantidad * precio unitario)
 function calcularTotalVenta() {
     let total = 0;
     const rows = document.querySelectorAll('#listaProductosVenta .producto-row');
@@ -8537,7 +8959,7 @@ function calcularTotalVenta() {
     document.getElementById('ventaTotal').innerText = total.toFixed(2);
 }
 
-// Pre-cargar precio del producto al seleccionar
+// Event listener para pre-cargar precio
 document.addEventListener('change', function(e) {
     if (e.target.classList.contains('producto-select')) {
         const precio = parseFloat(e.target.options[e.target.selectedIndex]?.getAttribute('data-precio')) || 0;
@@ -8549,16 +8971,147 @@ document.addEventListener('change', function(e) {
     }
 });
 
-    
+// Event listener para cliente select
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'ventaClienteId') {
+        cargarDatosClienteEnFormularioVenta(e.target.value);
+    }
+});
+
+// ========== GUARDAR VENTA (usa ventas.js) ==========
+const ventaForm = document.getElementById('formVenta');
+if (ventaForm) {
+    ventaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const cliente_id = document.getElementById('ventaClienteId').value;
+        if (!cliente_id) {
+            alert('Debe seleccionar un cliente');
+            return;
+        }
+        
+        const productos = [];
+        const rows = document.querySelectorAll('#listaProductosVenta .producto-row');
+        let valido = true;
+        let totalGeneral = 0;
+        
+        rows.forEach(row => {
+            const productoId = row.querySelector('.producto-select').value;
+            const cantidad = parseFloat(row.querySelector('.producto-cantidad').value);
+            const piezas = parseInt(row.querySelector('.venta-piezas').value) || 0;
+            const precioUnitario = parseFloat(row.querySelector('.producto-precio-unitario').value);
+            
+            if (!productoId) {
+                valido = false;
+            } else if (!cantidad || cantidad <= 0) {
+                alert('Ingrese una cantidad válida para todos los productos');
+                valido = false;
+            } else if (!precioUnitario || precioUnitario <= 0) {
+                alert('Ingrese un precio unitario válido para todos los productos');
+                valido = false;
+            } else {
+                const precioTotal = cantidad * precioUnitario;
+                totalGeneral += precioTotal;
+                productos.push({ 
+                    id: productoId, 
+                    cantidad: cantidad,
+                    piezas: piezas,
+                    precio_unitario: precioUnitario,
+                    precio_total: precioTotal
+                });
+            }
+        });
+        
+        if (!valido || productos.length === 0) {
+            alert('Complete correctamente todos los productos');
+            return;
+        }
+        
+        const data = {
+            action: 'guardar_venta',
+            cliente_id: cliente_id,
+            fecha: document.getElementById('ventaFecha').value,
+            metodo_pago: document.getElementById('ventaMetodoPago').value,
+            es_credito: document.getElementById('ventaMetodoPago').value === 'credito',
+            sucursal_id: document.getElementById('ventaSucursalId').value || null,
+            observaciones: document.getElementById('ventaObservaciones').value,
+            subtotal: totalGeneral,
+            total: totalGeneral,
+            productos: productos
+        };
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/db/ventas.js', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Venta registrada correctamente');
+                
+                const facturaData = {
+                    venta: result.venta,
+                    detalles: result.detalles || [],
+                    empresa: {
+                        nombre: 'Agroindustria Láctea J.K.V. C.A.',
+                        rif: 'J-41022340-5',
+                        telefono: '(0412) 302-7063',
+                        direccion: 'Carretera Lara-Zulia (82Km) | Palmarito - Cerro Verde, Finca Las Vegas',
+                        email: ''
+                    }
+                };
+                sessionStorage.setItem('facturaData', JSON.stringify(facturaData));
+                window.open('factura.html', '_blank', 'width=900,height=700,scrollbars=yes');
+                
+                // Resetear formulario
+                document.getElementById('ventaClienteId').value = '';
+                document.getElementById('ventaClienteNombre').value = '';
+                document.getElementById('ventaClienteRif').value = '';
+                document.getElementById('ventaClienteTelefono').value = '';
+                document.getElementById('ventaClienteContacto').value = '';
+                document.getElementById('ventaClienteEmail').value = '';
+                document.getElementById('ventaClienteDireccion').value = '';
+                document.getElementById('ventaFecha').value = getFechaActual();
+                document.getElementById('ventaMetodoPago').value = 'efectivo';
+                document.getElementById('ventaObservaciones').value = '';
+                document.getElementById('ventaTotal').innerText = '0.00';
+                
+                const container = document.getElementById('listaProductosVenta');
+                while (container.children.length > 1) {
+                    container.removeChild(container.lastChild);
+                }
+                const firstRow = container.children[0];
+                if (firstRow) {
+                    firstRow.querySelector('.producto-select').value = '';
+                    firstRow.querySelector('.producto-cantidad').value = '';
+                    firstRow.querySelector('.venta-piezas').value = '0';
+                    firstRow.querySelector('.producto-precio-unitario').value = '';
+                }
+                
+                cargarHistorialVentas();
+            } else {
+                alert('❌ Error: ' + (result.error || 'Error desconocido'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al guardar la venta: ' + error.message);
+        }
+    });
+}
+
+// ========== HISTORIAL DE VENTAS (se mantiene igual, apuntando a index.js) ==========
 function agregarFiltrosVentas() {
     const container = document.getElementById('tablaHistorialVentas');
     if (!container) return;
     
-    // Eliminar filtros existentes para evitar duplicados
-    const filtrosExistentes = document.getElementById('filtrosVentas');
-    if (filtrosExistentes) {
-        filtrosExistentes.remove();
-    }
+    if (document.getElementById('filtrosVentas')) return;
     
     const filtrosHtml = `
         <div id="filtrosVentas" class="filtros-container" style="margin-bottom: 15px; justify-content: space-between;">
@@ -8594,7 +9147,6 @@ function agregarFiltrosVentas() {
         </div>
     `;
     
-    // Insertar filtros al principio del contenedor
     container.insertAdjacentHTML('afterbegin', filtrosHtml);
     
     const inputBusqueda = document.getElementById('busquedaVentas');
@@ -8620,17 +9172,14 @@ function agregarFiltrosVentas() {
             let coincideFecha = true;
             let coincideSucursal = true;
             
-            // Búsqueda por cliente (columna 2)
             if (filtroTexto && celdas[2]) {
                 coincideTexto = celdas[2].innerText.toLowerCase().indexOf(filtroTexto) > -1;
             }
             
-            // Filtro por sucursal (columna 5)
             if (sucursalVal && celdas[5]) {
                 coincideSucursal = celdas[5].innerText.toLowerCase().indexOf(sucursalVal) > -1;
             }
             
-            // Filtro por fecha (columna 1)
             if (fechaInicioVal || fechaFinVal) {
                 let fechaCelda = celdas[1]?.innerText.trim() || '';
                 let partes = fechaCelda.split('/');
@@ -8653,30 +9202,26 @@ function agregarFiltrosVentas() {
         aplicarFiltros();
     }
     
-    // Remover event listeners anteriores para evitar duplicados
     inputBusqueda.removeEventListener('keyup', aplicarFiltros);
     btnFiltrar.removeEventListener('click', aplicarFiltros);
     btnLimpiar.removeEventListener('click', limpiarFiltros);
     filtroSucursal.removeEventListener('change', aplicarFiltros);
     
-    // Agregar event listeners
     inputBusqueda.addEventListener('keyup', aplicarFiltros);
     btnFiltrar.addEventListener('click', aplicarFiltros);
     btnLimpiar.addEventListener('click', limpiarFiltros);
     filtroSucursal.addEventListener('change', aplicarFiltros);
 }
 
-
-// Historial de ventas - asegurar que la sucursal se muestre correctamente
 async function cargarHistorialVentas() {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=ventas&&action=obtener', {
-		headers: {
-	        'Authorization': `Bearer ${token}`,
-	        'Content-Type': 'application/json'
-	    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/index.js?endpoint=ventas&action=obtener', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         if (data.success) {
             mostrarHistorialVentas(data.ventas);
@@ -8696,21 +9241,13 @@ function mostrarHistorialVentas(ventas) {
     }
     
     let html = '<div style="overflow-x: auto;"><table class="tabla-produccion" style="width:100%;">';
-    // IMPORTANTE: El orden de las columnas debe coincidir con los índices del filtro
     html += '<thead><tr><th>N° Factura</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Método Pago</th><th>Sucursal</th><th></th></tr></thead><tbody>';
     
     ventas.forEach(v => {
-        // Asegurar que sucursal_nombre exista, si no, mostrar vacío
         const sucursalNombre = v.sucursal_nombre || '—';
-        
-        
         let sucursal = '';
-        if (sucursalNombre === '') {
-        	sucursal = '';
-        }else { 
-            if (sucursalNombre === 'principal') { sucursal = 'Principal'; }
-            else if (sucursalNombre === 'cerro_verde') { sucursal = 'Cerro Verde'; }
-        }
+        if (sucursalNombre === 'principal') { sucursal = 'Principal'; }
+        else if (sucursalNombre === 'cerro_verde') { sucursal = 'Cerro Verde'; }
         
         html += `
             <tr>
@@ -8720,16 +9257,17 @@ function mostrarHistorialVentas(ventas) {
                 <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></td>
                 <td>${v.metodo_pago}</br></td>
                 <td>${sucursal}</br></td>
-                <td><button class="btn-ver" onclick="verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:8px;border-radius:3px;cursor:pointer;">Ver</button>
-                    <button class="btn-eliminar" onclick="eliminarVenta(${v.id})">∅</button></td>
+                <td>
+                    <button class="btn-ver" onclick="verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:8px;border-radius:3px;cursor:pointer;">Ver</button>
+                    <button class="btn-eliminar" onclick="eliminarVenta(${v.id})">∅</button>
+                </td>
             </tr>
         `;
     });
     
-    html += '</tbody><table></div>';
+    html += '</tbody></table></div>';
     document.getElementById('tablaHistorialVentas').innerHTML = html;
     
-    // Agregar filtros después de que la tabla esté en el DOM
     setTimeout(() => {
         agregarFiltrosVentas();
     }, 50);
@@ -8737,23 +9275,22 @@ function mostrarHistorialVentas(ventas) {
 
 async function verFactura(id) {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=ventas&&action=obtener_detalle&id=${id}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/index.js?endpoint=ventas&action=obtener_detalle&id=${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         if (data.success && data.detalles && data.detalles.length > 0) {
-            // data.venta contiene los datos de la venta (ya incluye cliente del JOIN)
             const ventaData = data.venta;
             
             const facturaData = {
                 venta: {
                     id: ventaData.venta_id,
-                    cliente: ventaData.cliente,  // Ya viene del JOIN
+                    cliente: ventaData.cliente,
                     rif: ventaData.rif || '',
                     telefono: ventaData.telefono || '',
                     contacto: ventaData.contacto || '',
@@ -8798,13 +9335,13 @@ async function eliminarVenta(id) {
     if (!confirm('¿Estás seguro de eliminar esta venta? Esta acción no se puede deshacer.')) return;
     
     try {
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/index.js?endpoint=ventas', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action: 'eliminar', id: id })
         });
         const result = await response.json();
@@ -8824,11 +9361,9 @@ function exportarVentasCSV() {
     const container = document.getElementById('tablaHistorialVentas');
     if (!container) return;
     
-    // Buscar la tabla dentro del contenedor
     const tabla = container.querySelector('table');
     if (!tabla) return;
     
-    // Obtener SOLO las filas visibles (no ocultas por filtros)
     const filasVisibles = tabla.querySelectorAll('tbody tr:not([style*="display: none"])');
     
     if (filasVisibles.length === 0) {
@@ -8839,24 +9374,18 @@ function exportarVentasCSV() {
     let csv = [];
     const BOM = "\uFEFF";
     
-    // Encabezados
     csv.push(['Factura', 'Fecha', 'Cliente', 'Total', 'Método Pago', 'Sucursal'].join(','));
     
-    // Recorrer SOLO las filas visibles
     filasVisibles.forEach(fila => {
         const rowData = [];
         const celdas = fila.querySelectorAll('td');
         
-        // Tomar columnas: Factura(0), Fecha(1), Cliente(2), Total(3), Método(4), Sucursal(5)
         for (let i = 0; i <= 5; i++) {
             if (celdas[i]) {
                 let text = celdas[i].innerText || '';
-                // Limpiar HTML y saltos de línea
                 text = text.replace(/<[^>]*>/g, '');
                 text = text.replace(/\s+/g, ' ').trim();
-                // Escapar comillas dobles
                 text = text.replace(/"/g, '""');
-                // Si contiene comas, comillas o saltos, encerrar entre comillas
                 if (text.includes(',') || text.includes('"') || text.includes('\n')) {
                     text = `"${text}"`;
                 }
@@ -8868,7 +9397,6 @@ function exportarVentasCSV() {
         csv.push(rowData.join(','));
     });
     
-    // Agregar una fila de resumen con el total de ventas y monto
     let totalVentas = filasVisibles.length;
     let totalMonto = 0;
     
@@ -8876,7 +9404,6 @@ function exportarVentasCSV() {
         const celdas = fila.querySelectorAll('td');
         if (celdas[3]) {
             let montoTexto = celdas[3].innerText || '0';
-            // Extraer solo números y puntos
             const montoMatch = montoTexto.match(/[\d,]+\.?\d*/);
             if (montoMatch) {
                 const monto = parseFloat(montoMatch[0].replace(/,/g, ''));
@@ -8885,7 +9412,7 @@ function exportarVentasCSV() {
         }
     });
     
-    csv.push(''); // línea en blanco
+    csv.push('');
     csv.push([`Total de ventas exportadas: ${totalVentas}`, `Monto total: $${totalMonto.toFixed(2)}`].join(','));
     
     const csvContent = BOM + csv.join('\n');
@@ -8893,11 +9420,9 @@ function exportarVentasCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     
-    // Generar timestamp y nombre de archivo indicando filtros
     const fecha = new Date();
     const timestamp = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2,'0')}-${fecha.getDate().toString().padStart(2,'0')}_${fecha.getHours().toString().padStart(2,'0')}${fecha.getMinutes().toString().padStart(2,'0')}`;
     
-    // Detectar filtro de sucursal activo para el nombre del archivo
     const filtroSucursal = document.getElementById('filtroSucursalVentas');
     let sufijo = '';
     if (filtroSucursal && filtroSucursal.value) {
@@ -8911,20 +9436,24 @@ function exportarVentasCSV() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    // Mostrar mensaje de confirmación
     alert(`✅ Exportadas ${totalVentas} ventas por un total de $${totalMonto.toFixed(2)}`);
 }
 
-// Inicializar al cargar
+// Inicializar
 document.addEventListener('DOMContentLoaded', function() {
     cargarProductosVenta();
-    // Agregar event listener para calcular total al modificar inputs
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('producto-cantidad') || e.target.classList.contains('producto-precio-unitario')) {
             calcularTotalVenta();
         }
     });
-});    
+});
+
+// Sobrescribir la función original de abrirModalClientes si existe
+const abrirModalClienteOriginal = window.abrirModalCliente;
+window.abrirModalCliente = function() {
+    abrirModalClienteVenta();
+};    
 </script>    
     
     
