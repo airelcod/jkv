@@ -3042,34 +3042,34 @@ function cargarResumenManual() {
     
     <script>
     // ========== MÓDULO DE MATERIA PRIMA (RECEPCIÓN DE LECHE) ==========
-    function abrirModalMateriaPrima() {
-        setTimeout(() => window.forzarResetFocus(), 50);
+function abrirModalMateriaPrima() {
+    setTimeout(() => window.forzarResetFocus(), 50);
 
-        document.getElementById('modalMateriaPrima').style.display = 'block';
-        cargarProveedores();
-        cargarRecepciones();
-        cargarProductosEnSelect();
+    document.getElementById('modalMateriaPrima').style.display = 'block';
+    cargarProveedores();
+    cargarRecepciones();
+    cargarProductosEnSelect();
 
-        // Resetear filtro
-        proveedorFiltroActual = null;
-        const tituloModal = document.querySelector('#modalMateriaPrima h2');
-        if (tituloModal) {
-            tituloModal.innerHTML = 'Recepción de Material';
-        }
+    proveedorFiltroActual = null;
+    const tituloModal = document.querySelector('#modalMateriaPrima h2');
+    if (tituloModal) {
+        tituloModal.innerHTML = 'Recepción de Material';
     }
+}
 
-    function cerrarModalMateriaPrima() {
-        document.getElementById('modalMateriaPrima').style.display = 'none';
-    }    
-        // Ver detalle de recepción
+function cerrarModalMateriaPrima() {
+    document.getElementById('modalMateriaPrima').style.display = 'none';
+}
+
+// Ver detalle de recepción (usa materia_prima.js)
 async function verDetalleRecepcion(id) {
-	const token = localStorage.getItem('token');
-    const response = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_detalle_recepcion&id=${id}`, {
-		headers: {
-	        'Authorization': `Bearer ${token}`,
-	        'Content-Type': 'application/json'
-	    }
-	});
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/db/materia_prima.js?action=obtener_detalle_recepcion&id=${id}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
     const data = await response.json();
     
     if (!data.success) {
@@ -3127,7 +3127,7 @@ async function verDetalleRecepcion(id) {
                         <span class="label">Guardar en Cuentas:</span>
                         <span class="value"><span class="${r.guardar_en_cuentas == 1 ? 'badge-si' : 'badge-no'}">${r.guardar_en_cuentas == 1 ? 'Sí' : 'No'}</span></span>
                     </div>
-        `;
+    `;
     
     if (r.pago_con_producto == 1) {
         const unidad = r.producto_entregado === 'suero' ? 'litros' : 'kg';
@@ -3154,7 +3154,6 @@ async function verDetalleRecepcion(id) {
         `;
     }
     
-    // Información del proveedor
     if (r.contacto || r.telefono || r.email) {
         html += `
                 </div>
@@ -3175,7 +3174,6 @@ async function verDetalleRecepcion(id) {
         }
     }
     
-    // Observaciones
     if (r.observaciones && r.observaciones.trim() !== '') {
         html += `
                 </div>
@@ -3200,42 +3198,24 @@ async function verDetalleRecepcion(id) {
     ventana.document.write(html);
 }
 
-// Editar proveedor (desde el modal)
-function editarProveedorDesdeLista(id, nombre, contacto, telefono, email, direccion) {
-    setTimeout(() => window.forzarResetFocus(), 50);
-    
-    document.getElementById('provId').value = id;
-    document.getElementById('provNombre').value = nombre;
-    document.getElementById('provContacto').value = contacto || '';
-    document.getElementById('provTelefono').value = telefono || '';
-    document.getElementById('provEmail').value = email || '';
-    document.getElementById('provDireccion').value = direccion || '';
-    document.getElementById('provDiaCorte').value = dia_corte || '2';
-    
-    document.getElementById('modalProveedorTitle').innerHTML = 'Editar Proveedor';
-    document.getElementById('modalProveedor').style.display = 'block';
-}
-
-// Cargar productos dinámicamente para el select
-// Cargar productos dinámicamente desde la tabla productos (mismo método que producción)
+// Cargar productos en select (usa materia_prima.js)
 async function cargarProductosEnSelect() {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/db//api/index.js?endpoint=obtener_productos_mp', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js?action=obtener_productos', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
-        console.log('Productos recibidos:', data); // Para depuración
+        console.log('Productos recibidos:', data);
         
         if (data.success && data.productos) {
             const select = document.getElementById('mpProductoEntregadoSelect');
             if (select) {
                 select.innerHTML = '<option value="">Seleccionar producto</option>';
-                // Filtrar productos activos, excluyendo la leche
                 const productosFiltrados = data.productos.filter(p => p.nombre !== 'leche' && p.activo == 1);
                 
                 productosFiltrados.forEach(p => {
@@ -3251,39 +3231,30 @@ async function cargarProductosEnSelect() {
             }
         } else {
             console.error('Error al cargar productos:', data);
-            // Fallback: opciones manuales
             const select = document.getElementById('mpProductoEntregadoSelect');
             if (select) {
-                select.innerHTML = `
-                    <option value="">Seleccionar producto</option>
-                `;
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
             }
         }
     } catch (error) {
         console.error('Error cargando productos:', error);
-        // Fallback en caso de error de red
         const select = document.getElementById('mpProductoEntregadoSelect');
         if (select) {
-            select.innerHTML = `
-                <option value="">Error cargando productos</option>
-            `;
+            select.innerHTML = '<option value="">Error cargando productos</option>';
         }
     }
 }
 
-// Calcular automáticamente costo total o precio por litro
 function calcularAutoCosto() {
     const cantidad = parseFloat(document.getElementById('mpCantidad').value) || 0;
     const costoTotal = parseFloat(document.getElementById('mpCostoTotal').value) || 0;
     
-    // Si se ingresa cantidad y costo total, se puede mostrar el precio por litro (solo informativo)
     if (cantidad > 0 && costoTotal > 0) {
         const precioLitro = costoTotal / cantidad;
         console.log(`Precio por litro: $${precioLitro.toFixed(4)}`);
     }
 }
 
-// Función para obtener el producto entregado (combina select y texto)
 function getProductoEntregado() {
     const selectValue = document.getElementById('mpProductoEntregadoSelect').value;
     const textValue = document.getElementById('mpProductoEntregadoText').value.trim();
@@ -3293,7 +3264,6 @@ function getProductoEntregado() {
     return selectValue;
 }
 
-// Actualizar unidad según el producto seleccionado
 document.getElementById('mpProductoEntregadoSelect')?.addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
     const esLeche = selectedOption.getAttribute('data-es_leche') === '1';
@@ -3305,30 +3275,28 @@ document.getElementById('mpProductoEntregadoSelect')?.addEventListener('change',
     }
 });
 
-// Limpiar texto cuando se selecciona un producto del select
 document.getElementById('mpProductoEntregadoSelect')?.addEventListener('change', function() {
     if (this.value) {
         document.getElementById('mpProductoEntregadoText').value = '';
     }
 });
 
-// Limpiar select cuando se escribe en texto
 document.getElementById('mpProductoEntregadoText')?.addEventListener('input', function() {
     if (this.value) {
         document.getElementById('mpProductoEntregadoSelect').value = '';
     }
 });
-        
-// Cargar proveedores para el sidebar
+
+// Cargar proveedores (usa materia_prima.js)
 async function cargarProveedores() {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima&action=obtener_proveedores', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js?action=obtener_proveedores', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         if (data.success) {
             mostrarListaProveedores(data.proveedores);
@@ -3347,8 +3315,7 @@ function mostrarListaProveedores(proveedores) {
     }
     
     const hoy = new Date();
-    const diaSemanaHoy = hoy.getDay(); // 0=Domingo, 1=Lunes...
-    // Mapear al formato del día de corte (1=Domingo, 2=Lunes...)
+    const diaSemanaHoy = hoy.getDay();
     let diaSemanaNum = diaSemanaHoy + 1;
     if (diaSemanaNum === 8) diaSemanaNum = 1;
     
@@ -3387,28 +3354,21 @@ function mostrarListaProveedores(proveedores) {
     });
     document.getElementById('listaProveedores').innerHTML = html;
 }
-        
-// Mostrar menú contextual para proveedor
+
 function mostrarMenuProveedor(event, proveedorId) {
     event.stopPropagation();
     
-    // Eliminar menú existente si hay
     const menuExistente = document.getElementById('menuContextualProveedor');
-    if (menuExistente) {
-        menuExistente.remove();
-    }
+    if (menuExistente) menuExistente.remove();
     
-    // Obtener el botón que disparó el evento
     const btn = event.currentTarget;
-    
-    // Obtener datos del proveedor desde los atributos del botón
     const nombre = btn.getAttribute('data-nombre') || '';
     const contacto = btn.getAttribute('data-contacto') || '';
     const telefono = btn.getAttribute('data-telefono') || '';
     const email = btn.getAttribute('data-email') || '';
     const direccion = btn.getAttribute('data-direccion') || '';
+    const dia_corte = btn.getAttribute('data-dia_corte') || '2';
     
-    // Crear menú
     const menu = document.createElement('div');
     menu.id = 'menuContextualProveedor';
     menu.style.cssText = `
@@ -3418,7 +3378,7 @@ function mostrarMenuProveedor(event, proveedorId) {
         border-radius: 6px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         z-index: 10000;
-        min-width: 180px;
+        min-width: 220px;
         overflow: hidden;
     `;
     
@@ -3426,24 +3386,37 @@ function mostrarMenuProveedor(event, proveedorId) {
         <div style="padding: 8px 12px; background: #278233; color: white; font-weight: bold; font-size: 13px;">
             ${escapeHtml(nombre)}
         </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); editarProveedor(${proveedorId}, '${escapeHtml(nombre)}', '${escapeHtml(contacto)}', '${escapeHtml(telefono)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); filtrarPorProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver solo sus entregas</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalPagoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Registrar Pago</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalAdelantoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee;">
+            <span>Registrar Adelanto</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); verHistorialDeudasProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver Historial de Pagos</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); verAdelantosProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+            <span>Ver Adelantos</span>
+        </div>
+        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); editarProveedor(${proveedorId}, '${escapeHtml(nombre)}', '${escapeHtml(contacto)}', '${escapeHtml(telefono)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}', '${dia_corte}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 16px;">✎</span>
             <span>Editar proveedor</span>
         </div>
         <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); eliminarProveedorConfirmar(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 16px;">∅</span>
-            <span>Eliminar proveedor</span>
+            <span style="color: #f44336;">Eliminar proveedor</span>
         </div>
     `;
     
-    // Posicionar el menú cerca del botón
     const rect = btn.getBoundingClientRect();
-    menu.style.left = rect.left - 150 + 'px';
+    menu.style.left = rect.left - 200 + 'px';
     menu.style.top = rect.bottom + 5 + 'px';
     
     document.body.appendChild(menu);
     
-    // Cerrar menú al hacer clic fuera
     setTimeout(() => {
         document.addEventListener('click', function cerrarMenu(e) {
             if (!menu.contains(e.target) && e.target !== btn) {
@@ -3454,31 +3427,28 @@ function mostrarMenuProveedor(event, proveedorId) {
     }, 10);
 }
 
-// Cerrar menú contextual de proveedor
 function cerrarMenuProveedor() {
     const menu = document.getElementById('menuContextualProveedor');
     if (menu) menu.remove();
 }
 
-// Confirmar eliminación de proveedor
 function eliminarProveedorConfirmar(id, nombre) {
     if (confirm(`¿Estás seguro de eliminar al proveedor "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
         eliminarProveedor(id);
     }
 }
 
-// Función eliminarProveedor (ya existe, asegurar que cierre el menú)
 async function eliminarProveedor(id) {
     if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
     
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
         });
         const result = await response.json();
@@ -3493,45 +3463,19 @@ async function eliminarProveedor(id) {
     }
 }
 
-// Función para editar proveedor
-async function editarProveedor(id, nombre, contacto, telefono, email, direccion) {
+async function editarProveedor(id, nombre, contacto, telefono, email, direccion, dia_corte) {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     document.getElementById('provId').value = id;
     document.getElementById('provNombre').value = nombre;
-    document.getElementById('provContacto').value = contacto;
-    document.getElementById('provTelefono').value = telefono;
-    document.getElementById('provEmail').value = email;
-    document.getElementById('provDireccion').value = direccion;
+    document.getElementById('provContacto').value = contacto || '';
+    document.getElementById('provTelefono').value = telefono || '';
+    document.getElementById('provEmail').value = email || '';
+    document.getElementById('provDireccion').value = direccion || '';
+    document.getElementById('provDiaCorte').value = dia_corte || '2';
     
     document.getElementById('modalProveedorTitle').innerHTML = 'Editar Proveedor';
     document.getElementById('modalProveedor').style.display = 'block';
-}
-
-// Eliminar proveedor
-async function eliminarProveedor(id) {
-    if (!confirm('¿Estás seguro de eliminar este proveedor?')) return;
-    
-    try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
-            method: 'POST',
-            headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
-            body: JSON.stringify({ action: 'eliminar_proveedor', id: id })
-        });
-        const result = await response.json();
-        if (result.success) {
-            alert('Proveedor eliminado');
-            cargarProveedores();
-        } else {
-            alert('❌ Error: ' + result.error);
-        }
-    } catch (error) {
-        alert('❌ Error al eliminar proveedor');
-    }
 }
 
 function cargarSelectProveedores(proveedores) {
@@ -3544,7 +3488,7 @@ function cargarSelectProveedores(proveedores) {
         select.appendChild(option);
     });
 }
-        
+
 function agregarFiltrosMateriaPrima() {
     const container = document.getElementById('listaRecepciones');
     if (!container) return;
@@ -3628,17 +3572,17 @@ function agregarFiltrosMateriaPrima() {
 
 async function cargarRecepciones(proveedorId = null) {
     try {
-        let url = '/api/index.js?endpoint=materia_prima&action=obtener&modo=tabla';
+        let url = '/api/db/materia_prima.js?action=obtener&modo=tabla';
         if (proveedorId) {
             url += `&proveedor_id=${proveedorId}`;
         }
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const response = await fetch(url, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         if (data.success) {
@@ -3678,7 +3622,6 @@ function mostrarTablaRecepciones(recepciones) {
 
     recepciones.forEach(item => {
         if (item.es_cabecera) {
-            // ========== ES UNA CABECERA DE PAGO (AGRUPADA POR PAGO REAL) ==========
             const idGrupo = `grupo-pago-${item.pago_id}`;
             const fechaInicio = formatearFecha(item.semana_inicio);
             const fechaFin = formatearFecha(item.semana_fin);
@@ -3687,7 +3630,6 @@ function mostrarTablaRecepciones(recepciones) {
             const totalPagado = parseFloat(item.monto_pagado).toFixed(2);
             const deducciones = parseFloat(item.deducciones || 0).toFixed(2);
             
-            // Verificar si el detalle ya está visible en el DOM
             const filaDetalleExistente = document.getElementById(idGrupo);
             const estaVisible = filaDetalleExistente && filaDetalleExistente.style.display !== 'none';
             
@@ -3696,38 +3638,26 @@ function mostrarTablaRecepciones(recepciones) {
                     <td colspan="8" style="padding: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
                             <div style="display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap;">
-                            	<div style="display:flex;width:100%;">
-                                <strong style="font-size: 1em; background: #278233; color: white; padding: 4px 12px; border-radius: 4px;">PAGO - ${escapeHtml(item.proveedor_nombre)} | ${fechaPago}</strong><span id="${idGrupo}-icon" style="font-size: 18px; cursor: pointer; padding: 0 5px;margin-left:auto;" onclick="event.stopPropagation();toggleDetallePago('${idGrupo}')">${estaVisible ? '▼' : '▶'}</span></div>
-                                
+                                <div style="display:flex;width:100%;">
+                                    <strong style="font-size: 1em; background: #278233; color: white; padding: 4px 12px; border-radius: 4px;">PAGO - ${escapeHtml(item.proveedor_nombre)} | ${fechaPago}</strong>
+                                    <span id="${idGrupo}-icon" style="font-size: 18px; cursor: pointer; padding: 0 5px;margin-left:auto;" onclick="event.stopPropagation();toggleDetallePago('${idGrupo}')">${estaVisible ? '▼' : '▶'}</span>
+                                </div>
                                 <span><strong>Período:</strong> ${fechaInicio} → ${fechaFin}</span>
                                 <span><strong>Litros:</strong> ${totalLitros} L</span>
                                 <span><strong>Deducciones:</strong> <span style="color:#f44336;">$${deducciones}</span></span>
                                 <span><strong>Total Pagado:</strong> <span style="color:#278233; font-weight:bold;">$${totalPagado}</span></span>
                             </div>
                         </div>
-                    </br><small>${item.observaciones ? escapeHtml(item.observaciones) : ''}</small>
+                        <br><small>${item.observaciones ? escapeHtml(item.observaciones) : ''}</small>
                     </td>
                 </tr>
                 <tr id="${idGrupo}" style="display: none; background-color: #f9f9f9;">
                     <td colspan="8" style="padding: 0;">
                         <div>
                             <table class="tabla-produccion" style="width: 100%; border-collapse: collapse; margin: 0;">
-                                <thead style="display:none">
-                                    <tr style="background: #f4d71b; color: rgba(0,0,0,.7);">
-                                        <th>Fecha</th>
-                                        <th>Proveedor</th>
-                                        <th>Tipo Leche</th>
-                                        <th>Cantidad (L)</th>
-                                        <th>Costo x Litro</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
             `;
             
-            // Recorrer las recepciones individuales de este pago
             if (item.recepciones && item.recepciones.length > 0) {
                 item.recepciones.forEach(r => {
                     const fechaDetalle = formatearFecha(r.fecha);
@@ -3763,12 +3693,11 @@ function mostrarTablaRecepciones(recepciones) {
                                 </tbody>
                             </table>
                         </div>
-                    </br><small>Pago realizado el ${fechaPago} - Método: ${item.metodo_pago}</small>
+                        <br><small>Pago realizado el ${fechaPago} - Método: ${item.metodo_pago}</small>
                     </td>
                 </tr>
             `;
         } else {
-            // ========== RECEPCIÓN NO PAGADA (DEUDA PENDIENTE) ==========
             const r = item;
             const fecha = new Date(r.fecha);
             const hoy = new Date();
@@ -3811,101 +3740,6 @@ function mostrarTablaRecepciones(recepciones) {
     }, 100);
 }
 
-// ========== FUNCIÓN PARA VER DETALLE DE PAGO A PROVEEDOR ==========
-// ========== FUNCIÓN PARA VER DETALLE DE PAGO A PROVEEDOR ==========
-async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInicio, semanaFin, pagoId = null) {
-    setTimeout(() => window.forzarResetFocus(), 50);
-    
-    try {
-        // 1. Obtener datos del proveedor
-		const token = localStorage.getItem('token');
-        const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
-        const dataProv = await responseProv.json();
-        
-        if (!dataProv.success) {
-            alert('Error al cargar datos del proveedor');
-            return;
-        }
-        
-        // 2. Obtener las recepciones de leche en ese período
-		const token = localStorage.getItem('token');
-        const responseRecepciones = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
-        const dataRecepciones = await responseRecepciones.json();
-        
-        if (!dataRecepciones.success || dataRecepciones.recepciones.length === 0) {
-            alert('No se encontraron recepciones en este período');
-            return;
-        }
-        
-        // 3. Si tenemos pagoId, obtener información adicional del pago
-        let totalPagado = 0;
-        let adelantosDeducidos = 0;
-        let observacionesPago = '';
-        let metodoPago = '';
-        let fechaPago = '';
-        
-        if (pagoId) {
-            const responsePago = await fetch(`/api/index.js?endpoint=proveedores_pagos&action=obtener_pago&id=${pagoId}`, {
-				headers: {
-			        'Authorization': `Bearer ${token}`,
-			        'Content-Type': 'application/json'
-			    }
-			});
-            const dataPago = await responsePago.json();
-            if (dataPago.success && dataPago.pago) {
-                totalPagado = parseFloat(dataPago.pago.monto_pagado);
-                adelantosDeducidos = parseFloat(dataPago.pago.deducciones) || 0;
-                observacionesPago = dataPago.pago.observaciones || '';
-                metodoPago = dataPago.pago.metodo_pago;
-                fechaPago = dataPago.pago.fecha_pago;
-            }
-        } else {
-            // Calcular total pagado (suma de todas las recepciones del grupo)
-            dataRecepciones.recepciones.forEach(r => {
-                totalPagado += parseFloat(r.total_costo);
-            });
-        }
-        
-        // 4. Preparar datos para el comprobante
-        const datosComprobante = {
-            proveedor: {
-                id: dataProv.proveedor.id,
-                nombre: dataProv.proveedor.nombre,
-                contacto: dataProv.proveedor.contacto || '',
-                telefono: dataProv.proveedor.telefono || '',
-                dia_corte: dataProv.proveedor.dia_corte || 2
-            },
-            periodoInicio: semanaInicio,
-            periodoFin: semanaFin,
-            fechaPago: fechaPago,
-            metodoPago: metodoPago,
-            recepciones: dataRecepciones.recepciones,
-            totalPagado: totalPagado,
-            adelantosDeducidos: adelantosDeducidos,
-            observaciones: observacionesPago || `Pago correspondiente al período del ${formatearFecha(semanaInicio)} al ${formatearFecha(semanaFin)}`
-        };
-        
-        // 5. Guardar en sessionStorage y abrir ventana
-        sessionStorage.setItem('pagoProveedorData', JSON.stringify(datosComprobante));
-        window.open('comprobante_pago_proveedor.html', '_blank', 'width=450,height=750,scrollbars=yes');
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al generar el comprobante: ' + error.message);
-    }
-}
-        
-// Función auxiliar para toggle de detalles de pago
 window.toggleDetallePago = function(idGrupo) {
     const filaDetalle = document.getElementById(idGrupo);
     const iconSpan = document.getElementById(`${idGrupo}-icon`);
@@ -3915,38 +3749,6 @@ window.toggleDetallePago = function(idGrupo) {
     } else {
         filaDetalle.style.display = 'none';
         if (iconSpan) iconSpan.innerHTML = '▶';
-    }
-}
-
-// Función para eliminar un grupo completo de recepciones (opcional)
-window.eliminarRecepcionMasiva = function(proveedorId, semanaInicio, semanaFin) {
-    if (confirm(`¿Eliminar TODAS las recepciones pagadas de este período (${formatearFecha(semanaInicio)} al ${formatearFecha(semanaFin)})?\n\nEsta acción no se puede deshacer.`)) {
-        // Aquí deberías implementar una llamada a un nuevo endpoint en materia_prima.php
-        // que elimine todas las recepciones con pagado=1 en ese rango de fechas.
-        // Por ahora, mostramos un mensaje.
-        alert('Error');
-        // Ejemplo de cómo sería la llamada:
-        /*
-        fetch('db/materia_prima.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                action: 'eliminar_masivo', 
-                proveedor_id: proveedorId, 
-                inicio: semanaInicio, 
-                fin: semanaFin 
-            })
-        })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success) {
-                alert('Pagos eliminados correctamente');
-                cargarRecepciones(); // Recargar la tabla
-            } else {
-                alert('Error: ' + result.error);
-            }
-        });
-        */
     }
 }
 
@@ -3962,12 +3764,6 @@ function toggleRecepcionSemana(semanaId) {
     }
 }
 
-function getNombreDiaMateria(fechaStr) {
-    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const fecha = new Date(fechaStr);
-    return dias[fecha.getDay()];
-}
-
 function abrirFormularioMateriaPrima() {    
     setTimeout(() => window.forzarResetFocus(), 50);
     
@@ -3978,25 +3774,13 @@ function abrirFormularioMateriaPrima() {
     document.getElementById('divPagoProducto').style.display = 'none';
     document.getElementById('mpGuardarEnCuentas').checked = false;
     document.getElementById('mpCostoTotal').value = '0.00';
-    document.getElementById('mpCostoPorLitro').value = '';  // Limpiar
-    document.getElementById('mpCantidad').value = '';       // Limpiar
+    document.getElementById('mpCostoPorLitro').value = '';
+    document.getElementById('mpCantidad').value = '';
     document.getElementById('formMateriaPrimaModal').style.display = 'block';
 }
 
 function cerrarFormularioMateriaPrima() {
     document.getElementById('formMateriaPrimaModal').style.display = 'none';
-}
-
-function toggleGuardarEnCuentas() {
-    const check = document.getElementById('mpGuardarEnCuentas');
-    const costoInput = document.getElementById('mpCostoLitro');
-    if (check.checked) {
-        costoInput.required = true;
-        costoInput.placeholder = 'Requerido para guardar en cuentas';
-    } else {
-        costoInput.required = false;
-        costoInput.placeholder = '0.00';
-    }
 }
 
 function togglePagoProducto() {
@@ -4012,15 +3796,13 @@ function togglePagoProducto() {
     }
 }
 
-// Función para calcular costo total automáticamente
 function calcularCostoTotal() {
     const cantidad = parseFloat(document.getElementById('mpCantidad').value) || 0;
     const costoPorLitro = parseFloat(document.getElementById('mpCostoPorLitro').value) || 0;
     const costoTotal = cantidad * costoPorLitro;
     document.getElementById('mpCostoTotal').value = costoTotal.toFixed(2);
 }
-        
-// En el submit del formulario
+
 document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -4030,8 +3812,7 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
     const proveedor_id = document.getElementById('mpProveedor').value;
     const proveedor_nombre = document.getElementById('mpProveedor').options[document.getElementById('mpProveedor').selectedIndex]?.text.split(' -')[0] || '';
     const cantidad_litros = parseFloat(document.getElementById('mpCantidad').value);
-    const costo_por_litro = parseFloat(document.getElementById('mpCostoPorLitro').value); // CAMBIADO
-    // No enviar costo_total, se calculará en el backend
+    const costo_por_litro = parseFloat(document.getElementById('mpCostoPorLitro').value);
     const guardar_en_cuentas = document.getElementById('mpGuardarEnCuentas').checked ? 1 : 0;
     const pago_con_producto = document.getElementById('mpPagoProducto').checked ? 1 : 0;
     const producto_entregado = getProductoEntregado();
@@ -4061,7 +3842,7 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
         proveedor_nombre: proveedor_nombre,
         tipo_leche: tipo_leche,
         cantidad_litros: cantidad_litros,
-        costo_por_litro: costo_por_litro,  // ENVIAR SOLO ESTO
+        costo_por_litro: costo_por_litro,
         guardar_en_cuentas: guardar_en_cuentas,
         pago_con_producto: pago_con_producto,
         producto_entregado: producto_entregado,
@@ -4072,13 +3853,13 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
     console.log('Enviando datos:', data);
 
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4094,18 +3875,18 @@ document.getElementById('formMateriaPrima')?.addEventListener('submit', async (e
         console.error('Error:', error);
         alert('❌ Error al guardar');
     }
-});   
-        
+});
+
 async function eliminarRecepcion(id) {
     if (!confirm('¿Eliminar esta recepción?')) return;
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ action: 'eliminar', id })
         });
         const result = await response.json();
@@ -4120,7 +3901,6 @@ async function eliminarRecepcion(id) {
     }
 }
 
-// Proveedores
 function abrirModalProveedor() {
     setTimeout(() => window.forzarResetFocus(), 50);
     
@@ -4149,17 +3929,17 @@ document.getElementById('formProveedor')?.addEventListener('submit', async (e) =
     }
 
     const action = id ? 'actualizar_proveedor' : 'guardar_proveedor';
-    const data = { action, nombre, contacto, telefono, email, direccion };
+    const data = { action, nombre, contacto, telefono, email, direccion, dia_corte };
     if (id) data.id = id;
 
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4167,7 +3947,6 @@ document.getElementById('formProveedor')?.addEventListener('submit', async (e) =
             alert(id ? 'Proveedor actualizado' : 'Proveedor agregado');
             cerrarModalProveedor();
             cargarProveedores();
-            // Resetear el ID oculto
             document.getElementById('provId').value = '';
         } else {
             alert('❌ Error: ' + result.error);
@@ -4177,28 +3956,11 @@ document.getElementById('formProveedor')?.addEventListener('submit', async (e) =
     }
 });
 
-function abrirFormularioMateriaPrima() {    
-    setTimeout(() => window.forzarResetFocus(), 50);
-    
-    document.getElementById('formMateriaPrima').reset();
-    document.getElementById('mpFecha').value = getFechaActual();
-    document.getElementById('mpHora').value = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('mpTipoLeche').value = 'normal';
-    document.getElementById('divPagoProducto').style.display = 'none';
-    document.getElementById('mpGuardarEnCuentas').checked = false;
-    document.getElementById('mpCostoTotal').value = '0.00';
-    document.getElementById('formMateriaPrimaModal').style.display = 'block';
-}        
-        
-// Cerrar modal
 document.getElementById('closeMateriaPrima')?.addEventListener('click', cerrarModalMateriaPrima);
 
-        
 // ========== MÓDULO DE PAGOS A PROVEEDORES ==========
-// Variables para pagos de proveedores
 let pagoProveedorData = null;
 
-// Abrir modal de pago para un proveedor
 async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
     setTimeout(() => window.forzarResetFocus(), 50);
     
@@ -4206,90 +3968,47 @@ async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
     document.getElementById('modalPagoProveedorTitle').innerHTML = `Registrar Pago - ${proveedorNombre}`;
     document.getElementById('pagoFecha').value = getFechaActual();
     
-    // Obtener día de corte del proveedor
-	const token = localStorage.getItem('token');
-    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
-		headers: {
-	        'Authorization': `Bearer ${token}`,
-	        'Content-Type': 'application/json'
-	    }
-	});
+    const token = localStorage.getItem('token');
+    const responseProv = await fetch(`/api/db/materia_prima.js?action=obtener_proveedor&id=${proveedorId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
     const dataProv = await responseProv.json();
     const diaCorte = dataProv.proveedor?.dia_corte || 2;
     
-    // Calcular período sugerido
     await recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte);
-    
     
     document.getElementById('modalPagoProveedor').style.display = 'block';
 }
 
-// Recalcular período según día de corte
-async function recalcularPeriodoProveedor() {
-    const proveedorId = document.getElementById('pagoProveedorId').value;
-    if (!proveedorId) return;
-
-	const token = localStorage.getItem('token');
-    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
-		headers: {
-	        'Authorization': `Bearer ${token}`,
-	        'Content-Type': 'application/json'
-	    }
-	});
-    const dataProv = await responseProv.json();
-    const diaCorte = dataProv.proveedor?.dia_corte || 2;
-    
-    await recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte);
-}
-
 async function recalcularPeriodoProveedorConDiaCorte(proveedorId, diaCorte) {
-	const token = localStorage.getItem('token');
-    const responsePeriodo = await fetch(`/api/index.js?endpoint=calcular_periodo_por_corte&&fecha=${getFechaActual()}&dia_corte=${diaCorte}`, {
-		headers: {
-	        'Authorization': `Bearer ${token}`,
-	        'Content-Type': 'application/json'
-	    }
-	});
+    const token = localStorage.getItem('token');
+    const responsePeriodo = await fetch(`/api/index.js?endpoint=calcular_periodo_por_corte&fecha=${getFechaActual()}&dia_corte=${diaCorte}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
     const dataPeriodo = await responsePeriodo.json();
     
     if (dataPeriodo.success) {
         document.getElementById('pagoPeriodoInicio').value = dataPeriodo.inicio;
         document.getElementById('pagoPeriodoFin').value = dataPeriodo.fin;
-        
-        // Actualizar resumen
         await actualizarResumenPagoProveedor(proveedorId, dataPeriodo.inicio, dataPeriodo.fin);
     }
 }
 
-// Actualizar resumen al cambiar fechas manualmente
-document.getElementById('pagoPeriodoInicio')?.addEventListener('change', () => {
-    const proveedorId = document.getElementById('pagoProveedorId').value;
-    const inicio = document.getElementById('pagoPeriodoInicio').value;
-    const fin = document.getElementById('pagoPeriodoFin').value;
-    if (proveedorId && inicio && fin) {
-        actualizarResumenPagoProveedor(proveedorId, inicio, fin);
-    }
-});
-
-document.getElementById('pagoPeriodoFin')?.addEventListener('change', () => {
-    const proveedorId = document.getElementById('pagoProveedorId').value;
-    const inicio = document.getElementById('pagoPeriodoInicio').value;
-    const fin = document.getElementById('pagoPeriodoFin').value;
-    if (proveedorId && inicio && fin) {
-        actualizarResumenPagoProveedor(proveedorId, inicio, fin);
-    }
-});
-
-// Modificar la función actualizarResumenPagoProveedor
 async function actualizarResumenPagoProveedor(proveedorId, inicio, fin) {
     try {
-		const token = localStorage.getItem('token');
-        const responseResumen = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const responseResumen = await fetch(`/api/db/materia_prima.js?action=obtener_resumen_semanal&proveedor_id=${proveedorId}&inicio=${inicio}&fin=${fin}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const dataResumen = await responseResumen.json();
         
         if (dataResumen.success) {
@@ -4307,13 +4026,7 @@ async function actualizarResumenPagoProveedor(proveedorId, inicio, fin) {
                 periodoFin: fin
             };
             
-            // Cargar adelantos después de tener el proveedor
             await cargarAdelantosProveedor(proveedorId);
-            
-        } else {
-            console.error('Error:', dataResumen.error);
-            document.getElementById('pagoTotalLeche').value = '0.00 L';
-            document.getElementById('pagoCostoTotal').value = '$0.00';
         }
     } catch (error) {
         console.error('Error:', error);
@@ -4328,17 +4041,13 @@ document.getElementById('formPagoProveedor')?.addEventListener('submit', async (
     const proveedor_id = document.getElementById('pagoProveedorId').value;
     const periodoInicio = document.getElementById('pagoPeriodoInicio').value;
     const periodoFin = document.getElementById('pagoPeriodoFin').value;
-    const total_leche = pagoProveedorData?.totalLeche || 0;
     const costo_total = pagoProveedorData?.costoTotal || 0;
     
-    // Obtener adelantos seleccionados
     const adelantosSeleccionados = [];
     document.querySelectorAll('.adelanto-checkbox:checked').forEach(cb => {
         adelantosSeleccionados.push(cb.getAttribute('data-id'));
     });
-    const adelantosIds = adelantosSeleccionados.join(',');
     
-    // Calcular total de adelantos
     let totalAdelantos = 0;
     document.querySelectorAll('.adelanto-checkbox:checked').forEach(cb => {
         totalAdelantos += parseFloat(cb.getAttribute('data-monto')) || 0;
@@ -4357,24 +4066,24 @@ document.getElementById('formPagoProveedor')?.addEventListener('submit', async (
         proveedor_id: proveedor_id,
         semana_inicio: periodoInicio,
         semana_fin: periodoFin,
-        total_leche: total_leche,
+        total_leche: pagoProveedorData?.totalLeche || 0,
         costo_total: costo_total,
         deducciones: deducciones,
         monto_pagado: neto_pagado,
         fecha_pago: document.getElementById('pagoFecha').value,
         metodo_pago: document.getElementById('pagoMetodo').value,
         observaciones: document.getElementById('pagoObservaciones').value,
-        adelantos_ids: adelantosIds || null
+        adelantos_ids: adelantosSeleccionados.join(',') || null
     };
     
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=proveedores_pagos', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(data)
         });
         const result = await response.json();
@@ -4398,16 +4107,15 @@ function cerrarModalPagoProveedor() {
     pagoProveedorData = null;
 }
 
-// Ver historial de pagos de un proveedor
 async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=proveedores_pagos&&action=obtener_historial&proveedor_id=${proveedorId}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_historial_pagos&proveedor_id=${proveedorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         if (!data.success) {
@@ -4438,10 +4146,10 @@ async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
                 html += `
                     <tr>
                         <td>${formatearFecha(p.fecha_pago)}</td>
-                        <td><small>${formatearFecha(p.semana_inicio)}<br>→<br>${formatearFecha(p.semana_fin)}</br></small></td>
-                        <td>${parseFloat(p.total_leche).toFixed(2)} L</br><small>litros</small></td>
-                        <td><strong>$${parseFloat(p.costo_total).toFixed(2)}</strong></br><small>costo</small></td>
-                        <td><strong style="color:#278233">$${parseFloat(p.monto_pagado).toFixed(2)}</strong></br><small>pagado</small></td>
+                        <td><small>${formatearFecha(p.semana_inicio)}<br>→<br>${formatearFecha(p.semana_fin)}</small></td>
+                        <td>${parseFloat(p.total_leche).toFixed(2)} L<br><small>litros</small></td>
+                        <td><strong>$${parseFloat(p.costo_total).toFixed(2)}</strong><br><small>costo</small></td>
+                        <td><strong style="color:#278233">$${parseFloat(p.monto_pagado).toFixed(2)}</strong><br><small>pagado</small></td>
                         <td>${p.metodo_pago}</td>
                     </tr>
                 `;
@@ -4457,28 +4165,92 @@ async function verHistorialDeudasProveedor(proveedorId, proveedorNombre) {
         document.getElementById('historialPagosTitle').innerHTML = `Historial de Pagos - ${proveedorNombre}`;
         document.getElementById('historialPagosLista').innerHTML = html;
         document.getElementById('modalHistorialPagosProveedor').style.display = 'block';
-        
     } catch (error) {
         console.error('Error:', error);
         alert('Error al cargar historial');
     }
 }
 
-function cerrarModalHistorialPagos() {
-    document.getElementById('modalHistorialPagosProveedor').style.display = 'none';
-}
+async function verAdelantosProveedor(proveedorId, proveedorNombre) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
         
-// ========== FUNCIONES PARA ADELANTOS DE PROVEEDORES ==========
+        if (!data.success) {
+            alert('Error al cargar adelantos');
+            return;
+        }
+        
+        let html = `
+            <div style="overflow-x: auto;">
+                <table class="tabla-produccion" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        if (data.adelantos.length === 0) {
+            html += '<td><td colspan="7" style="text-align:center;">No hay adelantos registrados</td></tr>';
+        } else {
+            data.adelantos.forEach(a => {
+                const estadoClass = a.estado === 'aplicado' ? 'estado-pagado' : 'estado-pendiente';
+                const estadoTexto = a.estado === 'aplicado' ? 'APLICADO' : 'PENDIENTE';
+                
+                html += `
+                    <tr>
+                        <td>${formatearFecha(a.fecha)}<br><small>${a.metodo_pago}</small></td>
+                        <td><strong>$${parseFloat(a.monto).toFixed(2)}</strong></td>
+                        <td>${a.metodo_pago}</td>
+                        <td>${a.referencia || '-'}</td>
+                        <td>${a.descripcion || '-'}<br><small>adelanto</small></td>
+                        <td><span class="${estadoClass}">${estadoTexto}</span></td>
+                        <td>
+                            ${a.estado === 'pendiente' ? `<button class="btn-eliminar" onclick="eliminarAdelantoProveedor(${a.id})">∅</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        document.getElementById('historialPagosTitle').innerHTML = `Adelantos - ${proveedorNombre}`;
+        document.getElementById('historialPagosLista').innerHTML = html;
+        document.getElementById('modalHistorialPagosProveedor').style.display = 'block';
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar adelantos');
+    }
+}
 
 async function cargarAdelantosProveedor(proveedorId) {
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_adelantos&proveedor_id=${proveedorId}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/db/materia_prima.js?action=obtener_adelantos&proveedor_id=${proveedorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         const container = document.getElementById('listaAdelantosProveedor');
@@ -4513,7 +4285,6 @@ async function cargarAdelantosProveedor(proveedorId) {
         document.querySelectorAll('.adelanto-checkbox').forEach(cb => {
             cb.addEventListener('change', recalcularTotalConAdelantos);
         });
-        
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('listaAdelantosProveedor').innerHTML = '<div class="cargando">Error al cargar adelantos</div>';
@@ -4528,16 +4299,41 @@ function recalcularTotalConAdelantos() {
         totalAdelantos += parseFloat(cb.getAttribute('data-monto')) || 0;
     });
     
-    const deudaTexto = document.getElementById('pagoDeudasPendientes').value;
-    const deuda = parseFloat(deudaTexto.replace('$', '')) || 0;
-    
-    const netoPagado = Math.max(0, costoTotal - (totalAdelantos + deuda));
-    
-    document.getElementById('pagoDeudasPendientes').innerHTML = `$${deuda.toFixed(2)} (Adelantos: $${totalAdelantos.toFixed(2)})`;
+    const netoPagado = Math.max(0, costoTotal - totalAdelantos);
     
     const inputMonto = document.getElementById('pagoMontoPagado');
     if (inputMonto) {
         inputMonto.value = netoPagado.toFixed(2);
+    }
+}
+
+async function eliminarAdelantoProveedor(id) {
+    if (!confirm('¿Estás seguro de eliminar este adelanto?')) return;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'eliminar_adelanto', id: id })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Adelanto eliminado');
+            const modal = document.getElementById('modalHistorialPagosProveedor');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            }
+            cargarAdelantosProveedor(document.getElementById('pagoProveedorId')?.value);
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error al eliminar adelanto');
     }
 }
 
@@ -4570,9 +4366,13 @@ document.getElementById('formAdelantoProveedor')?.addEventListener('submit', asy
     }
     
     try {
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/materia_prima.js', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ 
                 action: 'guardar_adelanto', 
                 proveedor_id, 
@@ -4589,6 +4389,7 @@ document.getElementById('formAdelantoProveedor')?.addEventListener('submit', asy
             alert('Adelanto registrado correctamente');
             cerrarModalAdelantoProveedor();
             document.getElementById('formAdelantoProveedor').reset();
+            cargarAdelantosProveedor(proveedor_id);
         } else {
             alert('Error: ' + result.error);
         }
@@ -4598,183 +4399,20 @@ document.getElementById('formAdelantoProveedor')?.addEventListener('submit', asy
     }
 });
 
-async function verHistorialAdelantosProveedor(proveedorId, proveedorNombre) {
-    try {
-        const response = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_adelantos&proveedor_id=${proveedorId}`);
-        const data = await response.json();
-        
-        if (!data.success) {
-            alert('Error al cargar adelantos');
-            return;
-        }
-        
-        let html = `
-            <div style="overflow-x: auto;">
-                <table class="tabla-produccion" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Monto</th>
-                            <th>Método</th>
-                            <th>Referencia</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        
-        if (data.adelantos.length === 0) {
-            html += '<tr><td colspan="7" style="text-align:center;">No hay adelantos registrados</td><tr>';
-        } else {
-            data.adelantos.forEach(a => {
-                const estadoClass = a.estado === 'aplicado' ? 'estado-pagado' : 'estado-pendiente';
-                const estadoTexto = a.estado === 'aplicado' ? 'APLICADO' : 'PENDIENTE';
-                
-                html += `
-                    <tr>
-                        <td>${formatearFecha(a.fecha)}<br><small>${a.metodo_pago}</small></td>
-                        <td><strong>$${parseFloat(a.monto).toFixed(2)}</strong></td>
-                        <td>${a.metodo_pago}</td>
-                        <td>${a.referencia || '-'}</td>
-                        <td>${a.descripcion || '-'}<br><small>adelanto</small></td>
-                        <td><span class="${estadoClass}">${estadoTexto}</span></td>
-                        <td>
-                            ${a.estado === 'pendiente' ? `<button class="btn-eliminar" onclick="eliminarAdelantoProveedor(${a.id})">∅</button>` : ''}
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-        
-        html += `
-                    </tbody>
-                </table>
-            </div>
-        `;
-        
-        document.getElementById('historialPagosTitle').innerHTML = `Adelantos - ${proveedorNombre}`;
-        document.getElementById('historialPagosLista').innerHTML = html;
-        document.getElementById('modalHistorialPagosProveedor').style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al cargar adelantos');
-    }
+function cerrarModalHistorialPagos() {
+    document.getElementById('modalHistorialPagosProveedor').style.display = 'none';
 }
 
-async function eliminarAdelantoProveedor(id) {
-    if (!confirm('¿Estás seguro de eliminar este adelanto?')) return;
-    
-    try {
-        const response = await fetch('/api/index.js?endpoint=materia_prima', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'eliminar_adelanto', id: id })
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('Adelanto eliminado');
-            const modal = document.getElementById('modalHistorialPagosProveedor');
-            if (modal.style.display === 'block') {
-                const proveedorId = document.getElementById('pagoProveedorId')?.value;
-                const proveedorNombre = document.getElementById('modalPagoProveedorTitle')?.innerHTML?.replace('Registrar Pago - ', '');
-                if (proveedorId && proveedorNombre) {
-                    verHistorialAdelantosProveedor(proveedorId, proveedorNombre);
-                }
-            }
-        } else {
-            alert('Error: ' + result.error);
-        }
-    } catch (error) {
-        alert('Error al eliminar adelanto');
-    }
-}
-
-// Mostrar menú contextual para proveedor - VERSIÓN COMPLETA
-function mostrarMenuProveedor(event, proveedorId) {
-    event.stopPropagation();
-    
-    const menuExistente = document.getElementById('menuContextualProveedor');
-    if (menuExistente) menuExistente.remove();
-    
-    const btn = event.currentTarget;
-    const nombre = btn.getAttribute('data-nombre') || '';
-    const contacto = btn.getAttribute('data-contacto') || '';
-    const telefono = btn.getAttribute('data-telefono') || '';
-    const email = btn.getAttribute('data-email') || '';
-    const direccion = btn.getAttribute('data-direccion') || '';
-    
-    const menu = document.createElement('div');
-    menu.id = 'menuContextualProveedor';
-    menu.style.cssText = `
-        position: fixed;
-        background: white;
-        border: 1px solid rgba(0,0,0,0.2);
-        border-radius: 6px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        z-index: 10000;
-        min-width: 220px;
-        overflow: hidden;
-    `;
-    
-    menu.innerHTML = `
-        <div style="padding: 8px 12px; background: #278233; color: white; font-weight: bold; font-size: 13px;">
-            ${escapeHtml(nombre)}
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); filtrarPorProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-            <span>Ver solo sus entregas</span>
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalPagoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-            <span>Registrar Pago</span>
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); abrirModalAdelantoProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee;">
-            <span>Registrar Adelanto</span>
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); verHistorialDeudasProveedor(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-            <span>Ver Historial de Pagos</span>
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); editarProveedor(${proveedorId}, '${escapeHtml(nombre)}', '${escapeHtml(contacto)}', '${escapeHtml(telefono)}', '${escapeHtml(email)}', '${escapeHtml(direccion)}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 16px;">✎</span>
-            <span>Editar proveedor</span>
-        </div>
-        <div class="menu-opcion-item" onclick="cerrarMenuProveedor(); eliminarProveedorConfirmar(${proveedorId}, '${escapeHtml(nombre)}')" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 16px;">∅</span>
-            <span style="color: #f44336;">Eliminar proveedor</span>
-        </div>
-    `;
-    
-    const rect = btn.getBoundingClientRect();
-    menu.style.left = rect.left - 200 + 'px';
-    menu.style.top = rect.bottom + 5 + 'px';
-    
-    document.body.appendChild(menu);
-    
-    setTimeout(() => {
-        document.addEventListener('click', function cerrarMenu(e) {
-            if (!menu.contains(e.target) && e.target !== btn) {
-                menu.remove();
-                document.removeEventListener('click', cerrarMenu);
-            }
-        });
-    }, 10);
-}
-
-// Variable para filtro de proveedor actual
 let proveedorFiltroActual = null;
 
 function filtrarPorProveedor(proveedorId, proveedorNombre) {
     proveedorFiltroActual = { id: proveedorId, nombre: proveedorNombre };
     
-    // Cambiar el título del modal para indicar el filtro
     const tituloModal = document.querySelector('#modalMateriaPrima h2');
     if (tituloModal) {
         tituloModal.innerHTML = `Recepción de Material - Mostrando: ${proveedorNombre} <span style="font-size:12px; cursor:pointer; margin-left:10px;" onclick="limpiarFiltroProveedor()">Limpiar filtro</span>`;
     }
     
-    // Recargar recepciones filtradas
     cargarRecepciones(proveedorId);
 }
 
@@ -4785,6 +4423,10 @@ function limpiarFiltroProveedor() {
         tituloModal.innerHTML = 'Recepción de Material';
     }
     cargarRecepciones();
+}
+
+function verDetalleRecepcionProveedor(proveedorId) {
+    filtrarPorProveedor(proveedorId, '');
 }
     </script>    
     
