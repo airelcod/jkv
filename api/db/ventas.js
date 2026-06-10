@@ -1,4 +1,3 @@
-
 import { query, sendJSON, parseBody, transaction } from './config.js';
 
 export default async function handler(req, res) {
@@ -20,15 +19,6 @@ export default async function handler(req, res) {
             case 'obtener_detalle':
                 await obtenerDetalleVenta(req, res);
                 break;
-            case 'obtener_clientes':
-                await obtenerClientes(res);
-                break;
-            case 'obtener_cliente':
-                await obtenerCliente(req, res);
-                break;
-            case 'obtener_cliente_detalle':
-                await obtenerClienteDetalle(req, res);
-                break;
             case 'obtener_productos':
                 await obtenerProductosVenta(res);
                 break;
@@ -43,23 +33,11 @@ export default async function handler(req, res) {
         const postAction = data.action;
         
         switch (postAction) {
-            case 'guardar':
+            case 'guardar_venta':
                 await guardarVenta(data, res);
                 break;
             case 'eliminar':
                 await eliminarVenta(data, res);
-                break;
-            case 'guardar_cliente':
-                await guardarCliente(data, res);
-                break;
-            case 'actualizar_cliente':
-                await actualizarCliente(data, res);
-                break;
-            case 'eliminar_cliente':
-                await eliminarCliente(data, res);
-                break;
-            case 'guardar_venta':
-                await guardarVenta(data, res);
                 break;
             default:
                 sendJSON(res, { success: false, error: 'Acción no válida: ' + postAction });
@@ -200,6 +178,21 @@ async function obtenerDetalleVenta(req, res) {
     }
 }
 
+async function obtenerProductosVenta(res) {
+    try {
+        const productos = await query(`
+            SELECT id, nombre, es_leche, COALESCE(precio_venta, 0) as precio 
+            FROM productos 
+            WHERE activo = 1 
+            ORDER BY nombre
+        `);
+        
+        sendJSON(res, { success: true, productos });
+    } catch (error) {
+        sendJSON(res, { success: false, error: error.message }, 500);
+    }
+}
+
 async function guardarVenta(data, res) {
     try {
         const { cliente_id, sucursal_id, fecha, metodo_pago, tiene_descuento, 
@@ -232,10 +225,9 @@ async function guardarVenta(data, res) {
                 `, [venta_id, producto.id, producto.cantidad, producto.piezas || 0, producto.precio_unitario]);
             }
             
-            // Si es crédito, agregar a cuentas por cobrar
             if (es_credito) {
-                const clienteInfo = await conn.execute("SELECT nombre FROM clientes WHERE id = ?", [cliente_id]);
-                const clienteNombre = clienteInfo[0].length > 0 ? clienteInfo[0][0].nombre : '';
+                const [clienteInfo] = await conn.execute("SELECT nombre FROM clientes WHERE id = ?", [cliente_id]);
+                const clienteNombre = clienteInfo.length > 0 ? clienteInfo[0].nombre : '';
                 
                 const fechaVencimiento = new Date(fecha);
                 fechaVencimiento.setDate(fechaVencimiento.getDate() + 7);
@@ -249,8 +241,7 @@ async function guardarVenta(data, res) {
             }
         });
         
-        // Obtener la venta completa para respuesta
-        const ventaInfo = await query(`
+        const [ventaInfo] = await query(`
             SELECT v.*, c.nombre as cliente_nombre, c.rif, c.telefono, c.contacto, c.email, c.direccion,
                    s.nombre as sucursal_nombre
             FROM ventas v 
@@ -259,9 +250,25 @@ async function guardarVenta(data, res) {
             WHERE v.id = ?
         `, [venta_id]);
         
-        const venta = ventaInfo[0];
-        venta.cliente = venta.cliente_nombre;
-        delete venta.cliente_nombre;
+        const venta = {
+            id: ventaInfo.id,
+            cliente: ventaInfo.cliente_nombre,
+            rif: ventaInfo.rif,
+            telefono: ventaInfo.telefono,
+            contacto: ventaInfo.contacto,
+            email: ventaInfo.email,
+            direccion: ventaInfo.direccion,
+            fecha: ventaInfo.fecha,
+            metodo_pago: ventaInfo.metodo_pago,
+            tiene_descuento: ventaInfo.tiene_descuento,
+            descuento_porcentaje: ventaInfo.descuento_porcentaje,
+            descuento_monto: ventaInfo.descuento_monto,
+            es_credito: ventaInfo.es_credito,
+            subtotal: ventaInfo.subtotal,
+            total: ventaInfo.total,
+            observaciones: ventaInfo.observaciones,
+            sucursal_nombre: ventaInfo.sucursal_nombre
+        };
         
         const detallesVenta = await query(`
             SELECT vd.*, COALESCE(p.nombre, 'Producto') as producto_nombre, COALESCE(p.es_leche, 0) as es_leche 
