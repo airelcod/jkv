@@ -3064,7 +3064,7 @@ function cargarResumenManual() {
         // Ver detalle de recepción
 async function verDetalleRecepcion(id) {
 	const token = localStorage.getItem('token');
-    const response = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_detalle_recepcion&id=${id}`, {
+    const response = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_detalle_recepcion&id=${id}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -3323,7 +3323,7 @@ document.getElementById('mpProductoEntregadoText')?.addEventListener('input', fu
 async function cargarProveedores() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=materia_prima&&action=obtener_proveedores', {
+        const response = await fetch('/api/index.js?endpoint=materia_prima&action=obtener_proveedores', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -3628,7 +3628,7 @@ function agregarFiltrosMateriaPrima() {
 
 async function cargarRecepciones(proveedorId = null) {
     try {
-        let url = '/api/index.js?endpoint=materia_prima&&action=obtener&modo=tabla';
+        let url = '/api/index.js?endpoint=materia_prima&action=obtener&modo=tabla';
         if (proveedorId) {
             url += `&proveedor_id=${proveedorId}`;
         }
@@ -3819,7 +3819,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
     try {
         // 1. Obtener datos del proveedor
 		const token = localStorage.getItem('token');
-        const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_proveedor&id=${proveedorId}`, {
+        const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -3834,7 +3834,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         
         // 2. Obtener las recepciones de leche en ese período
 		const token = localStorage.getItem('token');
-        const responseRecepciones = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`, {
+        const responseRecepciones = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_recepciones_por_periodo&proveedor_id=${proveedorId}&inicio=${semanaInicio}&fin=${semanaFin}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -3856,7 +3856,7 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         
         if (pagoId) {
 			const token = localStorage.getItem('token');
-            const responsePago = await fetch(`/api/index.js?endpoint=proveedores_pagos&&action=obtener_pago&id=${pagoId}`, {
+            const responsePago = await fetch(`/api/index.js?endpoint=proveedores_pagos&action=obtener_pago&id=${pagoId}`, {
 				headers: {
 			        'Authorization': `Bearer ${token}`,
 			        'Content-Type': 'application/json'
@@ -4209,7 +4209,7 @@ async function abrirModalPagoProveedor(proveedorId, proveedorNombre) {
     
     // Obtener día de corte del proveedor
 	const token = localStorage.getItem('token');
-    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_proveedor&id=${proveedorId}`, {
+    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -4231,7 +4231,7 @@ async function recalcularPeriodoProveedor() {
     if (!proveedorId) return;
 
 	const token = localStorage.getItem('token');
-    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&&action=obtener_proveedor&id=${proveedorId}`, {
+    const responseProv = await fetch(`/api/index.js?endpoint=materia_prima&action=obtener_proveedor&id=${proveedorId}`, {
 		headers: {
 	        'Authorization': `Bearer ${token}`,
 	        'Content-Type': 'application/json'
@@ -10957,7 +10957,7 @@ function cambiarTabCuentas(tipo) {
 async function cargarCuentasPagar() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=cuentas&&action=obtener_pagar', {
+        const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_pagar', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -10978,7 +10978,7 @@ async function cargarCuentasPagar() {
 async function cargarCuentasCobrar() {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=cuentas&&action=obtener_cobrar', {
+        const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_cobrar', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11003,7 +11003,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
     try {
         // Obtener datos de la cuenta por cobrar
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=cuentas&&action=obtener_detalle_cobrar&id=${cuentaId}`, {
+        const response = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_detalle_cobrar&id=${cuentaId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11018,7 +11018,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         
         // Obtener los pagos de esta cuenta
 		const token = localStorage.getItem('token');
-        const responsePagos = await fetch(`/api/index.js?endpoint=cuentas&&action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
+        const responsePagos = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11031,7 +11031,7 @@ async function verEstadoCuentaCobrar(cuentaId) {
         if (data.cuenta.venta_id) {
             try {
 				const token = localStorage.getItem('token');
-                const responseVenta = await fetch(`/api/index.js?endpoint=ventas&&action=obtener_detalle&id=${data.cuenta.venta_id}`, {
+                const responseVenta = await fetch(`/api/index.js?endpoint=ventas&action=obtener_detalle&id=${data.cuenta.venta_id}`, {
 					headers: {
 				        'Authorization': `Bearer ${token}`,
 				        'Content-Type': 'application/json'
@@ -11262,7 +11262,7 @@ async function agregarResumenesDebajo(containerId) {
     try {
         // Obtener datos de proveedores
 		const token = localStorage.getItem('token');
-        const responseMP = await fetch('/api/index.js?endpoint=materia_prima&&action=obtener&modo=tabla', {
+        const responseMP = await fetch('/api/index.js?endpoint=materia_prima&action=obtener&modo=tabla', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11272,7 +11272,7 @@ async function agregarResumenesDebajo(containerId) {
         
         // Obtener datos de producción
 		const token = localStorage.getItem('token');
-        const responseProd = await fetch('/api/index.js?endpoint=produccion_sucursal&&action=obtener_tabla', {
+        const responseProd = await fetch('/api/index.js?endpoint=produccion_sucursal&action=obtener_tabla', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -11695,7 +11695,7 @@ document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta)
 async function verHistorialPagos(id, tipo) {
     try {
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=cuentas&&action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
+        const response = await fetch(`/api/index.js?endpoint=cuentas&action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
