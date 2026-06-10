@@ -3855,7 +3855,6 @@ async function verDetallePagoProveedor(proveedorId, proveedorNombre, semanaInici
         let fechaPago = '';
         
         if (pagoId) {
-			const token = localStorage.getItem('token');
             const responsePago = await fetch(`/api/index.js?endpoint=proveedores_pagos&action=obtener_pago&id=${pagoId}`, {
 				headers: {
 			        'Authorization': `Bearer ${token}`,
