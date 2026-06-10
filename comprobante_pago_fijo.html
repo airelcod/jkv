@@ -133,6 +133,8 @@
         }
         
         async function registrarPago(totalPagar, sueldoFijo, deuda, observaciones) {
+            const token = localStorage.getItem('token');
+            
             const data = {
                 action: 'registrar_pago_fijo',
                 trabajador_id: datosComprobante.trabajador.id,
@@ -145,9 +147,12 @@
             };
             
             try {
-                const response = await fetch('db/nomina.php', {
+                const response = await fetch('/api/db/nomina.js?action=registrar_pago_fijo', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
@@ -169,8 +174,16 @@
         
         function formatearFecha(fecha) {
             if (!fecha) return '';
-            const partes = fecha.split('-');
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            // Manejar formato ISO si viene con T
+            let fechaStr = fecha;
+            if (fechaStr.includes('T')) {
+                fechaStr = fechaStr.split('T')[0];
+            }
+            const partes = fechaStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return fechaStr;
         }
         
         function escapeHtml(text) {
