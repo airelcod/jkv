@@ -11797,23 +11797,33 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
 });
 
 // Función para formatear fechas en cuentas (usa el mismo formato)
+// Función para formatear fechas en cuentas con separador /
 function formatearFechaCuenta(fecha) {
     if (!fecha) return '';
     
     try {
         let fechaObj;
         
+        // Si es un string ISO con T
         if (typeof fecha === 'string' && fecha.includes('T')) {
             fechaObj = new Date(fecha);
-        } else if (typeof fecha === 'string' && fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
+        } 
+        // Si es formato YYYY-MM-DD
+        else if (typeof fecha === 'string' && fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
             fechaObj = new Date(fecha);
-        } else if (fecha instanceof Date) {
+        }
+        // Si ya es un objeto Date
+        else if (fecha instanceof Date) {
             fechaObj = fecha;
-        } else {
+        }
+        // Intentar convertir cualquier otro formato
+        else {
             fechaObj = new Date(fecha);
         }
         
+        // Verificar si la fecha es válida
         if (isNaN(fechaObj.getTime())) {
+            // Si no es válida, intentar extraer solo la fecha del string
             const match = String(fecha).match(/(\d{4})-(\d{2})-(\d{2})/);
             if (match) {
                 return `${match[3]}/${match[2]}/${match[1]}`;
@@ -11821,11 +11831,12 @@ function formatearFechaCuenta(fecha) {
             return String(fecha);
         }
         
+        // Formatear: DD/MM/YYYY
         const dia = fechaObj.getDate().toString().padStart(2, '0');
         const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
         const año = fechaObj.getFullYear();
         
-        return `${dia}-${mes}-${año}`;
+        return `${dia}/${mes}/${año}`;
     } catch (error) {
         console.error('Error formateando fecha cuenta:', fecha, error);
         return String(fecha);
