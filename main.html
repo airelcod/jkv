@@ -7977,20 +7977,20 @@ document.getElementById('formTrabajador')?.addEventListener('submit', async (e) 
     }
 });
 
-// Eliminar pago
+// Eliminar pago (usa nomina.js)
 async function eliminarPago(id) {
     if (!confirm('¿Estás seguro de eliminar este pago? Esta acción también restaurará los préstamos pagados en esta transacción.')) {
         return;
     }
     
     try {
-		const token = localStorage.getItem('token');
-        const response = await fetch('/api/index.js?endpoint=nomina&&action=eliminar_pago', {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/db/nomina.js?action=eliminar_pago', {
             method: 'POST',
             headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    },
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ id: id })
         });
         
@@ -7999,9 +7999,8 @@ async function eliminarPago(id) {
         if (result.success) {
             alert('✅ Pago eliminado correctamente');
             // Recargar todo
-            
-            cargarTrabajadores();
-            cargarDiasConPagos();
+            if (typeof cargarTrabajadores === 'function') cargarTrabajadores();
+            if (typeof cargarDiasConPagos === 'function') cargarDiasConPagos();
         } else {
             alert('❌ Error: ' + result.error);
         }
