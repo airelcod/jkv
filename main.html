@@ -8398,7 +8398,7 @@ function abrirModalVentas() {
     
     document.getElementById('modalVentas').style.display = 'block';
     document.getElementById('ventaFecha').value = getFechaActual();
-    cargarClientesParaVenta();
+    cargarClientesVenta();
     cargarProductosVenta();
     cargarHistorialVentas();
 }
@@ -8423,8 +8423,7 @@ function cambiarTabVentas(tab) {
         btns[0].style.color = 'white';
         btns[1].style.background = '#ddd';
         btns[1].style.color = '#333';
-        // Cargar productos y clientes al entrar a la pestaña nueva
-        cargarClientesParaVenta();
+        cargarClientesVenta();
     } else {
         tabNueva.style.display = 'none';
         tabHistorial.style.display = 'block';
@@ -8436,11 +8435,11 @@ function cambiarTabVentas(tab) {
     }
 }
 
-// ========== CLIENTES PARA VENTAS (usa ventas.js) ==========
-async function cargarClientesParaVenta() {
+// ========== CLIENTES (usa clientes.js) ==========
+async function cargarClientesVenta() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js?action=obtener_clientes', {
+        const response = await fetch('/api/db/clientes.js?action=obtener_todos', {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -8508,7 +8507,7 @@ function cargarSelectClientesVenta(clientes) {
     });
 }
 
-// Menú contextual para clientes (usa ventas.js)
+// Menú contextual para clientes
 function mostrarMenuClienteVenta(event, clienteId) {
     event.stopPropagation();
     
@@ -8569,26 +8568,33 @@ function cerrarMenuClienteVenta() {
     if (menu) menu.remove();
 }
 
-// Ver detalles del cliente (usa ventas.js)
 async function verDetallesClienteVenta(clienteId) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente_detalle&id=${clienteId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        const data = await response.json();
+        const [clienteRes, ventasRes, deudasRes] = await Promise.all([
+            fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`/api/index.js?endpoint=ventas&action=obtener_por_cliente&cliente_id=${clienteId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch(`/api/db/cuentas.js?action=obtener_deudas_cliente&cliente_id=${clienteId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
         
-        if (!data.success) {
+        const dataCliente = await clienteRes.json();
+        const dataVentas = await ventasRes.json();
+        const dataDeudas = await deudasRes.json();
+        
+        if (!dataCliente.success) {
             alert('Error al cargar los datos del cliente');
             return;
         }
         
-        const cliente = data.cliente;
-        const ventas = data.ventas || [];
-        const deudas = data.deudas || [];
+        const cliente = dataCliente.cliente;
+        const ventas = dataVentas.success ? dataVentas.ventas : [];
+        const deudas = dataDeudas.success ? dataDeudas.deudas : [];
         
         let totalDeuda = 0;
         deudas.forEach(d => { totalDeuda += parseFloat(d.monto_pendiente || d.monto || 0); });
@@ -8644,10 +8650,10 @@ async function verDetallesClienteVenta(clienteId) {
                             <tbody>
                                 ${deudas.map(d => `
                                     <tr>
-                                        <td>${formatearFecha(d.fecha_inicio)}</td>
-                                        <td><strong>$${(parseFloat(d.monto_pendiente || d.monto || 0)).toFixed(2)}</strong></td>
-                                        <td>${formatearFecha(d.fecha_vencimiento)}</td>
-                                        <td><span class="estado-pendiente">PENDIENTE</span></td>
+                                        <td>${formatearFecha(d.fecha_inicio)}</br><small>inicio</small></td>
+                                        <td><strong>$${(parseFloat(d.monto_pendiente || d.monto || 0)).toFixed(2)}</strong></br><small>monto</small></td>
+                                        <td>${formatearFecha(d.fecha_vencimiento)}</br><small>vencimiento</small></td>
+                                        <td><span class="estado-pendiente">PENDIENTE</span></br><small>estado</small></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -8664,10 +8670,10 @@ async function verDetallesClienteVenta(clienteId) {
                                 ${ventas.map(v => `
                                     <tr>
                                         <td>${String(v.id).padStart(6, '0')}</td>
-                                        <td>${formatearFecha(v.fecha)}</td>
-                                        <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></td>
-                                        <td>${v.metodo_pago}</td>
-                                        <td><button onclick="window.opener.verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:4px 12px;border-radius:3px;cursor:pointer;">Ver</button></td>
+                                        <td>${formatearFecha(v.fecha)}</br><small>fecha</small></td>
+                                        <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></br><small>total</small></td>
+                                        <td>${v.metodo_pago}</br><small>pago</small></td>
+                                        <td><button onclick="window.opener.verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:4px 12px;border-radius:3px;cursor:pointer;">Ver Factura</button></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -8692,7 +8698,7 @@ async function verDetallesClienteVenta(clienteId) {
     }
 }
 
-// CRUD de clientes (usa ventas.js)
+// CRUD de clientes (usa clientes.js)
 function abrirModalClienteVenta(id = null) {
     setTimeout(() => window.forzarResetFocus(), 50);
     document.getElementById('formCliente').reset();
@@ -8710,7 +8716,7 @@ function abrirModalClienteVenta(id = null) {
 async function cargarClienteParaEditarVenta(id) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente&id=${id}`, {
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -8736,51 +8742,6 @@ async function cargarClienteParaEditarVenta(id) {
     }
 }
 
-document.getElementById('formCliente')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('clienteId').value;
-    const nombre = document.getElementById('clienteNombre').value;
-    const rif = document.getElementById('clienteRif').value;
-    const telefono = document.getElementById('clienteTelefono').value;
-    const contacto = document.getElementById('clienteContacto').value;
-    const email = document.getElementById('clienteEmail').value;
-    const direccion = document.getElementById('clienteDireccion').value;
-    
-    if (!nombre) {
-        alert('El nombre del cliente es obligatorio');
-        return;
-    }
-    
-    const action = id ? 'actualizar_cliente' : 'guardar_cliente';
-    const data = { action, nombre, rif, telefono, contacto, email, direccion };
-    if (id) data.id = id;
-    
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            alert(id ? 'Cliente actualizado' : 'Cliente agregado');
-            cerrarModalCliente();
-            cargarClientesParaVenta();
-        } else {
-            alert('❌ Error: ' + result.error);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al guardar cliente');
-    }
-});
-
 function editarClienteVenta(id, nombre, rif, telefono, contacto, email, direccion) {
     abrirModalClienteVenta(id);
 }
@@ -8794,18 +8755,18 @@ function eliminarClienteConfirmarVenta(id, nombre) {
 async function eliminarClienteVenta(id) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/db/ventas.js', {
+        const response = await fetch('/api/db/clientes.js', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ action: 'eliminar_cliente', id: id })
+            body: JSON.stringify({ action: 'eliminar', id: id })
         });
         const result = await response.json();
         if (result.success) {
             alert('Cliente eliminado correctamente');
-            cargarClientesParaVenta();
+            cargarClientesVenta();
         } else {
             alert('❌ Error: ' + result.error);
         }
@@ -8838,7 +8799,7 @@ async function cargarDatosClienteEnFormularioVenta(clienteId) {
     
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/db/ventas.js?action=obtener_cliente&id=${clienteId}`, {
+        const response = await fetch(`/api/db/clientes.js?action=obtener_uno&id=${clienteId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -8859,7 +8820,7 @@ async function cargarDatosClienteEnFormularioVenta(clienteId) {
     }
 }
 
-// ========== PRODUCTOS PARA VENTAS ==========
+// ========== PRODUCTOS PARA VENTAS (usa ventas.js) ==========
 async function cargarProductosVenta() {
     try {
         const token = localStorage.getItem('token');
@@ -8873,6 +8834,8 @@ async function cargarProductosVenta() {
         if (data.success) {
             productosVentaGlobal = data.productos;
             actualizarSelectsProductos();
+        } else {
+            console.error('Error cargando productos:', data);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -8959,7 +8922,7 @@ function calcularTotalVenta() {
     document.getElementById('ventaTotal').innerText = total.toFixed(2);
 }
 
-// Event listener para pre-cargar precio
+// Event listeners
 document.addEventListener('change', function(e) {
     if (e.target.classList.contains('producto-select')) {
         const precio = parseFloat(e.target.options[e.target.selectedIndex]?.getAttribute('data-precio')) || 0;
@@ -8971,7 +8934,6 @@ document.addEventListener('change', function(e) {
     }
 });
 
-// Event listener para cliente select
 document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'ventaClienteId') {
         cargarDatosClienteEnFormularioVenta(e.target.value);
@@ -9016,8 +8978,7 @@ if (ventaForm) {
                     id: productoId, 
                     cantidad: cantidad,
                     piezas: piezas,
-                    precio_unitario: precioUnitario,
-                    precio_total: precioTotal
+                    precio_unitario: precioUnitario
                 });
             }
         });
@@ -9252,11 +9213,11 @@ function mostrarHistorialVentas(ventas) {
         html += `
             <tr>
                 <td>${String(v.id).padStart(6, '0')}</br><small>Factura</small></td>
-                <td>${formatearFecha(v.fecha)}</br></td>
+                <td>${formatearFecha(v.fecha)}</br><small>fecha</small></td>
                 <td>${escapeHtml(v.cliente)}</br><small>${v.rif || ''}</small></td>
-                <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></td>
-                <td>${v.metodo_pago}</br></td>
-                <td>${sucursal}</br></td>
+                <td><strong>$${parseFloat(v.total).toFixed(2)}</strong></br><small>total</small></td>
+                <td>${v.metodo_pago}</br><small>pago</small></td>
+                <td>${sucursal}</br><small>sucursal</small></td>
                 <td>
                     <button class="btn-ver" onclick="verFactura(${v.id})" style="background:#278233;color:white;border:none;padding:8px;border-radius:3px;cursor:pointer;">Ver</button>
                     <button class="btn-eliminar" onclick="eliminarVenta(${v.id})">∅</button>
@@ -9449,8 +9410,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Sobrescribir la función original de abrirModalClientes si existe
-const abrirModalClienteOriginal = window.abrirModalCliente;
+// Sobrescribir la función original de abrirModalCliente si existe
 window.abrirModalCliente = function() {
     abrirModalClienteVenta();
 };    
