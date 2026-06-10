@@ -8012,10 +8012,25 @@ async function eliminarPago(id) {
 }
 
 // Funciones auxiliares
+// Función para formatear fechas (maneja ISO y formato YYYY-MM-DD)
 function formatearFecha(fecha) {
     if (!fecha) return '';
-    const partes = fecha.split('-');
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    
+    let fechaStr = fecha;
+    
+    // Si la fecha viene en formato ISO (2026-05-25T00:00:00.000Z)
+    if (fechaStr.includes('T')) {
+        fechaStr = fechaStr.split('T')[0];
+    }
+    
+    // Ahora fechaStr debería ser YYYY-MM-DD
+    const partes = fechaStr.split('-');
+    if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    
+    // Si ya viene en otro formato, devolver como está
+    return fechaStr;
 }
 
 function getFechaActual() {
