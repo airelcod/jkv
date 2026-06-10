@@ -6156,7 +6156,7 @@ function exportarProduccionImprimir() {
 
 async function cargarProduccionSucursal() {
     try {
-        let url = `/api/index.js?endpoint=produccion_sucursal&&action=obtener_tabla`;
+        let url = `/api/index.js?endpoint=produccion_sucursal&action=obtener_tabla`;
         
         // Si no es "total", pasar el ID de sucursal para filtrar
         if (sucursalActual !== 'total') {
@@ -6264,7 +6264,7 @@ if (formSucursal) {
         };
         
         try {
-            const response = await fetch('/api/index.js?endpoint=produccion_sucursal&&action=guardar', {
+            const response = await fetch('/api/index.js?endpoint=produccion_sucursal&action=guardar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -9574,7 +9574,7 @@ async function verProduccionProducto(productoNombre) {
         }
 
 		const token = localStorage.getItem('token');
-        const response = await fetch(`/api/index.js?endpoint=produccion_sucursal&&action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`, {
+        const response = await fetch(`/api/index.js?endpoint=produccion_sucursal&action=obtener_produccion_producto&producto=${encodeURIComponent(productoNombre)}&fecha_inicio=${fechaInicioStr}&fecha_fin=${fechaFin}&sucursal_id=${sucursalId}`, {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
 		        'Content-Type': 'application/json'
@@ -9738,7 +9738,7 @@ async function verProduccionProducto(productoNombre) {
                             return;
                         }
                         
-                        fetch(\`/api/index.js?endpoint=produccion_sucursal&&action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
+                        fetch(\`/api/index.js?endpoint=produccion_sucursal&action=obtener_produccion_producto&producto=\${encodeURIComponent(producto)}&fecha_inicio=\${fechaInicio}&fecha_fin=\${fechaFin}&sucursal_id=\${sucursalId}\`)
                             .then(res => res.json())
                             .then(data => {
                                 if (data.success) {
@@ -10915,6 +10915,7 @@ function abrirModalCuentas() {
     document.getElementById('modalCuentas').style.display = 'block';
     cargarCuentasPagar();
     cargarCuentasCobrar();
+	const token = localStorage.getItem('token');
 }
 
 document.getElementById('closeCuentas')?.addEventListener('click', () => {
@@ -10956,7 +10957,6 @@ function cambiarTabCuentas(tipo) {
 
 async function cargarCuentasPagar() {
     try {
-		const token = localStorage.getItem('token');
         const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_pagar', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
@@ -10977,7 +10977,6 @@ async function cargarCuentasPagar() {
 
 async function cargarCuentasCobrar() {
     try {
-		const token = localStorage.getItem('token');
         const response = await fetch('/api/index.js?endpoint=cuentas&action=obtener_cobrar', {
 			headers: {
 		        'Authorization': `Bearer ${token}`,
