@@ -11816,7 +11816,7 @@ function formatearFechaCuenta(fecha) {
         if (isNaN(fechaObj.getTime())) {
             const match = String(fecha).match(/(\d{4})-(\d{2})-(\d{2})/);
             if (match) {
-                return `${match[3]}-${match[2]}-${match[1]}`;
+                return `${match[3]}/${match[2]}/${match[1]}`;
             }
             return String(fecha);
         }
