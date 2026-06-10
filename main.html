@@ -11796,10 +11796,40 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
     }
 });
 
+// Función para formatear fechas en cuentas (usa el mismo formato)
 function formatearFechaCuenta(fecha) {
     if (!fecha) return '';
-    const partes = fecha.split('-');
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    
+    try {
+        let fechaObj;
+        
+        if (typeof fecha === 'string' && fecha.includes('T')) {
+            fechaObj = new Date(fecha);
+        } else if (typeof fecha === 'string' && fecha.match(/^\d{4}-\d{2}-\d{2}/)) {
+            fechaObj = new Date(fecha);
+        } else if (fecha instanceof Date) {
+            fechaObj = fecha;
+        } else {
+            fechaObj = new Date(fecha);
+        }
+        
+        if (isNaN(fechaObj.getTime())) {
+            const match = String(fecha).match(/(\d{4})-(\d{2})-(\d{2})/);
+            if (match) {
+                return `${match[3]}-${match[2]}-${match[1]}`;
+            }
+            return String(fecha);
+        }
+        
+        const dia = fechaObj.getDate().toString().padStart(2, '0');
+        const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+        const año = fechaObj.getFullYear();
+        
+        return `${dia}-${mes}-${año}`;
+    } catch (error) {
+        console.error('Error formateando fecha cuenta:', fecha, error);
+        return String(fecha);
+    }
 }
 
 document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta);
