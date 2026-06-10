@@ -10929,8 +10929,6 @@ function cambiarTabCuentas(tipo) {
     const tabPagar = document.getElementById('tabPagar');
     const tabCobrar = document.getElementById('tabCobrar');
     const btns = document.querySelectorAll('.tab-cuentas-btn');
-    const btnNuevaPagar = document.getElementById('btnNuevaPagar');
-    const btnNuevaCobrar = document.getElementById('btnNuevaCobrar');
     
     if (tipo === 'pagar') {
         tabPagar.style.display = 'block';
@@ -10939,8 +10937,6 @@ function cambiarTabCuentas(tipo) {
         btns[0].style.color = 'white';
         btns[1].style.background = '#ddd';
         btns[1].style.color = '#333';
-        if (btnNuevaPagar) btnNuevaPagar.style.display = 'inline-block';
-        if (btnNuevaCobrar) btnNuevaCobrar.style.display = 'none';
     } else {
         tabPagar.style.display = 'none';
         tabCobrar.style.display = 'block';
@@ -10948,8 +10944,6 @@ function cambiarTabCuentas(tipo) {
         btns[1].style.color = 'white';
         btns[0].style.background = '#ddd';
         btns[0].style.color = '#333';
-        if (btnNuevaPagar) btnNuevaPagar.style.display = 'none';
-        if (btnNuevaCobrar) btnNuevaCobrar.style.display = 'inline-block';
     }
 }
 
@@ -10994,20 +10988,19 @@ async function cargarCuentasCobrar() {
         document.getElementById('tabCobrar').innerHTML = '<div class="cargando">Error de conexión</div>';
     }
 }
-    
+
 // ========== FUNCIÓN PARA VER ESTADO DE CUENTA POR COBRAR ==========
 async function verEstadoCuentaCobrar(cuentaId) {
     setTimeout(() => window.forzarResetFocus(), 50);
     
     try {
-        // Obtener datos de la cuenta por cobrar
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/db/cuentas.js?action=obtener_detalle_cobrar&id=${cuentaId}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         if (!data.success) {
@@ -11015,27 +11008,25 @@ async function verEstadoCuentaCobrar(cuentaId) {
             return;
         }
         
-        // Obtener los pagos de esta cuenta
-		const token = localStorage.getItem('token');
+        const token2 = localStorage.getItem('token');
         const responsePagos = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${cuentaId}&tipo=cobrar`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token2}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const dataPagos = await responsePagos.json();
         
-        // Si la cuenta está asociada a una venta, obtener los productos
         let detallesProductos = [];
         if (data.cuenta.venta_id) {
             try {
-				const token = localStorage.getItem('token');
+                const token3 = localStorage.getItem('token');
                 const responseVenta = await fetch(`/api/db/ventas.js?action=obtener_detalle&id=${data.cuenta.venta_id}`, {
-					headers: {
-				        'Authorization': `Bearer ${token}`,
-				        'Content-Type': 'application/json'
-				    }
-				});
+                    headers: {
+                        'Authorization': `Bearer ${token3}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 const dataVenta = await responseVenta.json();
                 if (dataVenta.success && dataVenta.detalles) {
                     detallesProductos = dataVenta.detalles;
@@ -11071,9 +11062,7 @@ function mostrarTablaCuentas(cuentas, tipo) {
     const hoy = new Date();
     const esPagar = tipo === 'pagar';
     
-    // ========== SIEMPRE MOSTRAR FILTROS Y BOTÓN (incluso sin cuentas) ==========
     agregarFiltrosCuentas(containerId);
-    
     
     let html = '<div><table class="tabla-produccion">';
     html += '<thead><tr>';
@@ -11117,14 +11106,13 @@ function mostrarTablaCuentas(cuentas, tipo) {
         }
         html += `<td>
                     <strong>${escapeHtml(cuenta.descripcion)}</strong>
-                    <!--br><small style="font-size:10px">ID: ${cuenta.id}</small!-->
                     ${cuenta.venta_id ? '<br><small>Factura #' + cuenta.venta_id + '</small>' : ''}
                  </div></td>`;
         html += `<td>$${montoOriginal.toFixed(2)}</br><small>original</small></td>`;
         if (montoPagado > 0) {
             html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
         }else{
-        	html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
+            html += `<td><div class="payHover" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')">$${montoPagado.toFixed(2)}</br><div style="background:#e0e0e0; border-radius:4px; margin-top:4px; height:6px; width:100%;"><div style="background:#278233; width:${porcentajePagado}%; height:6px; border-radius:4px;"></div></div></div></td>`;
         }
         html += `<td class="${claseMonto}"><strong>$${montoPendiente.toFixed(2)}</strong></br><small>pendiente</small></td>`;
         html += `<td>${formatearFechaCuenta(cuenta.fecha_vencimiento)}</br><small>${estaVencido ? 'VENCIDA' : ''}</small></td>`;
@@ -11134,10 +11122,6 @@ function mostrarTablaCuentas(cuentas, tipo) {
         if (puedePagar) {
             html += `<button class="btn-editar" onclick="event.stopPropagation();abrirModalPagoParcial(${cuenta.id}, '${tipo}', '${escapeHtml(cuenta.descripcion)}', ${montoPendiente})" style="background: #278233; color: white;">${textoBoton}</button>`;
         }
-        
-        /*if (montoPagado > 0) {
-            html += `<button class="btn-editar" onclick="event.stopPropagation();verHistorialPagos(${cuenta.id}, '${tipo}')" style="background: #f4d71b; color: rgba(0,0,0,.8);">↺</button>`;
-        }*/
         
         if (montoPagado === 0 || montoPagado === montoOriginal) {
             html += `<button class="btn-eliminar" onclick="eliminarCuenta(${cuenta.id}, '${tipo}')">∅</button>`;
@@ -11149,28 +11133,22 @@ function mostrarTablaCuentas(cuentas, tipo) {
     
     html += '</tbody></table></div>';
     
-    // Mostrar la tabla principal
     document.getElementById(containerId).innerHTML = html;
     agregarFiltrosCuentas(containerId);
-        
     
-    // ========== AGREGAR RESÚMENES DEBAJO (SOLO PARA PAGAR) ==========
     if (tipo === 'pagar') {
         agregarResumenesDebajo(containerId);
     }
 }
+
 function agregarFiltrosCuentas(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
     if (document.getElementById(`filtrosCuentas_${containerId}`)) return;
     
-    // Determinar el tipo de cuenta y el texto del botón
     const esPagar = containerId === 'tabPagar';
-    const textoBoton = esPagar ? '+' : '+';
     const funcionBoton = esPagar ? "abrirFormularioCuenta('pagar')" : "abrirFormularioCuenta('cobrar')";
-    
-    // 🔹 NUEVO: Determinar si mostrar botón de exportar (solo en cuentas por cobrar)
     const mostrarExportar = containerId === 'tabCobrar';
     
     const filtrosHtml = `
@@ -11195,7 +11173,7 @@ function agregarFiltrosCuentas(containerId) {
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
                 ${mostrarExportar ? `<button class="btn-agregar" onclick="exportarCuentasPendientesCobrar()" style="font-size: 14px; padding: 10px 12px;">Pendientes...</button>` : ''}
-                <button class="btn-agregar" onclick="${funcionBoton}" style="font-size:24px; padding: 8px 12px;">${textoBoton}</button>
+                <button class="btn-agregar" onclick="${funcionBoton}" style="font-size:24px; padding: 8px 12px;">+</button>
             </div>
         </div>
     `;
@@ -11205,7 +11183,6 @@ function agregarFiltrosCuentas(containerId) {
         tabla.insertAdjacentHTML('beforebegin', filtrosHtml);
     }
     
-    // ... el resto de la función (aplicarFiltros, limpiarFiltros, event listeners) se mantiene IGUAL ...
     const inputBusqueda = document.getElementById(`busquedaCuentas_${containerId}`);
     const btnFiltrar = document.getElementById(`btnFiltrarCuentas_${containerId}`);
     const btnLimpiar = document.getElementById(`btnLimpiarCuentas_${containerId}`);
@@ -11255,51 +11232,29 @@ function agregarFiltrosCuentas(containerId) {
     if (btnFiltrar) btnFiltrar.addEventListener('click', aplicarFiltros);
     if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarFiltros);
 }
-    
-// Función para agregar los resúmenes debajo de la tabla (manteniendo tu formato original)
+
 async function agregarResumenesDebajo(containerId) {
     try {
-        // Obtener datos de proveedores
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const responseMP = await fetch('/api/index.js?endpoint=materia_prima&action=obtener&modo=tabla', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const dataMP = await responseMP.json();
         
-        // Obtener datos de producción
-		const token = localStorage.getItem('token');
+        const token2 = localStorage.getItem('token');
         const responseProd = await fetch('/api/index.js?endpoint=produccion_sucursal&action=obtener_tabla', {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token2}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const htmlProd = await responseProd.text();
         
-        // Generar el HTML de los resúmenes (USANDO TUS FUNCIONES EXISTENTES)
-        let resumenProveedores = '';
-        let resumenProduccion = '';
-        
-        // Usar tus funciones existentes si están disponibles
-        if (typeof generarResumenProveedores === 'function') {
-            resumenProveedores = await generarResumenProveedores(dataMP);
-        } else if (typeof generarHTMLProveedores === 'function') {
-            resumenProveedores = await generarHTMLProveedores(dataMP);
-        } else {
-            // Fallback: resumen simple si tus funciones no existen
-            resumenProveedores = generarResumenProveedoresSimple(dataMP);
-        }
-        
-        if (typeof generarResumenProduccion === 'function') {
-            resumenProduccion = await generarResumenProduccion(htmlProd);
-        } else if (typeof generarHTMLProduccion === 'function') {
-            resumenProduccion = await generarHTMLProduccion(htmlProd);
-        } else {
-            resumenProduccion = generarResumenProduccionSimple(htmlProd);
-        }
+        let resumenProveedores = generarResumenProveedoresSimple(dataMP);
+        let resumenProduccion = generarResumenProduccionSimple(htmlProd);
         
         const resumenHtml = `
             <div style="margin-top: 20px;display:flex;gap:12px">
@@ -11324,7 +11279,6 @@ async function agregarResumenesDebajo(containerId) {
             </div>
         `;
         
-        // Agregar los resúmenes al final del contenedor (sin duplicar)
         const container = document.getElementById(containerId);
         if (container && !document.getElementById('resumenesContainer')) {
             const resumenDiv = document.createElement('div');
@@ -11338,7 +11292,6 @@ async function agregarResumenesDebajo(containerId) {
     }
 }
 
-// FUNCIONES FALLBACK (solo se usan si NO encuentras tus funciones originales)
 function generarResumenProveedoresSimple(dataMP) {
     if (!dataMP.success || !dataMP.datos || dataMP.datos.length === 0) {
         return '<div style="text-align:center; padding:20px;">No hay datos de proveedores</div>';
@@ -11376,7 +11329,6 @@ function generarResumenProveedoresSimple(dataMP) {
     html += '<th style="text-align:left; padding:8px;">Proveedor</th>';
     html += '<th style="text-align:right; padding:8px;">Litros</th>';
     html += '<th style="text-align:right; padding:8px;">Deuda</th>';
-    html += '<!--th style="text-align:center; padding:8px;"></th!-->';
     html += '</tr></thead><tbody>';
     
     let totalLitros = 0;
@@ -11390,9 +11342,6 @@ function generarResumenProveedoresSimple(dataMP) {
                 <td style="padding:8px;"><strong>${escapeHtml(proveedor.nombre)}</strong></td>
                 <td style="text-align:right; padding:8px;">${proveedor.litros.toFixed(2)} L</br><small>litros</small></td>
                 <td style="text-align:right; padding:8px;"><strong style="color:#a18f1b;">$${proveedor.total.toFixed(2)}</strong></br><small>por pagar</small></td>
-                <!--td style="text-align:center; padding:8px;">
-                    <button class="btn-editar" onclick="filtrarPorProveedor(${proveedorId}, '${escapeHtml(proveedor.nombre)}')">Ver recibos</button>
-                 </br><small>filtrar en MP</small></td!-->
             </tr>
         `;
     }
@@ -11404,7 +11353,6 @@ function generarResumenProveedoresSimple(dataMP) {
                     <td style="padding:10px;"><strong>TOTAL GENERAL</strong></td>
                     <td style="text-align:right; padding:10px;">${totalLitros.toFixed(2)} L</br><small>litros</small></td>
                     <td style="text-align:right; padding:10px;"><strong style="color:#a18f1b; font-size:16px;">$${totalGeneral.toFixed(2)}</strong></br><small>total adeudado</small></td>
-                    <td style="text-align:center; padding:10px;"></td>
                 </tr>
             </tfoot>
         </table></div>
@@ -11502,7 +11450,6 @@ function generarResumenProduccionSimple(htmlTable) {
     return html;
 }
 
-// Función toggle (mantén la que ya tienes o usa esta)
 function togglePanel(panelId, iconId) {
     const panel = document.getElementById(panelId);
     const icon = document.getElementById(iconId);
@@ -11516,9 +11463,7 @@ function togglePanel(panelId, iconId) {
         }
     }
 }
-    
 
-// Función para calcular pago estimado (global)
 window.calcularPagoEstimado = function(trabajador, kilos, piezas) {
     const precio = prompt(`Ingrese el precio por kilo para ${trabajador}:\n(Kilos: ${kilos.toFixed(2)} kg)\n(Piezas: ${piezas} pz)`);
     if (precio && !isNaN(parseFloat(precio))) {
@@ -11527,7 +11472,6 @@ window.calcularPagoEstimado = function(trabajador, kilos, piezas) {
     }
 };
 
-// Resto de funciones de cuentas
 function abrirFormularioCuenta(tipo) {
     setTimeout(() => window.forzarResetFocus(), 50);
     document.getElementById('cuentaTipo').value = tipo;
@@ -11653,7 +11597,7 @@ document.getElementById('formPagoParcialCuenta')?.addEventListener('submit', asy
     }
     
     try {
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/db/cuentas.js', {
             method: 'POST',
             headers: {
@@ -11693,13 +11637,13 @@ document.getElementById('formCuenta')?.addEventListener('submit', guardarCuenta)
 
 async function verHistorialPagos(id, tipo) {
     try {
-		const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/db/cuentas.js?action=obtener_historial_pagos&id=${id}&tipo=${tipo}`, {
-			headers: {
-		        'Authorization': `Bearer ${token}`,
-		        'Content-Type': 'application/json'
-		    }
-		});
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const data = await response.json();
         
         if (data.success && data.pagos.length > 0) {
@@ -11796,10 +11740,8 @@ async function verHistorialPagos(id, tipo) {
                     </div>
                     
                     <script>
-                        // Variable para almacenar datos del pago a eliminar
                         let pagoAEliminar = null;
                         
-                        // Función para confirmar eliminación
                         function confirmarEliminarPago(pagoId, cuentaId, tipo, monto) {
                             pagoAEliminar = { pagoId, cuentaId, tipo };
                             if (confirm('¿Eliminar este pago de $' + monto + '?\\n\\nEl monto se restará del total pagado de la cuenta.')) {
@@ -11807,14 +11749,13 @@ async function verHistorialPagos(id, tipo) {
                             }
                         }
                         
-                        // Función para ejecutar la eliminación
                         async function ejecutarEliminarPago() {
                             if (!pagoAEliminar) return;
                             
                             const { pagoId, cuentaId, tipo } = pagoAEliminar;
                             
                             try {
-                                const response = await fetch('/api/index.js?endpoint=cuentas', {
+                                const response = await fetch('/api/db/cuentas.js', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ 
@@ -11844,7 +11785,6 @@ async function verHistorialPagos(id, tipo) {
                             pagoAEliminar = null;
                         }
                         
-                        // Asignar eventos a los botones
                         document.querySelectorAll('.btn-eliminar-pago-local').forEach(btn => {
                             btn.addEventListener('click', function() {
                                 const pagoId = parseInt(this.getAttribute('data-id'));
@@ -11855,7 +11795,6 @@ async function verHistorialPagos(id, tipo) {
                             });
                         });
                         
-                        // Botón cerrar
                         document.getElementById('btnCerrar').addEventListener('click', function() {
                             window.close();
                         });
