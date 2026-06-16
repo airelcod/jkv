@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "mysql2": "^3.6.0",
+    "pg": "^8.13.1",
     "jsonwebtoken": "^9.0.0",
     "bcryptjs": "^2.4.3"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test-db": "node test-connection.js"
+  },
+  "description": "Sistema de gestión con Supabase PostgreSQL"
 }
