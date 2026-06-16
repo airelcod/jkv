@@ -396,8 +396,7 @@ async function handleClientes(req, res) {
     if (method === 'GET') {
         if (action === 'obtener_todos') {
             try {
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 const sql = hasActivo ? "SELECT id, nombre, rif, telefono, contacto, email, direccion FROM clientes WHERE activo = 1 ORDER BY nombre ASC" : "SELECT id, nombre, rif, telefono, contacto, email, direccion FROM clientes ORDER BY nombre ASC";
                 const clientes = await query(sql);
                 sendJSON(res, { success: true, clientes });
@@ -408,8 +407,7 @@ async function handleClientes(req, res) {
         }
         if (action === 'obtener_uno' && id) {
             try {
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 const sql = hasActivo ? "SELECT * FROM clientes WHERE id = ? AND activo = 1" : "SELECT * FROM clientes WHERE id = ?";
                 const clientes = await query(sql, [id]);
                 if (clientes.length > 0) sendJSON(res, { success: true, cliente: clientes[0] });
@@ -429,8 +427,7 @@ async function handleClientes(req, res) {
             try {
                 const { nombre, rif, telefono, contacto, email, direccion } = data;
                 if (!nombre) { sendJSON(res, { success: false, error: 'El nombre del cliente es requerido' }); return; }
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 let sql, params;
                 if (hasActivo) {
                     sql = "INSERT INTO clientes (nombre, rif, telefono, contacto, email, direccion, activo) VALUES (?, ?, ?, ?, ?, ?, 1)";
@@ -462,8 +459,7 @@ async function handleClientes(req, res) {
             try {
                 const { id } = data;
                 if (!id || id <= 0) { sendJSON(res, { success: false, error: 'ID de cliente inválido' }); return; }
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 if (hasActivo) {
                     await query("UPDATE clientes SET activo = 0 WHERE id = ?", [id]);
                 } else {
