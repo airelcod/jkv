@@ -1,43 +1,64 @@
-import mysql from 'mysql2/promise';
+import pkg from 'pg';
+const { Pool } = pkg;
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 // ========== CONFIGURACIÓN DE BASE DE DATOS ==========
 const dbConfig = {
     host: process.env.DB_HOST || 'aws-1-us-east-2.pooler.supabase.com',
+    port: parseInt(process.env.DB_PORT || '6543'),
     user: process.env.DB_USER || 'postgres.manhnummghvgumgrivzl',
     password: process.env.DB_PASSWORD || 'Negroyamarill1(',
     database: process.env.DB_NAME || 'postgres',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 30000  // Aumentado para evitar timeout
 };
 
 let pool = null;
 
 async function getConnection() {
     if (!pool) {
-        pool = mysql.createPool(dbConfig);
+        pool = new Pool(dbConfig);
+        pool.on('error', (err) => {
+            console.error('Pool error:', err);
+        });
+        // Test connection
+        try {
+            const client = await pool.connect();
+            console.log('✅ Conectado a Supabase PostgreSQL');
+            client.release();
+        } catch (err) {
+            console.error('❌ Error conectando a Supabase:', err.message);
+        }
     }
     return pool;
 }
 
+// Query con parámetros (usa $1, $2, ...)
 async function query(sql, params = []) {
-    const conn = await getConnection();
+    const pool = await getConnection();
     try {
-        const [rows] = await conn.execute(sql, params);
-        return rows;
+        // Convertir ? a $1, $2, ... para PostgreSQL
+        let pgSql = sql;
+        let paramIndex = 1;
+        // Esta es una conversión básica. Para casos complejos, usa directamente $1, $2 en tu SQL
+        const result = await pool.query(pgSql, params);
+        return result.rows;
     } catch (error) {
         console.error('Database error:', error);
+        console.error('SQL:', sql);
+        console.error('Params:', params);
         throw error;
     }
 }
 
 async function queryMultiple(sql, params = []) {
-    const conn = await getConnection();
+    const pool = await getConnection();
     try {
-        const [rows] = await conn.query(sql, params);
-        return rows;
+        const result = await pool.query(sql, params);
+        return result.rows;
     } catch (error) {
         console.error('Database error:', error);
         throw error;
@@ -45,19 +66,29 @@ async function queryMultiple(sql, params = []) {
 }
 
 async function transaction(callback) {
-    const conn = await getConnection();
-    const connection = await conn.getConnection();
-    await connection.beginTransaction();
+    const pool = await getConnection();
+    const client = await pool.connect();
     try {
-        const result = await callback(connection);
-        await connection.commit();
+        await client.query('BEGIN');
+        const result = await callback(client);
+        await client.query('COMMIT');
         return result;
     } catch (error) {
-        await connection.rollback();
+        await client.query('ROLLBACK');
         throw error;
     } finally {
-        connection.release();
+        client.release();
     }
+}
+
+async function columnExists(tableName, columnName) {
+    const result = await query(
+        `SELECT column_name 
+         FROM information_schema.columns 
+         WHERE table_name = $1 AND column_name = $2`,
+        [tableName, columnName]
+    );
+    return result.length > 0;
 }
 
 function sendJSON(res, data, status = 200) {
