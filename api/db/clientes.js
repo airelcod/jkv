@@ -13,8 +13,7 @@ export default async function handler(req, res) {
         
         if (action === 'obtener_todos') {
             try {
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 
                 const sql = hasActivo 
                     ? "SELECT id, nombre, rif, telefono, contacto, email, direccion FROM clientes WHERE activo = 1 ORDER BY nombre ASC"
@@ -30,8 +29,7 @@ export default async function handler(req, res) {
         
         if (action === 'obtener_uno' && id) {
             try {
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 
                 const sql = hasActivo
                     ? "SELECT * FROM clientes WHERE id = ? AND activo = 1"
@@ -67,8 +65,7 @@ export default async function handler(req, res) {
                     return;
                 }
                 
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 
                 let sql, params;
                 if (hasActivo) {
@@ -120,8 +117,7 @@ export default async function handler(req, res) {
                     return;
                 }
                 
-                const columns = await query("SHOW COLUMNS FROM clientes LIKE 'activo'");
-                const hasActivo = columns.length > 0;
+                const hasActivo = await columnExists('clientes', 'activo');
                 
                 if (hasActivo) {
                     await query("UPDATE clientes SET activo = 0 WHERE id = ?", [id]);
