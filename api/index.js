@@ -252,7 +252,10 @@ async function handleLogin(req, res) {
     }
     try {
         const { email, password } = await parseBody(req);
-        const users = await query("SELECT * FROM usuarios WHERE email = ?", [email]);
+        
+        // ✅ USAR $1 EN LUGAR DE ?
+        const users = await query("SELECT * FROM usuarios WHERE email = $1", [email]);
+        
         if (users.length === 1) {
             const user = users[0];
             const validPassword = await bcrypt.compare(password, user.password);
@@ -262,7 +265,16 @@ async function handleLogin(req, res) {
                     process.env.JWT_SECRET || 'mi-secret-key-2024',
                     { expiresIn: '24h' }
                 );
-                sendJSON(res, { success: true, token, user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol } });
+                sendJSON(res, { 
+                    success: true, 
+                    token, 
+                    user: { 
+                        id: user.id, 
+                        nombre: user.nombre, 
+                        email: user.email, 
+                        rol: user.rol 
+                    } 
+                });
             } else {
                 sendJSON(res, { success: false, error: 'Contraseña incorrecta' });
             }
@@ -270,6 +282,7 @@ async function handleLogin(req, res) {
             sendJSON(res, { success: false, error: 'Usuario no encontrado' });
         }
     } catch (error) {
+        console.error('Login error:', error);
         sendJSON(res, { success: false, error: error.message }, 500);
     }
 }
